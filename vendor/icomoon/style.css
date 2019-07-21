@@ -1,0 +1,15 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('fonts/icomoon.eot?78sf2d');
+  src:  url('fonts/icomoon.eot?78sf2d#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?78sf2d') format('truetype'),
+    url('fonts/icomoon.woff?78sf2d') format('woff'),
+    url('fonts/icomoon.svg?78sf2d#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.icon-pencil-alt-solid-crossed:before {
+  content: "\e900";
+  font-family: 'icomoon' !important;
+}

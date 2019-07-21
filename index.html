@@ -1,0 +1,94 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Tree manipulator</title>
+  <meta name="description" content="Tree editor">
+  <meta name="author" content="Serafim Nenarokov">
+  <link rel="stylesheet" href="css/vendor/open-iconic-bootstrap.min.css">
+  <link rel="stylesheet" href="css/vendor/font-awesome.min.css">
+  <link rel="stylesheet" href="vendor/icomoon/style.css">
+  <link rel="stylesheet" href="css/vendor/boostrap-dropdown.css">
+  <link rel="stylesheet" href="css/vendor/phylotree.css">
+  <link rel="stylesheet" href="css/vendor/photon.min.css">
+  <link rel="stylesheet" href="css/styles.css?v=1.0">
+</head>
+
+<body>
+
+  <div class="window" id="window">
+    <header class="toolbar toolbar-header draggable">
+      <h1 class="title">Fangorn</h1>
+
+      <div class="toolbar-actions">
+
+        <div class="btn-group">
+          <button id="mark-node" class="btn btn-default">
+            <span class="ui-text fa fa-pencil"></span>
+          </button>
+          <button id="unmark-node" class="btn btn-default">
+            <span class="ui-text fa icon-pencil-alt-solid-crossed"></span>
+          </button>
+        </div>
+
+        <div class="btn-group">
+          <button id="open-tree" class="btn btn-default">
+            <span class="ui-text">Open tree</span>
+          </button>
+          <button id="open-fasta" class="btn btn-default">
+            <span class="ui-text">Open fasta</span>
+          </button>
+        </div>
+
+        <div class="btn-group">
+          <button id="zoom-in-action" class="btn btn-default" data-direction="horizontal" data-amount="-10">
+            <span class="ui-text fa fa-compress fa-rotate-45"></span>
+          </button>
+          <button id="zoom-out-action" class="btn btn-default" data-direction="horizontal" data-amount="10">
+            <span class="ui-text fa fa-arrows-h"></span>
+          </button>
+
+          <button id="zoom-in-action" class="btn btn-default" data-direction="vertical" data-amount="-10">
+            <span class="ui-text fa fa-compress fa-rotate-135"></span>
+          </button>
+          <button id="zoom-out-action" class="btn btn-default" data-direction="vertical" data-amount="10">
+            <span class="ui-text fa fa-arrows-h fa-rotate-90"></span>
+          </button>
+        </div>
+
+        <button class="btn btn-default pull-right" title="Show fasta">
+          <span class="icon icon-book-open"></span>
+        </button>
+
+        <button id="search-action" class="btn btn-default pull-right" title="Search">
+          <span class="icon icon-search"></span>
+        </button>
+      </div>
+    </header>
+
+    <div class="window-content">
+      <div class="padded-more">
+        <!-- CONTENT -->
+
+        <svg id="tree_display" />
+
+      <!-- END CONTENT -->
+      </div>
+    </div>
+
+    <footer class="toolbar toolbar-footer">
+    </footer>
+  </div>
+
+  <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+  <script src="js/vendor/jquery-3.4.0.min.js"></script>
+  <script src="js/vendor/underscore-min.js"></script>
+  <script src="js/vendor/d3.v3.min.js"></script>
+  <script src="js/vendor/phylotree-src.js"></script>
+  <script src="js/phylotree-ext.js"></script>
+  <script src="js/scripts.js"></script>
+  <script>if (window.module) module = window.module;</script>
+</body>
+</html>
