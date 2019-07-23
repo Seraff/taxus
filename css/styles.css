@@ -14,10 +14,30 @@
   transform:rotate(135deg);
 }
 
+.btn-pressed {
+  background-color:#ddd;
+  background-image:none;
+}
+
+.btn:disabled,
+.btn[disabled] {
+  background-color:red !important;
+  border-color: #C9C8C9;
+  background-color: #D2D0D2;
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0,#D2D0D2),color-stop(100%,#29a03b));
+  background-image: -webkit-linear-gradient(top,#D2D0D2 0,#D2D0D2 100%);
+  background-image: linear-gradient(to bottom,#D2D0D2 0,#D2D0D2 100%);
+  color: #F7F7F7;
+}
+
 /* phylotree */
 
 .node-selected {
   fill: #3182bd !important;
+}
+
+.fasta-node-selected {
+  color: #3182bd;
 }
 
 .branch-selected {
@@ -37,4 +57,11 @@
   stroke-opacity: 0.7;
   stroke-width: 2;
   stroke-dasharray: 5, 5;
+}
+
+dialog {
+  padding: 0px;
+  border-width: 1px;
+  border-color: #B1B1B1;
+  width: 400px;
 }

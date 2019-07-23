@@ -1,17 +1,20 @@
-const fs = require('fs');
-const Fasta = require('biojs-io-fasta');
 const Node = require('./node.js');
+const FastaRepresentation = require('./fasta_representation.js');
+const fs = require('fs');
 
 function Fangorn(){
   var fangorn = this;
   var _nodes = null;
   var _tree_content = null;
   var _tree = null;
-  var _fasta_seqs = null;
-  var _fasta_path = null;
+  var _fasta = null;
 
   fangorn.get_tree = function(){
     return _tree;
+  }
+
+  fangorn.tree_is_loaded = function(){
+    return _tree != null;
   }
 
   fangorn.get_nodes = function(){
@@ -22,8 +25,20 @@ function Fangorn(){
     return _nodes.filter(function(node){ return node.is_leaf() });
   }
 
+  fangorn.get_leave_names = function(){
+    return fangorn.get_leaves().map(function(node){ return node.name });
+  }
+
   fangorn.nodes_are_loaded = function(){
     return _nodes.length > 0;
+  }
+
+  fangorn.get_fasta = function(){
+    return _fasta;
+  }
+
+  fangorn.get_selection = function(){
+    return fangorn.get_tree().get_selection();
   }
 
   fangorn.init_phylotree = function(str){
@@ -55,6 +70,15 @@ function Fangorn(){
     _tree.style_nodes(nodeStyler);
     _tree(str).layout();
     d3.select(".phylotree-container").attr("align","center");
+
+    document.addEventListener('selection_modified', function(e){
+      fangorn.update_fasta_sidebar()
+      fangorn.dispatch_state_update();
+    });
+
+    _fasta = null;
+    fangorn.update_fasta_sidebar();
+    fangorn.dispatch_state_update();
   }
 
   fangorn.load_tree = function(path){
@@ -74,31 +98,79 @@ function Fangorn(){
   }
 
   fangorn.load_fasta = function(path){
-    if (!nodes_are_loaded()){
-      return false;
-    }
-
-    var contents;
-
-    try {
-      contents = fs.readFileSync(path, 'utf8');
-    } catch(err) {
-      console.error(err);
-    }
-
-    _fasta_seqs = Fasta.parse(contents);
-
-    return _fasta_seqs ? true : false;
+    _fasta = FastaRepresentation(path);
+    _fasta.addEventListener('loaded', function(e){
+      if (!_fasta.check_consistency(fangorn.get_leave_names())){
+        _fasta = null;
+      } else {
+        fangorn.each_leaf(function(leaf){
+          leaf.apply_fasta(_fasta.sequences[leaf.name]);
+        })
+        fangorn.update_fasta_sidebar()
+        fangorn.dispatch_state_update();
+      }
+    });
   }
 
-  // check_fasta = function(){
-  //   if (_fasta_seqs == null){
-  //     return true;
-  //   }
+  fangorn.save_fasta = function(){
+    var content = '';
 
-  //   var
-  //   _fasta_seqs.filter(function(seq){  });
-  // }
+    fangorn.each_leaf(function(leaf){
+      var raw_fasta = leaf.raw_fasta_entry();
+      if (raw_fasta != null)
+        content += raw_fasta;
+    });
+
+    console.log(content);
+
+    fs.writeFile(_fasta.out_path, content, function(err) {
+      if(err) {
+        return console.error(err);
+      }
+    });
+   }
+
+  fangorn.fasta_is_loaded = function(){
+    return _fasta != null;
+  }
+
+  fangorn.update_fasta_sidebar = function(){
+    var content = '';
+
+    if (fangorn.fasta_is_loaded()){
+      content = '<b class="ui-text">' + _fasta._out_filename + '</b></br>'
+      fangorn.each_leaf(function(leaf){
+        content += leaf.fasta_bar_entry()
+      });
+    } else {
+      content += '<b class="ui-text">No fasta loaded...</b>'
+    }
+
+    $('#fasta-panel').html(content);
+  }
+
+  fangorn.dispatch_state_update = function(){
+    var event = new Event('fangorn_state_update');
+    document.dispatchEvent(event);
+  }
+
+  fangorn.each_leaf = function(f){
+    fangorn.get_leaves().forEach(function(leaf){
+      f(leaf);
+    })
+  }
+
+  fangorn.update_node_title = function(node, title){
+    if (!fangorn.fasta_is_loaded())
+      return null;
+
+    var new_id = FastaRepresentation.extract_id(title);
+    node.name = new_id;
+    node.fasta.id = new_id;
+    node.fasta.title = title;
+
+    fangorn.update_fasta_sidebar()
+  }
 
   return this;
 }

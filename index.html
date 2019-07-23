@@ -25,11 +25,11 @@
       <div class="toolbar-actions">
 
         <div class="btn-group">
-          <button id="mark-node" class="btn btn-default">
-            <span class="ui-text fa fa-pencil"></span>
+          <button id="mark-node" class="btn btn-default mark-button" title="Remove sequence from fasta file">
+            <span class="icon icon-logout"></span>
           </button>
-          <button id="unmark-node" class="btn btn-default">
-            <span class="ui-text fa icon-pencil-alt-solid-crossed"></span>
+          <button id="unmark-node" class="btn btn-default mark-button" title="Return sequence to fasta file">
+            <span class="icon icon-login"></span>
           </button>
         </div>
 
@@ -58,29 +58,60 @@
           </button>
         </div>
 
-        <button class="btn btn-default pull-right" title="Show fasta">
+        <button id="annotate-node-action" class="btn btn-default" title="Annotate node">
+          <span class="icon icon-pencil"></span>
+        </button>
+
+        <button id="show-fasta-action" class="btn btn-default pull-right" title="Show fasta">
           <span class="icon icon-book-open"></span>
         </button>
 
         <button id="search-action" class="btn btn-default pull-right" title="Search">
           <span class="icon icon-search"></span>
         </button>
+
+        <button id="save-fasta-action" class="btn btn-positive pull-right" title="Save fasta">
+          Save fasta
+        </button>
       </div>
     </header>
 
     <div class="window-content">
-      <div class="padded-more">
-        <!-- CONTENT -->
-
-        <svg id="tree_display" />
-
-      <!-- END CONTENT -->
+      <div class="pane-group">
+        <div class="pane">
+          <div class="padded" id="main-tree-container">
+            <svg id="tree_display" />
+          </div>
+        </div>
+        <div class="pane-one-third sidebar padded" id="fasta-panel" style="display: none; overflow: auto">
+        </div>
       </div>
     </div>
 
     <footer class="toolbar toolbar-footer">
     </footer>
   </div>
+
+  <dialog id="annotate-dialog">
+      <header class="toolbar toolbar-header">
+          <h1 class="title">Edit the node title</h1>
+      </header>
+
+      <div class="padded-more">
+          <form>
+            <div class="form-group">
+              <input id="seq-title-input" type="text" class="form-control" placeholder="Title">
+            </div>
+          </form>
+      </div>
+
+      <footer class="toolbar toolbar-footer">
+          <div class="toolbar-actions">
+              <button id="annotation-dialog-save" class="btn btn-primary pull-right">Save</button>
+              <button id="annotation-dialog-cancel" class="btn btn-default pull-right">Cancel</button>
+          </div>
+      </footer>
+  </dialog>
 
   <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
   <script src="js/vendor/jquery-3.4.0.min.js"></script>
