@@ -42,9 +42,6 @@ $(document).ready(function() {
   var fangorn = Fangorn();
   fangorn.dispatch_state_update();
 
-  var example_tree = "((first:0.150276,second:0.213019):0.230956,(third:0.263487,fourth:0.202633):0.246917);";
-  fangorn.load_tree_from_text(example_tree);
-
   initSizes();
 
   const findInPage = new FindInPage(app.remote.getCurrentWebContents(), {
