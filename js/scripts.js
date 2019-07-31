@@ -81,7 +81,7 @@ $(document).ready(function() {
       n.mark();
     });
 
-    fangorn.update_fasta_sidebar();
+    fangorn.get_tree().refresh();
     fangorn.get_tree().modify_selection(function(n){ return false; });
   });
 
@@ -90,7 +90,7 @@ $(document).ready(function() {
       n.unmark();
     });
 
-    fangorn.update_fasta_sidebar();
+    fangorn.get_tree().refresh();
     fangorn.get_tree().modify_selection(function(){});
   });
 

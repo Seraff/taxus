@@ -60,8 +60,9 @@ function Fangorn(){
     }
 
     function nodeStyler(dom_element, node_object) {
-      if (node_object.style)
+      if (node_object.style){
         node_object.style(dom_element);
+      }
     }
 
     apply_extensions(_tree);
@@ -72,12 +73,11 @@ function Fangorn(){
     d3.select(".phylotree-container").attr("align","center");
 
     document.addEventListener('selection_modified', function(e){
-      fangorn.update_fasta_sidebar()
       fangorn.dispatch_state_update();
     });
 
     _fasta = null;
-    fangorn.update_fasta_sidebar();
+    fangorn.init_fasta_sidebar();
     fangorn.dispatch_state_update();
   }
 
@@ -106,7 +106,7 @@ function Fangorn(){
         fangorn.each_leaf(function(leaf){
           leaf.apply_fasta(_fasta.sequences[leaf.name]);
         })
-        fangorn.update_fasta_sidebar()
+        fangorn.init_fasta_sidebar()
         fangorn.dispatch_state_update();
       }
     });
@@ -121,8 +121,6 @@ function Fangorn(){
         content += raw_fasta;
     });
 
-    console.log(content);
-
     fs.writeFile(_fasta.out_path, content, function(err) {
       if(err) {
         return console.error(err);
@@ -134,13 +132,13 @@ function Fangorn(){
     return _fasta != null;
   }
 
-  fangorn.update_fasta_sidebar = function(){
+  fangorn.init_fasta_sidebar = function(){
     var content = '';
 
     if (fangorn.fasta_is_loaded()){
       content = '<b class="ui-text">' + _fasta._out_filename + '</b></br>'
       fangorn.each_leaf(function(leaf){
-        content += leaf.fasta_bar_entry()
+        content += leaf.init_fasta_bar_entry()
       });
     } else {
       content += '<b class="ui-text">No fasta loaded...</b>'
@@ -169,7 +167,7 @@ function Fangorn(){
     node.fasta.id = new_id;
     node.fasta.title = title;
 
-    fangorn.update_fasta_sidebar()
+    fangorn.init_fasta_sidebar()
   }
 
   return this;
