@@ -5,3 +5,6 @@ Newick + Fasta = Fangorn ❤️
 [Fangorn for Mac (x64)](https://github.com/Seraff/fangorn/releases/latest/download/fangorn-0.0.1.mac_x64.dmg)
 
 [Fangorn for Linux (x64)](https://github.com/Seraff/fangorn/releases/latest/download/fangorn.0.0.1.linux_x64.AppImage)
+
+# Poster
+![Poster](https://github.com/Seraff/fangorn/blob/master/media/poster.png)
