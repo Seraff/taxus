@@ -11,20 +11,18 @@ apply_extensions = function(phylotree){
     return node;
   }
 
-  phylotree.prototype.test = function(){
-    return svg;
-  }
-
   $(window).on("keydown", function(e) {
     if (e.ctrlKey){
       svg.call(zoom);
       zoom_mode = true;
+      $("#tree_display").css( 'cursor', 'grab' );
     }
   });
 
   $(window).on("keyup", function(e) {
     svg.on(".zoom", null);
     zoom_mode = false;
+    $("#tree_display").css( 'cursor', '' );
   });
 
   var zoom = d3.behavior.zoom()

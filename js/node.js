@@ -35,10 +35,12 @@ function Node(fangorn, phylotree_node){
       $(element).show();
     }
 
-    if (node.selected == true){
-      element.addClass('fasta-node-selected');
-    } else {
-      element.removeClass("fasta-node-selected");
+    if (node.fasta_is_loaded()){
+      if (node.selected == true){
+        element.addClass('fasta-node-selected');
+      } else {
+        element.removeClass("fasta-node-selected");
+      }
     }
   }
 

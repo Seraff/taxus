@@ -45,7 +45,7 @@ $(document).ready(function() {
   initSizes();
 
   const findInPage = new FindInPage(app.remote.getCurrentWebContents(), {
-    parentElement: $(".window-content")[0],
+    parentElement: document.querySelector("#main-tree-container"),
     offsetTop: 65,
     duration: 150
   })
