@@ -4,6 +4,7 @@ const cp = require('child_process');
 const FindInPage = require('electron-find').FindInPage
 const Fangorn = require('./js/fangorn.js');
 const fileDialog = require('file-dialog');
+var fg = null;
 
 initSizes = function() {
   var bounds = app.remote.getCurrentWindow().webContents.getOwnerBrowserWindow().getBounds();
@@ -40,6 +41,7 @@ $(document).ready(function() {
   });
 
   var fangorn = Fangorn();
+  fg = fangorn;
   fangorn.dispatch_state_update();
 
   initSizes();

@@ -1345,6 +1345,11 @@ const parseString = require('xml2js').parseString;
       if(selection_callback && attr != "tag"){
         selection_callback(phylotree.get_selection());
       }
+
+      // Fangorn stuff
+      var event = new Event('selection_modified');
+      document.dispatchEvent(event);
+
       return phylotree;
     };
 

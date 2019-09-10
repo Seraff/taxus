@@ -123,9 +123,6 @@ apply_extensions = function(phylotree){
         phylotree.modify_selection(function(n){ return selected_leafs.includes(n.target) })
         selection.attr("visibility", "hidden");
         subject.on("mousemove.selection", null).on("mouseup.selection", null);
-
-        var event = new Event('selection_modified');
-        document.dispatchEvent(event);
       });
   });
 }
