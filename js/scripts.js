@@ -12,32 +12,38 @@ initSizes = function() {
   $("svg#tree_display").css({ width: width-30, height: bounds.height-120});
 }
 
+updateControls = function(fangorn) {
+  $('#annotate-node-action').attr('disabled','disabled');
+  $('#reroot-action').attr('disabled','disabled');
+  $("[data-direction]").attr('disabled','disabled');
+  $('.mark-button').attr('disabled','disabled');
+
+  if (fangorn.tree_is_loaded()){
+    $("[data-direction]").removeAttr('disabled');
+
+
+    if (fangorn.get_selected_leaves().length > 0)
+      $('.mark-button').removeAttr('disabled');
+
+    if (fangorn.is_one_leaf_selected())
+      $('#annotate-node-action').removeAttr('disabled');
+
+    if (fangorn.get_selection().length == 1)
+      $('#reroot-action').removeAttr('disabled');
+
+
+    if (fangorn.fasta_is_loaded()){
+      $('#save-fasta-action').removeAttr('disabled');
+    } else {
+      $('#save-fasta-action').attr('disabled','disabled');
+    }
+
+  }
+}
+
 $(document).ready(function() {
   document.addEventListener("fangorn_state_update", function(e){
-    $('#annotate-node-action').attr('disabled','disabled');
-
-    if (fangorn.tree_is_loaded()){
-      $("[data-direction]").removeAttr('disabled');
-
-      if (fangorn.get_selection().length > 0){
-        $('.mark-button').removeAttr('disabled');
-
-        if (fangorn.get_selection().length == 1)
-          $('#annotate-node-action').removeAttr('disabled');
-
-      } else {
-        $('.mark-button').attr('disabled','disabled');
-      }
-
-      if (fangorn.fasta_is_loaded()){
-        $('#save-fasta-action').removeAttr('disabled');
-      } else {
-        $('#save-fasta-action').attr('disabled','disabled');
-      }
-    } else {
-      $("[data-direction]").attr('disabled','disabled');
-      $('.mark-button').attr('disabled','disabled');
-    }
+    updateControls(fangorn);
   });
 
   var fangorn = Fangorn();
@@ -135,6 +141,10 @@ $(document).ready(function() {
     $("#seq-title-input").val('');
     $("#annotate-dialog")[0].close(false);
     fangorn.get_tree().safe_update()
+  });
+
+  $('#reroot-action').on("click", function(){
+    fangorn.reroot_to_selected_node();
   });
 
   $("[data-direction]").on ("click", function () {

@@ -11,6 +11,10 @@ function Node(fangorn, phylotree_node){
     return d3.layout.phylotree.is_leafnode(node);
   }
 
+  node.is_edge = function(){
+    return !node.is_leaf();
+  }
+
   node.mark = function(){
     node.marked = true;
   }

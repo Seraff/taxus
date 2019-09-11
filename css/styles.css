@@ -44,8 +44,8 @@
 }
 
 .branch-selected {
-  stroke: #999 !important;
-  stroke-width: 2px;
+  stroke: #3182bd !important;
+  stroke-width: 4px !important;
 }
 
 .node-fangorn-marked {

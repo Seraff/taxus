@@ -41,6 +41,23 @@ function Fangorn(){
     return fangorn.get_tree().get_selection();
   }
 
+  fangorn.get_selected_leaves = function(){
+    return fangorn.get_selection().filter(function(node){ return node.is_leaf() });
+  }
+
+  fangorn.get_selected_edges = function(){
+    return fangorn.get_selection().filter(function(node){ return node.is_edge() });
+  }
+
+  fangorn.is_one_leaf_selected = function(){
+    return fangorn.get_selected_leaves().length == 1;
+  }
+
+  // by design zero or only one edge can be selected
+  fangorn.is_one_edge_selected = function(){
+    return fangorn.get_selected_edges().length == 1;
+  }
+
   fangorn.init_phylotree = function(str){
     _tree = d3.layout
                .phylotree()
@@ -168,6 +185,15 @@ function Fangorn(){
     node.fasta.title = title;
 
     fangorn.init_fasta_sidebar()
+  }
+
+  fangorn.reroot_to_selected_node = function(){
+    var selection = fangorn.get_selection();
+
+    if (selection.length == 1){
+      node = selection[0];
+      fangorn.get_tree().reroot(node).update();
+    }
   }
 
   return this;
