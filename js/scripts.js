@@ -17,27 +17,25 @@ updateControls = function(fangorn) {
   $('#reroot-action').attr('disabled','disabled');
   $("[data-direction]").attr('disabled','disabled');
   $('.mark-button').attr('disabled','disabled');
+  $('#open-fasta').attr('disabled','disabled');
 
   if (fangorn.tree_is_loaded()){
     $("[data-direction]").removeAttr('disabled');
+    $("#open-fasta").removeAttr('disabled');
 
-
-    if (fangorn.get_selected_leaves().length > 0)
-      $('.mark-button').removeAttr('disabled');
-
-    if (fangorn.is_one_leaf_selected())
+    if (fangorn.fasta_is_loaded() && fangorn.is_one_leaf_selected())
       $('#annotate-node-action').removeAttr('disabled');
 
     if (fangorn.get_selection().length == 1)
       $('#reroot-action').removeAttr('disabled');
 
+    if (fangorn.fasta_is_loaded() && fangorn.get_selected_leaves().length > 0)
+      $('.mark-button').removeAttr('disabled');
 
-    if (fangorn.fasta_is_loaded()){
+    if (fangorn.fasta_is_loaded())
       $('#save-fasta-action').removeAttr('disabled');
-    } else {
+    else
       $('#save-fasta-action').attr('disabled','disabled');
-    }
-
   }
 }
 
