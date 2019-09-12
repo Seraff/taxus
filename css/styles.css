@@ -62,6 +62,10 @@
   stroke-dasharray: 5, 5;
 }
 
+.bootstrap {
+  font: 8px sans-serif;
+}
+
 dialog {
   padding: 0px;
   border-width: 1px;

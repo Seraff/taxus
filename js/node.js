@@ -5,6 +5,7 @@ function Node(fangorn, phylotree_node){
   var fangorn = fangorn;
   var fasta_bar_entry_selector = null;
 
+  node.is_fangorn_node = true;
   node.marked = false;
 
   node.is_leaf = function(){
@@ -24,10 +25,14 @@ function Node(fangorn, phylotree_node){
   }
 
   node.style = function(dom_element){
-    if (!node.is_leaf()){
-      return true;
+    if (node.is_leaf()){
+      node.style_leaf(dom_element);
+    } else {
+      node.add_tip(node.bootstrap());
     }
+  }
 
+  node.style_leaf = function(dom_element){
     var element = node.get_fasta_bar_entry();
 
     if (node.marked == true){
@@ -91,6 +96,24 @@ function Node(fangorn, phylotree_node){
     content += node.fasta.seq + '\n';
 
     return content;
+  }
+
+  node.bootstrap = function(){
+    if (node.is_edge()){
+      return parseFloat(node.name)
+    }
+  }
+
+  node.add_tip = function(text){
+    if (node.is_leaf() || !text)
+      return;
+
+    d3.select(node.container).append("text")
+               .classed("bootstrap", true)
+               .text(text)
+               .attr("dx", ".3em")
+               .attr("text-anchor", "start")
+               .attr("alignment-baseline", "middle");
   }
 
   return node;

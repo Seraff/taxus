@@ -48,6 +48,7 @@ $(document).ready(function() {
 
   var fangorn = Fangorn();
   fg = fangorn;
+
   fangorn.dispatch_state_update();
 
   initSizes();

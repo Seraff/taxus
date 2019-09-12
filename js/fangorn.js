@@ -68,7 +68,8 @@ function Fangorn(){
                 "show-scale": false,
                 brush: false,
                 collapsible: false,
-                selectable: true
+                selectable: true,
+                "align-tips": false
                });
 
     function edgeStyler(dom_element, edge_object) {
@@ -86,7 +87,9 @@ function Fangorn(){
     _tree.node_circle_size(0);
     _tree.style_edges(edgeStyler);
     _tree.style_nodes(nodeStyler);
-    _tree(str).layout();
+
+    _tree(str).layout(); // renders the tree
+
     d3.select(".phylotree-container").attr("align","center");
 
     document.addEventListener('selection_modified', function(e){
@@ -102,7 +105,8 @@ function Fangorn(){
     try {
       _tree_content = fs.readFileSync(path, 'utf8');
       init_phylotree(_tree_content);
-      _nodes = _tree.get_nodes().map(function(node){ return Node(fangorn, node) });
+      fangorn.reinit_nodes();
+      fangorn.get_tree().update(); // for initial node styling
     } catch(err) {
       console.error(err);
     }
@@ -111,7 +115,8 @@ function Fangorn(){
   fangorn.load_tree_from_text = function(txt){
     _tree_content = txt;
     init_phylotree(_tree_content);
-    _nodes = _tree.get_nodes().map(function(node){ return Node(fangorn, node) });
+    fangorn.reinit_nodes();
+    fangorn.get_tree().update(); // for initial node styling
   }
 
   fangorn.load_fasta = function(path){
@@ -127,6 +132,12 @@ function Fangorn(){
         fangorn.dispatch_state_update();
       }
     });
+  }
+
+  fangorn.reinit_nodes = function(){
+    if (tree_is_loaded){
+      _nodes = _tree.get_nodes().map(function(node){ return Node(fangorn, node) });
+    }
   }
 
   fangorn.save_fasta = function(){
@@ -194,6 +205,8 @@ function Fangorn(){
       node = selection[0];
       fangorn.get_tree().reroot(node).update();
     }
+
+    fangorn.reinit_nodes();
   }
 
   return this;
