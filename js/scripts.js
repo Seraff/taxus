@@ -60,6 +60,7 @@ $(document).ready(function() {
   $("#open-tree").on("click", function(){
     fileDialog({ multiple: false }, file => {
       fangorn.load_tree(file[0].path);
+      $("#pane-with-bg").css("background-image", "none");
     });
   });
 

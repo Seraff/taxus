@@ -108,6 +108,8 @@ function Node(fangorn, phylotree_node){
     if (node.is_leaf() || !text)
       return;
 
+
+    d3.select(node.container).html("");
     d3.select(node.container).append("text")
                .classed("bootstrap", true)
                .text(text)
