@@ -67,8 +67,15 @@
 }
 
 dialog {
-  padding: 0px;
-  border-width: 1px;
-  border-color: #B1B1B1;
-  width: 400px;
+    padding: 0;
+    border: 1px solid #bebebe;
+    border-radius: 6px;
+    box-shadow: 0 0 30px rgba(0,0,0,.1);
+    overflow: hidden;
+    width: 400px;
+
+    /* if you want a non-default backdrop: */
+    &::backdrop {
+        background: rgba(0,0,0,.2);   /* the default is rgba(0,0,0,.1) */
+    }
 }

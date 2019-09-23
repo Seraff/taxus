@@ -1,9 +1,9 @@
 const app = require('electron')
 const { BrowserWindow } = require('electron').remote
 const cp = require('child_process');
+const fileDialog = require('file-dialog');
 const FindInPage = require('electron-find').FindInPage
 const Fangorn = require('./js/fangorn.js');
-const fileDialog = require('file-dialog');
 var fg = null;
 
 initSizes = function() {
@@ -37,6 +37,24 @@ updateControls = function(fangorn) {
     else
       $('#save-fasta-action').attr('disabled','disabled');
   }
+}
+
+var showAlert = function(title, body){
+  $("#universal-dialog").find('.title').html(title)
+  $("#universal-dialog").find('.modal-body').html(body)
+  $("#universal-dialog")[0].showModal();
+}
+
+var showLogAlert = function(title, subtitle, rows){
+  $("#universal-dialog").find('.title').html(title)
+
+  $("#universal-dialog").find('.modal-body').html('')
+  $("#universal-dialog").find('.modal-body').append(subtitle)
+  $("#universal-dialog").find('.modal-body').append('<div id="log_body" style="overflow-y: auto; max-height: 200px; border: none;"></div>');
+
+  rows.forEach(function(r){ $("#log_body").append(r + "</br>"); });
+
+  $("#universal-dialog")[0].showModal();
 }
 
 $(document).ready(function() {
@@ -145,6 +163,10 @@ $(document).ready(function() {
 
   $('#reroot-action').on("click", function(){
     fangorn.reroot_to_selected_node();
+  });
+
+  $("#universal-dialog-close").on("click", function(){
+    $("#universal-dialog")[0].close(false);
   });
 
   $("[data-direction]").on ("click", function () {

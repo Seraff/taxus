@@ -21,18 +21,15 @@ function FastaRepresentation(path){
   fasta._out_filename = f_name_array.join('.')
   fasta.out_path = p.join(p.dirname(path), fasta._out_filename)
 
-  fasta.read_from_file = function(path){
+  fasta.read_from_file = function(callback){
     try {
-      Fasta.obj(path)
+      Fasta.obj(_path)
         .on('data', function(data) {
           id = data.id.split(/\s/)[0];
           data.title = data.id;
           data.id = id
           fasta.sequences[id] = data;
-        }).on('end', function(){
-          var event = new Event('loaded');
-          fasta.dispatchEvent(event);
-        });
+        }).on('end', callback);
     } catch(err) {
       console.error(err);
       return false;
@@ -40,15 +37,31 @@ function FastaRepresentation(path){
     return true;
   }
 
-  fasta.check_consistency = function(ids){
-    if (ids.length != Object.keys(fasta.sequences).length){
-      return false;
-    }
+  // Checks if fasta is compatible for the names provided
+  // returns true if fasta is compatible with tree
+  // returns object { not_in_fasta: [...], not_in_tree: [...] } if problems found
+  fasta.check_consistency = function(leave_ids){
 
-    ids.forEach(function(id){
-      if (!fasta.sequences.hasOwnProperty(id))
-        return false;
-    })
+    var not_in_fasta = [];
+    var not_in_tree = [];
+
+    var fasta_ids = Object.values(fasta.sequences).map(function(e){ return e.id })
+
+    fasta_ids.forEach(function(id){
+      if (!(leave_ids.includes(id))){
+        not_in_tree.push(id);
+      }
+    });
+
+    leave_ids.forEach(function(id){
+      if (!(fasta_ids.includes(id))){
+        not_in_fasta.push(id);
+      }
+    });
+
+    if (not_in_tree.length != 0 || not_in_fasta.length != 0){
+      return {  not_in_tree: not_in_tree, not_in_fasta: not_in_fasta };
+    }
 
     return true;
   }
@@ -60,9 +73,6 @@ function FastaRepresentation(path){
       }
     }
   }
-
-  fasta.read_from_file(path);
-  return fasta;
 }
 
 FastaRepresentation.extract_id = function(title){

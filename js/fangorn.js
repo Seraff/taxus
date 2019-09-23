@@ -1,6 +1,7 @@
+const fs = require('fs');
+
 const Node = require('./node.js');
 const FastaRepresentation = require('./fasta_representation.js');
-const fs = require('fs');
 
 function Fangorn(){
   var fangorn = this;
@@ -120,10 +121,27 @@ function Fangorn(){
   }
 
   fangorn.load_fasta = function(path){
-    _fasta = FastaRepresentation(path);
-    _fasta.addEventListener('loaded', function(e){
-      if (!_fasta.check_consistency(fangorn.get_leave_names())){
+    _fasta = new FastaRepresentation(path);
+
+    _fasta.read_from_file(function(e){
+      var consistency = _fasta.check_consistency(fangorn.get_leave_names())
+      if (consistency != true){
         _fasta = null;
+        var rows = [];
+
+        if (consistency['not_in_fasta'].length > 0){
+          rows.push('');
+          rows.push('Not found in fasta file:');
+          rows = rows.concat(consistency['not_in_fasta']);
+        }
+
+        if (consistency['not_in_tree'].length > 0){
+          rows.push('');
+          rows.push('Not found in the tree:');
+          rows = rows.concat(consistency['not_in_tree']);
+        }
+
+        showLogAlert("File cannot be loaded", "The data doesn't match:", rows);
       } else {
         fangorn.each_leaf(function(leaf){
           leaf.apply_fasta(_fasta.sequences[leaf.name]);
