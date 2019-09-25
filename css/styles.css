@@ -79,3 +79,28 @@ dialog {
         background: rgba(0,0,0,.2);   /* the default is rgba(0,0,0,.1) */
     }
 }
+
+/* Icons */
+
+.custom-icon {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  background-size: 15px 15px;
+  background-color: #737475;
+}
+
+.custom-icon-remove-selected {
+  -webkit-mask-image: url(../img/icons/icon-remove-selected.svg);
+  mask-image: url(../img/icons/icon-remove-selected.svg);
+}
+
+.custom-icon-keep-selected {
+  -webkit-mask-image: url(../img/icons/icon-keep-selected.svg);
+  mask-image: url(../img/icons/icon-keep-selected.svg);
+}
+
+.custom-icon-restore-selected {
+  -webkit-mask-image: url(../img/icons/icon-restore-selected.svg);
+  mask-image: url(../img/icons/icon-restore-selected.svg);
+}

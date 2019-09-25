@@ -1,17 +1,17 @@
 {
   "name": "fangorn",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "dist": "electron-builder -mwl"
   },
   "devDependencies": {
     "electron": "^5.0.1",
-    "electron-builder": "^20.39.0",
+    "electron-builder": "^21.2.0",
     "xml2js": "0.4.19"
   },
   "keywords": [

@@ -102,7 +102,7 @@ $(document).ready(function() {
     findInPage.openFindWindow();
   });
 
-  $("#mark-node").on("click", function() {
+  $("#remove-selected-action").on("click", function() {
     fangorn.get_selection().forEach(function(n){
       n.mark();
     });
@@ -111,7 +111,19 @@ $(document).ready(function() {
     fangorn.get_tree().modify_selection(function(n){ return false; });
   });
 
-  $("#unmark-node").on("click", function() {
+  $("#remove-unselected-action").on("click", function() {
+    var selected = fangorn.get_selection();
+
+    fangorn.get_leaves().forEach(function(l){
+      if (!selected.includes(l))
+        l.mark();
+    });
+
+    fangorn.get_tree().refresh();
+    fangorn.get_tree().modify_selection(function(n){ return false; });
+  });
+
+  $("#restore-selected-action").on("click", function() {
     fangorn.get_selection().forEach(function(n){
       n.unmark();
     });
