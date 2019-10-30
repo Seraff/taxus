@@ -2,10 +2,13 @@ const fs = require('fs');
 
 const Node = require('./node.js');
 const FastaRepresentation = require('./fasta_representation.js');
+const NexusRepresentation = require('./nexus_representation.js');
+t = null;
 
 function Fangorn(){
   var fangorn = this;
   var _nodes = null;
+  var _branches = null;
   var _tree_content = null;
   var _tree = null;
   var _fasta = null;
@@ -46,20 +49,26 @@ function Fangorn(){
     return fangorn.get_selection().filter(function(node){ return node.is_leaf() });
   }
 
-  fangorn.get_selected_edges = function(){
-    return fangorn.get_selection().filter(function(node){ return node.is_edge() });
+  fangorn.get_selected_internals = function(){
+    return fangorn.get_selection().filter(function(node){ return node.is_internal() });
   }
 
   fangorn.is_one_leaf_selected = function(){
     return fangorn.get_selected_leaves().length == 1;
   }
 
-  // by design zero or only one edge can be selected
-  fangorn.is_one_edge_selected = function(){
-    return fangorn.get_selected_edges().length == 1;
+  // by design zero or only one internal can be selected
+  fangorn.is_one_internal_selected = function(){
+    return fangorn.get_selected_internals().length == 1;
   }
 
   fangorn.init_phylotree = function(str){
+    var nexus = new NexusRepresentation(str);
+
+    if (nexus.is_success()){
+      str = nexus.get_newick();
+    }
+
     _tree = d3.layout
                .phylotree()
                .svg(d3.select("#tree_display"))
@@ -70,8 +79,12 @@ function Fangorn(){
                 brush: false,
                 collapsible: false,
                 selectable: true,
-                "align-tips": false
+                "align-tips": false,
+                transitions: false
                });
+
+    t = _tree;
+
 
     function edgeStyler(dom_element, edge_object) {
       var coloring_scheme = d3.scale.category20c();
@@ -88,10 +101,9 @@ function Fangorn(){
     _tree.node_circle_size(0);
     _tree.style_edges(edgeStyler);
     _tree.style_nodes(nodeStyler);
-
     _tree(str).layout(); // renders the tree
 
-    d3.select(".phylotree-container").attr("align","center");
+    d3.select(".phylotree-container").attr("align", "center");
 
     document.addEventListener('selection_modified', function(e){
       fangorn.dispatch_state_update();
@@ -100,14 +112,17 @@ function Fangorn(){
     _fasta = null;
     fangorn.init_fasta_sidebar();
     fangorn.dispatch_state_update();
+
   }
 
   fangorn.load_tree = function(path){
     try {
       _tree_content = fs.readFileSync(path, 'utf8');
       init_phylotree(_tree_content);
+
       fangorn.reinit_nodes();
-      fangorn.get_tree().update(); // for initial node styling
+      fangorn.get_tree().update(); // for initial node styling.
+
     } catch(err) {
       console.error(err);
     }
@@ -148,13 +163,24 @@ function Fangorn(){
         })
         fangorn.init_fasta_sidebar()
         fangorn.dispatch_state_update();
+        fangorn.get_tree().refresh();
       }
     });
   }
 
+  // wrap phylotree nodes with fangorn nodes
+  // prepare branches
   fangorn.reinit_nodes = function(){
     if (tree_is_loaded){
       _nodes = _tree.get_nodes().map(function(node){ return Node(fangorn, node) });
+
+      _branches = [];
+      this.get_tree().get_svg().selectAll('.branch').each(function(b){ _branches.push(b) });
+      _branches.forEach(function(b){
+        b.source.next_branch = b;
+        b.target.prev_branch = b;
+        b.get_element = function(){ return d3.select("path[d='" + b.existing_path + "']") }
+      });
     }
   }
 

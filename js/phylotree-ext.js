@@ -62,16 +62,6 @@ apply_extensions = function(phylotree){
     .attr("class", "selection")
     .attr("visibility", "hidden");
 
-  function makeAbsoluteContext(element) {
-    return function(x,y) {
-      var matrix = element.getCTM();
-      return {
-        x: (matrix.a * x) + (matrix.c * y) + matrix.e,
-        y: (matrix.b * x) + (matrix.d * y) + matrix.f
-      };
-    };
-  }
-
   svg.on("mousedown", function() {
     if (zoom_mode) return false;
 
@@ -88,9 +78,8 @@ apply_extensions = function(phylotree){
 
     leafs.forEach(function(n){
       n.bbox = d3.select(n.container).node().getBBox();
-      n.self_transform = d3.transform(d3.select(n.container).attr("transform"));
 
-      convert = makeAbsoluteContext(d3.select(n.container).node());
+      var convert = makeAbsoluteContext(d3.select(n.container).node());
 
       n.bbox_translated = d3.select(n.container).node().getBBox();
       n.bbox_translated.x = (convert(n.bbox.x, n.bbox.y).x);
