@@ -10,7 +10,7 @@
     "dist": "electron-builder -mwl"
   },
   "devDependencies": {
-    "electron": "^5.0.1",
+    "electron": "^7.1.1",
     "electron-builder": "^21.2.0",
     "xml2js": "0.4.19"
   },

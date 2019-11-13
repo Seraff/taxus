@@ -9,7 +9,7 @@ function NexusRepresentation(str){
 
   this.get_newick = function(){
     if (this.is_success()){
-      return this.parsed.treesblock.trees[0].newick;
+      return this.parsed.treesblock.trees[0].newick.match(/\(.+\)/)[0];
     } else {
       return false;
     }

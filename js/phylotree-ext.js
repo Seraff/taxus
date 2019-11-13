@@ -114,4 +114,12 @@ apply_extensions = function(phylotree){
         subject.on("mousemove.selection", null).on("mouseup.selection", null);
       });
   });
+
+  phylotree.to_newick = function(annotations = false){
+    if (annotations){
+      return phylotree.get_newick(function(e){ return e.annotation ? "[" + e.annotation + "]" : "" });
+    } else {
+      return phylotree.get_newick(function(e){ return "" });
+    }
+  }
 }

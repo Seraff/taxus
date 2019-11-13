@@ -1,8 +1,6 @@
-const fs = require('fs');
-
 const Node = require('./node.js');
 const FastaRepresentation = require('./fasta_representation.js');
-const NexusRepresentation = require('./nexus_representation.js');
+const TreeFile = require('./tree_file.js');
 t = null;
 
 function Fangorn(){
@@ -63,12 +61,6 @@ function Fangorn(){
   }
 
   fangorn.init_phylotree = function(str){
-    var nexus = new NexusRepresentation(str);
-
-    if (nexus.is_success()){
-      str = nexus.get_newick();
-    }
-
     _tree = d3.layout
                .phylotree()
                .svg(d3.select("#tree_display"))
@@ -117,9 +109,8 @@ function Fangorn(){
 
   fangorn.load_tree = function(path){
     try {
-      _tree_content = fs.readFileSync(path, 'utf8');
-      init_phylotree(_tree_content);
-
+      fangorn.file = new TreeFile(path);
+      init_phylotree(fangorn.file.newick);
       fangorn.reinit_nodes();
       fangorn.get_tree().update(); // for initial node styling.
 
@@ -128,11 +119,10 @@ function Fangorn(){
     }
   }
 
-  fangorn.load_tree_from_text = function(txt){
-    _tree_content = txt;
-    init_phylotree(_tree_content);
-    fangorn.reinit_nodes();
-    fangorn.get_tree().update(); // for initial node styling
+  fangorn.save_tree = function(path){
+    if (fangorn.file){
+      fangorn.file.save_tree(path, fangorn.get_tree().to_newick(true))
+    }
   }
 
   fangorn.load_fasta = function(path){
