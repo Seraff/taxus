@@ -145,6 +145,19 @@ $(document).ready(function() {
     }
   });
 
+  $("#show-tool-panel-action").on("click", function() {
+    if ($('#tool-panel').is(":hidden")){
+      $('#tool-panel').show();
+      $("#show-tool-panel-action").addClass("btn-pressed");
+      initSizes();
+    }
+    else{
+      $('#tool-panel').hide();
+      $("#show-tool-panel-action").removeClass("btn-pressed");
+      initSizes();
+    }
+  });
+
   $("#save-fasta-action").on("click", function(){
     fangorn.save_fasta();
   });

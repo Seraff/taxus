@@ -1,6 +1,8 @@
+const fs = require('fs');
 const Node = require('./node.js');
 const FastaRepresentation = require('./fasta_representation.js');
-const TreeFile = require('./tree_file.js');
+const apply_extensions = require('./phylotree-ext.js');
+
 t = null;
 
 function Fangorn(){
@@ -75,8 +77,6 @@ function Fangorn(){
                 transitions: false
                });
 
-    t = _tree;
-
 
     function edgeStyler(dom_element, edge_object) {
       var coloring_scheme = d3.scale.category20c();
@@ -88,12 +88,11 @@ function Fangorn(){
         node_object.style(dom_element);
       }
     }
-
     apply_extensions(_tree);
     _tree.node_circle_size(0);
     _tree.style_edges(edgeStyler);
     _tree.style_nodes(nodeStyler);
-    _tree(str).layout(); // renders the tree
+    _tree.read_tree(str).layout(); // renders the tree
 
     d3.select(".phylotree-container").attr("align", "center");
 
@@ -109,8 +108,8 @@ function Fangorn(){
 
   fangorn.load_tree = function(path){
     try {
-      fangorn.file = new TreeFile(path);
-      init_phylotree(fangorn.file.newick);
+      var content = fs.readFileSync(path, 'utf8');
+      init_phylotree(content);
       fangorn.reinit_nodes();
       fangorn.get_tree().update(); // for initial node styling.
 
@@ -120,9 +119,8 @@ function Fangorn(){
   }
 
   fangorn.save_tree = function(path){
-    if (fangorn.file){
-      fangorn.file.save_tree(path, fangorn.get_tree().to_newick(true))
-    }
+    var data = fangorn.get_tree(path).output_tree()
+    fs.writeFileSync(path, data, 'utf8');
   }
 
   fangorn.load_fasta = function(path){
@@ -236,11 +234,13 @@ function Fangorn(){
     var selection = fangorn.get_selection();
 
     if (selection.length == 1){
-      node = selection[0];
+      var node = selection[0];
       fangorn.get_tree().reroot(node).update();
     }
 
     fangorn.reinit_nodes();
+    fangorn.get_tree().update_zoom_transform();
+    fangorn.get_tree().refresh();
   }
 
   return this;

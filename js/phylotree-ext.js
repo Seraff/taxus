@@ -1,4 +1,7 @@
-apply_extensions = function(phylotree){
+var Mousetrap = require('mousetrap');
+const nexus = require('./nexus.js');
+
+function apply_extensions(phylotree){
   // console.log(phylotree)
   var svg = phylotree.get_svg();
   var zoom_mode = false;
@@ -25,9 +28,23 @@ apply_extensions = function(phylotree){
     $("#tree_display").css( 'cursor', '' );
   });
 
+  phylotree.update_zoom_transform = function(){
+    var translate = phylotree.current_transform;
+    var scale = phylotree.current_zoom;
+
+    d3.select("."+phylotree.get_css_classes()["tree-container"])
+      .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
+  }
+
+  phylotree.current_transform = [0, 0];
+  phylotree.current_zoom = 1;
+
   var zoom = d3.behavior.zoom()
     .scaleExtent([.1, 10])
     .on("zoom", function(){
+      phylotree.current_transform = d3.event.translate;
+      phylotree.current_zoom = d3.event.scale;
+
       var translate = d3.event.translate;
 
       translate[0] += phylotree.get_offsets()[1] + phylotree.get_options()["left-offset"];
@@ -115,11 +132,82 @@ apply_extensions = function(phylotree){
       });
   });
 
-  phylotree.to_newick = function(annotations = false){
+  phylotree.to_fangorn_newick = function(annotations = false){
     if (annotations){
       return phylotree.get_newick(function(e){ return e.annotation ? "[" + e.annotation + "]" : "" });
     } else {
       return phylotree.get_newick(function(e){ return "" });
     }
   }
+
+  phylotree.translate_nodes = function(){
+    var table = phylotree.get_translations()
+
+    phylotree.get_nodes().forEach(function(n){
+      if (Object.keys(table).includes(n.name))
+        n.name = table[n.name];
+    });
+  }
+
+  phylotree.detranslate_nodes = function(){
+    var table = phylotree.get_translations()
+
+    phylotree.get_nodes().forEach(function(n){
+      var key = Object.keys(table).find(function(key){ return table[key] === n.name });
+      if (key)
+        n.name = key;
+    });
+  }
+
+  phylotree.read_tree = function(str){
+    var newick = null;
+    phylotree.nexus = null;
+    phylotree.original_newick = null;
+    phylotree.original_file_template = null;
+
+    // try with nexus
+    var parsed_nexus = nexus.parse(str);
+    console.log(parsed_nexus);
+
+    if (parsed_nexus.status === nexus.NexusError.ok){
+      // it is nexus
+      console.log("it is nexus")
+      phylotree.nexus = parsed_nexus;
+      newick = phylotree.nexus.treesblock.trees[0].newick.match(/\(.+\)/)[0];
+      phylotree.original_file_template = str.replace(newick, "%NWK%");
+    } else
+      newick = str;
+
+    phylotree.original_newick = newick;
+
+    phylotree(newick);
+
+    if (phylotree.nexus)
+      phylotree.translate_nodes(phylotree.get_translations());
+
+    return phylotree;
+  }
+
+  phylotree.get_translations = function(){
+    if (!phylotree.is_nexus())
+      return {};
+
+    return phylotree.nexus.treesblock.translate || {};
+  }
+
+  phylotree.is_nexus = function(){
+    return phylotree.nexus != null;
+  }
+
+  phylotree.output_tree = function(){
+    if (phylotree.is_nexus()){
+      phylotree.detranslate_nodes(phylotree.get_translations());
+      var newick = phylotree.to_fangorn_newick(true);
+      phylotree.translate_nodes(phylotree.get_translations());
+      return phylotree.original_file_template.replace("%NWK%", newick);
+    } else
+      return phylotree.to_fangorn_newick(true);
+  }
 }
+
+module.exports = apply_extensions;

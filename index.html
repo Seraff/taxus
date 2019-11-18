@@ -23,6 +23,9 @@
       <h1 class="title">Fangorn</h1>
 
       <div class="toolbar-actions">
+        <button id="show-tool-panel-action" class="btn btn-default" title="Show tool panel">
+          <span class="icon icon-cog"></span>
+        </button>
 
         <div class="btn-group">
           <button id="open-tree" class="btn btn-default">
@@ -85,6 +88,12 @@
 
     <div class="window-content">
       <div class="pane-group">
+        <div class="pane-one-half sidebar padded" id="tool-panel" style="display: none; overflow: auto">
+
+            <h1 class="title">Tree</h1>
+            <span class="title">Branch width</span><input type="text" class="form-control" placeholder="1" width="40px">
+
+        </div>
         <div class="pane" id="pane-with-bg">
           <div class="padded" id="main-tree-container">
             <svg id="tree_display" />
@@ -141,7 +150,6 @@
   <script src="js/vendor/d3.v3.min.js"></script>
   <script src="js/helpers.js"></script>
   <script src="js/vendor/phylotree-src.js"></script>
-  <script src="js/phylotree-ext.js"></script>
   <script src="js/scripts.js"></script>
   <script>if (window.module) module = window.module;</script>
 </body>
