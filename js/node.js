@@ -154,6 +154,15 @@ function Node(fangorn, phylotree_node){
     return translated_bbox;
   }
 
+  node.build_annotation = function(){
+    var annotations = []
+    Object.keys(node.parsed_annotation).forEach(function(k){
+      annotations.push("!" + k + "=" + node.parsed_annotation[k])
+    })
+
+    node.annotation = (annotations.length > 0) ? ("&" + annotations.join(',')) : ""
+  }
+
   return node;
 }
 

@@ -167,11 +167,9 @@ function apply_extensions(phylotree){
 
     // try with nexus
     var parsed_nexus = nexus.parse(str);
-    console.log(parsed_nexus);
 
     if (parsed_nexus.status === nexus.NexusError.ok){
       // it is nexus
-      console.log("it is nexus")
       phylotree.nexus = parsed_nexus;
       newick = phylotree.nexus.treesblock.trees[0].newick.match(/\(.+\)/)[0];
       phylotree.original_file_template = str.replace(newick, "%NWK%");
@@ -200,6 +198,10 @@ function apply_extensions(phylotree){
   }
 
   phylotree.output_tree = function(){
+    phylotree.get_nodes().forEach(function(n){
+      n.build_annotation();
+    });
+
     if (phylotree.is_nexus()){
       phylotree.detranslate_nodes(phylotree.get_translations());
       var newick = phylotree.to_fangorn_newick(true);

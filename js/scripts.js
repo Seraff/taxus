@@ -3,49 +3,69 @@ const { BrowserWindow } = require('electron').remote
 const cp = require('child_process');
 const fileDialog = require('file-dialog');
 const FindInPage = require('electron-find').FindInPage
+const AColorPicker = require('a-color-picker');
 const Fangorn = require('./js/fangorn.js');
+const ColorPicker = require('./js/color_picker.js');
 var fg = null;
 
-initSizes = function() {
+var fangorn = null;
+
+function init_sizes() {
   var bounds = app.remote.getCurrentWindow().webContents.getOwnerBrowserWindow().getBounds();
   width = $('#main-tree-container')[0].clientWidth
   $("svg#tree_display").css({ width: width-30, height: bounds.height-120});
 }
 
-updateControls = function(fangorn) {
+function update_controls(fangorn) {
+  menu = app.remote.Menu.getApplicationMenu();
+
+  var disabled_menu_items = ['open-fasta', 'reroot', 'select-all'];
+  disabled_menu_items.forEach(function(item){
+    menu.disableItemById(item);
+  });
+
   $('#annotate-node-action').attr('disabled','disabled');
   $('#reroot-action').attr('disabled','disabled');
   $("[data-direction]").attr('disabled','disabled');
   $('.mark-button').attr('disabled','disabled');
   $('#open-fasta').attr('disabled','disabled');
+  $('#change-branch-color-action').attr('disabled','disabled');
 
   if (fangorn.tree_is_loaded()){
     $("[data-direction]").removeAttr('disabled');
     $("#open-fasta").removeAttr('disabled');
+    menu.enableItemById('open-fasta');
+    menu.enableItemById('select-all');
 
     if (fangorn.fasta_is_loaded() && fangorn.is_one_leaf_selected())
       $('#annotate-node-action').removeAttr('disabled');
 
-    if (fangorn.get_selection().length == 1)
+    if (fangorn.get_selection().length == 1){
       $('#reroot-action').removeAttr('disabled');
+      menu.enableItemById('reroot');
+    }
+
+    if (fangorn.get_selection().length > 0)
+      $('#change-branch-color-action').removeAttr('disabled');
 
     if (fangorn.fasta_is_loaded() && fangorn.get_selected_leaves().length > 0)
       $('.mark-button').removeAttr('disabled');
 
-    if (fangorn.fasta_is_loaded())
+    if (fangorn.fasta_is_loaded()){
       $('#save-fasta-action').removeAttr('disabled');
-    else
+    } else {
       $('#save-fasta-action').attr('disabled','disabled');
+    }
   }
 }
 
-var showAlert = function(title, body){
+function show_alert(title, body){
   $("#universal-dialog").find('.title').html(title)
   $("#universal-dialog").find('.modal-body').html(body)
   $("#universal-dialog")[0].showModal();
 }
 
-var showLogAlert = function(title, subtitle, rows){
+function show_log_alert(title, subtitle, rows){
   $("#universal-dialog").find('.title').html(title)
 
   $("#universal-dialog").find('.modal-body').html('')
@@ -57,17 +77,95 @@ var showLogAlert = function(title, subtitle, rows){
   $("#universal-dialog")[0].showModal();
 }
 
-$(document).ready(function() {
-  document.addEventListener("fangorn_state_update", function(e){
-    updateControls(fangorn);
+function set_window_header(text = null){
+  var header = "Fangorn";
+
+  if (text)
+    header += " — " + text;
+
+  $("h1#window-header").html(header);
+}
+
+function open_tree_action(){
+  fileDialog({ multiple: false }, file => {
+    fangorn.load_tree(file[0].path);
+    set_window_header(file[0].path.replace(/^.*[\\\/]/, ''));
+  });
+}
+
+function open_fasta_action(){
+  fileDialog({ multiple: false }, file => {
+    fangorn.load_fasta(file[0].path);
+  });
+}
+
+function remove_selected_action(){
+  fangorn.get_selection().forEach(function(n){ n.mark(); });
+  fangorn.get_tree().refresh();
+  fangorn.get_tree().modify_selection(function(n){ return false; });
+}
+
+function remove_unselected_action(){
+  var selected = fangorn.get_selection();
+
+  fangorn.get_leaves().forEach(function(l){
+    if (!selected.includes(l))
+      l.mark();
   });
 
-  var fangorn = Fangorn();
-  fg = fangorn;
+  fangorn.get_tree().refresh();
+  fangorn.get_tree().modify_selection(function(n){ return false; });
+}
 
+function restore_selected_action(){
+  fangorn.get_selection().forEach(function(n){ n.unmark(); });
+  fangorn.get_tree().refresh();
+  fangorn.get_tree().modify_selection(function(){});
+}
+
+function save_fasta_action(){
+  fangorn.save_fasta();
+}
+
+function show_fasta_action(){
+  if ($('#fasta-panel').is(":hidden")){
+    $('#fasta-panel').show();
+    $("#show-fasta-action").addClass("btn-pressed");
+    init_sizes();
+  }
+  else{
+    $('#fasta-panel').hide();
+    $("#show-fasta-action").removeClass("btn-pressed");
+    init_sizes();
+  }
+}
+
+function annotate_node_action(){
+  if (!fangorn.fasta_is_loaded() || fangorn.get_selection().length != 1)
+    return false;
+
+  var node = fangorn.get_selection()[0];
+  var title = node.fasta.title;
+  $("#seq-title-input").val(title);
+
+  $("#annotate-dialog")[0].showModal();
+}
+
+function reroot_action(){
+  fangorn.reroot_to_selected_node();
+}
+
+$(document).ready(function() {
+  set_window_header();
+
+  document.addEventListener("fangorn_state_update", function(e){
+    update_controls(fangorn);
+  });
+
+  fangorn = Fangorn();
   fangorn.dispatch_state_update();
 
-  initSizes();
+  init_sizes();
 
   const findInPage = new FindInPage(app.remote.getCurrentWebContents(), {
     parentElement: document.querySelector("#main-tree-container"),
@@ -75,21 +173,18 @@ $(document).ready(function() {
     duration: 150
   })
 
-  $("#open-tree").on("click", function(){
-    fileDialog({ multiple: false }, file => {
-      fangorn.load_tree(file[0].path);
-      $("#pane-with-bg").css("background-image", "none");
-    });
-  });
+  // *** Actions *** //
 
-  $("#open-fasta").on("click", function(){
-    fileDialog({ multiple: false }, file => {
-      fangorn.load_fasta(file[0].path);
-    });
-  });
+  menu = app.remote.Menu.getApplicationMenu();
+
+  $("#open-tree").on("click", open_tree_action);
+  menu.setCallbackOnItem('open-tree', open_tree_action);
+
+  $("#open-fasta").on("click", open_fasta_action);
+  menu.setCallbackOnItem('open-fasta', open_fasta_action);
 
   $(window).on("resize", function(){
-    initSizes();
+    init_sizes();
   });
 
   $(window).on("keydown", function(e) {
@@ -102,76 +197,17 @@ $(document).ready(function() {
     findInPage.openFindWindow();
   });
 
-  $("#remove-selected-action").on("click", function() {
-    fangorn.get_selection().forEach(function(n){
-      n.mark();
-    });
+  $("#remove-selected-action").on("click", remove_selected_action);
+  $("#remove-unselected-action").on("click", remove_unselected_action);
+  $("#restore-selected-action").on("click", restore_selected_action);
 
-    fangorn.get_tree().refresh();
-    fangorn.get_tree().modify_selection(function(n){ return false; });
-  });
+  $("#show-fasta-action").on("click", show_fasta_action);
+  $("#save-fasta-action").on("click", save_fasta_action);
 
-  $("#remove-unselected-action").on("click", function() {
-    var selected = fangorn.get_selection();
+  $('#annotate-node-action').on("click", annotate_node_action);
 
-    fangorn.get_leaves().forEach(function(l){
-      if (!selected.includes(l))
-        l.mark();
-    });
-
-    fangorn.get_tree().refresh();
-    fangorn.get_tree().modify_selection(function(n){ return false; });
-  });
-
-  $("#restore-selected-action").on("click", function() {
-    fangorn.get_selection().forEach(function(n){
-      n.unmark();
-    });
-
-    fangorn.get_tree().refresh();
-    fangorn.get_tree().modify_selection(function(){});
-  });
-
-  $("#show-fasta-action").on("click", function() {
-    if ($('#fasta-panel').is(":hidden")){
-      $('#fasta-panel').show();
-      $("#show-fasta-action").addClass("btn-pressed");
-      initSizes();
-    }
-    else{
-      $('#fasta-panel').hide();
-      $("#show-fasta-action").removeClass("btn-pressed");
-      initSizes();
-    }
-  });
-
-  $("#show-tool-panel-action").on("click", function() {
-    if ($('#tool-panel').is(":hidden")){
-      $('#tool-panel').show();
-      $("#show-tool-panel-action").addClass("btn-pressed");
-      initSizes();
-    }
-    else{
-      $('#tool-panel').hide();
-      $("#show-tool-panel-action").removeClass("btn-pressed");
-      initSizes();
-    }
-  });
-
-  $("#save-fasta-action").on("click", function(){
-    fangorn.save_fasta();
-  });
-
-  $('#annotate-node-action').on("click", function(){
-    if (!fangorn.fasta_is_loaded() || fangorn.get_selection().length != 1)
-      return false;
-
-    var node = fangorn.get_selection()[0];
-    var title = node.fasta.title;
-    $("#seq-title-input").val(title);
-
-    $("#annotate-dialog")[0].showModal();
-  });
+  $('#reroot-action').on("click", reroot_action);
+  menu.setCallbackOnItem('reroot', reroot_action);
 
   $("#annotation-dialog-cancel").on("click", function(){
     $("#seq-title-input").val('');
@@ -186,10 +222,6 @@ $(document).ready(function() {
     fangorn.get_tree().safe_update()
   });
 
-  $('#reroot-action').on("click", function(){
-    fangorn.reroot_to_selected_node();
-  });
-
   $("#universal-dialog-close").on("click", function(){
     $("#universal-dialog")[0].close(false);
   });
@@ -199,5 +231,19 @@ $(document).ready(function() {
     which_function (which_function () + (+ $(this).data ("amount"))).safe_update();
   });
 
+  // picker logic
+
+  var picker = new ColorPicker("#branch-color-picker", "#change-branch-color-action", ["#branch-color"]);
+  picker.add_color_change_callback(function(color){
+    fangorn.set_selected_nodes_annotation({color: color})
+  });
+
+  document.addEventListener('selection_modified', function(e){
+    var selection = fangorn.get_selection();
+    if (selection.length === 1)
+      picker.set_color(selection[0].parsed_annotation['color']);
+    else
+      picker.set_color();
+  });
 });
 

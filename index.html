@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
 
-  <title>Tree manipulator</title>
+  <title>Fangorn</title>
   <meta name="description" content="Tree editor">
   <meta name="author" content="Serafim Nenarokov">
   <link rel="stylesheet" href="css/vendor/open-iconic-bootstrap.min.css">
@@ -20,13 +20,9 @@
 
   <div class="window" id="window">
     <header class="toolbar toolbar-header draggable">
-      <h1 class="title">Fangorn</h1>
+      <h1 class="title" id="window-header"></h1>
 
       <div class="toolbar-actions">
-        <button id="show-tool-panel-action" class="btn btn-default" title="Show tool panel">
-          <span class="icon icon-cog"></span>
-        </button>
-
         <div class="btn-group">
           <button id="open-tree" class="btn btn-default">
             <span class="ui-text">Open tree</span>
@@ -72,6 +68,10 @@
           </button>
         </div>
 
+        <button id="change-branch-color-action" class="btn btn-default" title="Change color of selected branch">
+          <div id="branch-color" style="width:16px;height:16px;background:black;"></div>
+        </button>
+
         <button id="show-fasta-action" class="btn btn-default pull-right" title="Show fasta">
           <span class="icon icon-book-open"></span>
         </button>
@@ -87,13 +87,8 @@
     </header>
 
     <div class="window-content">
+      <div id="branch-color-picker"></div>
       <div class="pane-group">
-        <div class="pane-one-half sidebar padded" id="tool-panel" style="display: none; overflow: auto">
-
-            <h1 class="title">Tree</h1>
-            <span class="title">Branch width</span><input type="text" class="form-control" placeholder="1" width="40px">
-
-        </div>
         <div class="pane" id="pane-with-bg">
           <div class="padded" id="main-tree-container">
             <svg id="tree_display" />

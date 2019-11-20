@@ -1,4 +1,5 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow } = require('electron');
+const menu = require('./js/menu.js');
 
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
 
@@ -20,3 +21,5 @@ app.on('ready', createWindow)
 app.on('window-all-closed', () => {
   app.quit()
 })
+
+menu.build_menu();

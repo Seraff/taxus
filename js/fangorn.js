@@ -144,7 +144,7 @@ function Fangorn(){
           rows = rows.concat(consistency['not_in_tree']);
         }
 
-        showLogAlert("File cannot be loaded", "The data doesn't match:", rows);
+        show_log_alert("File cannot be loaded", "The data doesn't match:", rows);
       } else {
         fangorn.each_leaf(function(leaf){
           leaf.apply_fasta(_fasta.sequences[leaf.name]);
@@ -241,6 +241,14 @@ function Fangorn(){
     fangorn.reinit_nodes();
     fangorn.get_tree().update_zoom_transform();
     fangorn.get_tree().refresh();
+  }
+
+  fangorn.set_selected_nodes_annotation = function(annotation){
+    fangorn.get_selection().forEach(function(node){
+      Object.keys(annotation).forEach(function(key){
+        node.parsed_annotation[key] = annotation[key];
+      });
+    });
   }
 
   return this;

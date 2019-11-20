@@ -36,10 +36,6 @@ function NodeStyler(node){
 
       if (prop === 'color')
         this.redraw_color_annotation(val);
-
-      if (prop === 'hilight')
-        this.redraw_hilight_annotation(val);
-
     }
   }
 
@@ -47,8 +43,8 @@ function NodeStyler(node){
     this.node.prev_branch.get_element().attr('style', "stroke: " + value + " !important");
   }
 
+  // Under reconstruction
   this.redraw_hilight_annotation = function(value){
-    return 0;
     styler.drawn_shapes.forEach(function(sh){ sh.remove() });
     styler.drawn_shapes = [];
 

@@ -104,3 +104,11 @@ dialog {
   -webkit-mask-image: url(../img/icons/icon-restore-selected.svg);
   mask-image: url(../img/icons/icon-restore-selected.svg);
 }
+
+.a-color-picker {
+  position: absolute;
+  cursor: pointer;
+  z-index: 100;
+  margin-top: 10px;
+  margin-left: 430px;
+}
