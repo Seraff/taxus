@@ -7,7 +7,7 @@ function NodeStyler(node){
   this.drawn_shapes = [];
 
   this.style_leaf = function(dom_element){
-    if (this.node.marked == true){
+    if (this.node.is_marked() == true){
       var klass = dom_element.attr('class');
       klass += " node-fangorn-marked";
       dom_element.attr('class', klass);
@@ -22,7 +22,7 @@ function NodeStyler(node){
         fasta_entry.removeClass("fasta-node-selected");
       }
 
-      if (this.node.marked == true){
+      if (this.node.is_marked() == true){
         $(fasta_entry).hide();
       } else {
         $(fasta_entry).show();

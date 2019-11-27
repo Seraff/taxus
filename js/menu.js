@@ -1,6 +1,6 @@
-const electron = require('electron');
-const app = electron.app;
-const Menu = electron.Menu;
+var electron = require("electron")
+var app = electron.app
+var Menu = electron.Menu
 
 const template = [
   {
@@ -22,13 +22,13 @@ const template = [
       },
       {
         id: "save-tree",
-        label: "Save tree",
+        label: "Save",
         accelerator: 'CmdOrCtrl+S',
         click: function() { }
       },
       {
         id: "save-tree-as",
-        label: "Save tree as...",
+        label: "Save as...",
         accelerator: 'CmdOrCtrl+Shift+S',
         click: function() { }
       }
@@ -41,6 +41,18 @@ const template = [
         id: "reroot",
         label: 'Reroot',
         accelerator: 'CmdOrCtrl+Shift+R'
+      },
+      {
+        id: "copy",
+        label: 'Copy',
+        accelerator: 'CmdOrCtrl+C',
+        selector: "copy:"
+      },
+      {
+        id: "paste",
+        label: 'Paste',
+        accelerator: 'CmdOrCtrl+V',
+        selector: "paste:"
       },
       {
         id: "select-all",

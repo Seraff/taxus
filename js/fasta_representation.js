@@ -1,4 +1,4 @@
-var Fasta = require('bionode-fasta')
+const parser = require('bio-parsers')
 const fs = require('fs');
 const p = require('path');
 /**
@@ -6,35 +6,39 @@ const p = require('path');
  * Stores fasta sequence
  */
 
-function FastaRepresentation(path){
+function FastaRepresentation(){
   var fasta = this;
-  var _path = path;
 
   fasta.sequences = {};
+  fasta.original_str = null;
+  fasta.path = null;
+  fasta.out_path = null;
 
-  fasta._path = path;
-  fasta._src_filename = p.posix.basename(path);
+  fasta.read_from_file = function(path, callback){
+    fasta.sequences = {}
 
-  f_name_array = fasta._src_filename.split('.')
-  f_name_array.splice(f_name_array.length - 1, 0, 'fangorn');
+    var str = fs.readFileSync(path, 'utf8')
+    fasta.read_from_str(str, function(entries){
+      fasta.path = path
+      fasta.out_path = fangorize_path(path)
 
-  fasta._out_filename = f_name_array.join('.')
-  fasta.out_path = p.join(p.dirname(path), fasta._out_filename)
+      callback(entries)
+    })
+  }
 
-  fasta.read_from_file = function(callback){
-    try {
-      Fasta.obj(_path)
-        .on('data', function(data) {
-          id = data.id.split(/\s/)[0];
-          data.title = data.id;
-          data.id = id
-          fasta.sequences[id] = data;
-        }).on('end', callback);
-    } catch(err) {
-      console.error(err);
-      return false;
-    }
-    return true;
+  fasta.read_from_str = function(str, callback){
+    fasta.sequences = {}
+
+    fasta = parser.fastaToJson(str, function(json){
+      json.forEach(function(el){
+        var entry = new FastaEntry(el)
+        fasta.sequences[entry.id] = entry;
+      })
+
+      fasta.original_str = str
+
+      callback(fasta.sequences)
+    });
   }
 
   // Checks if fasta is compatible for the names provided
@@ -79,5 +83,19 @@ FastaRepresentation.extract_id = function(title){
   return title.split(/\s/)[0]
 }
 
+function FastaEntry(json){
+  entry = this
+  entry.json = json
+
+  entry.original_title = json.parsedSequence.name
+  entry.id = entry.original_title.split(/\s/)[0]
+  entry.sequence = json.parsedSequence.sequence
+
+  entry.to_fasta = function(){
+    content = '>' + entry.original_title + '\n'
+    content += entry.sequence + '\n'
+    return content
+  }
+}
 
 module.exports = FastaRepresentation;

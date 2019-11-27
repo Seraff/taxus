@@ -88,14 +88,14 @@ function set_window_header(text = null){
 
 function open_tree_action(){
   fileDialog({ multiple: false }, file => {
-    fangorn.load_tree(file[0].path);
+    fangorn.load_tree_file(file[0].path);
     set_window_header(file[0].path.replace(/^.*[\\\/]/, ''));
   });
 }
 
 function open_fasta_action(){
   fileDialog({ multiple: false }, file => {
-    fangorn.load_fasta(file[0].path);
+    fangorn.load_fasta_file(file[0].path);
   });
 }
 
@@ -153,6 +153,10 @@ function annotate_node_action(){
 
 function reroot_action(){
   fangorn.reroot_to_selected_node();
+}
+
+function save_tree_action(){
+  fangorn.save_tree();
 }
 
 $(document).ready(function() {
