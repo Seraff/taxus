@@ -4,7 +4,6 @@ const menu = require('./js/menu.js');
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
 
 function createWindow () {
-
   let win = new BrowserWindow({
     width: 800,
     height: 600,
@@ -13,6 +12,7 @@ function createWindow () {
       nodeIntegration: true
     }
   })
+  menu.build_menu();
   win.loadFile('index.html')
 }
 
@@ -21,5 +21,3 @@ app.on('ready', createWindow)
 app.on('window-all-closed', () => {
   app.quit()
 })
-
-menu.build_menu();

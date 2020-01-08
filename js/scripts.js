@@ -1,5 +1,6 @@
 const app = require('electron')
-const { BrowserWindow } = require('electron').remote
+const { BrowserWindow, dialog } = require('electron').remote
+
 const cp = require('child_process');
 const fileDialog = require('file-dialog');
 const FindInPage = require('electron-find').FindInPage
@@ -10,6 +11,9 @@ var fg = null;
 
 var fangorn = null;
 
+const TREE_EXT = ['tre', 'tree', 'nexus', 'nex', 'nxs', 'newick', 'txt']
+const FASTA_EXT = ['fa', 'fas', 'fasta', 'fna', 'faa', 'ffn', 'frn']
+
 function init_sizes() {
   var bounds = app.remote.getCurrentWindow().webContents.getOwnerBrowserWindow().getBounds();
   width = $('#main-tree-container')[0].clientWidth
@@ -19,7 +23,7 @@ function init_sizes() {
 function update_controls(fangorn) {
   menu = app.remote.Menu.getApplicationMenu();
 
-  var disabled_menu_items = ['open-fasta', 'reroot', 'select-all'];
+  var disabled_menu_items = ['open-fasta', 'save-fasta', 'save-fasta-as', 'reroot', 'select-all'];
   disabled_menu_items.forEach(function(item){
     menu.disableItemById(item);
   });
@@ -28,7 +32,6 @@ function update_controls(fangorn) {
   $('#reroot-action').attr('disabled','disabled');
   $("[data-direction]").attr('disabled','disabled');
   $('.mark-button').attr('disabled','disabled');
-  $('#open-fasta').attr('disabled','disabled');
   $('#change-branch-color-action').attr('disabled','disabled');
 
   if (fangorn.tree_is_loaded()){
@@ -53,6 +56,8 @@ function update_controls(fangorn) {
 
     if (fangorn.fasta_is_loaded()){
       $('#save-fasta-action').removeAttr('disabled');
+      menu.enableItemById('save-fasta');
+      menu.enableItemById('save-fasta-as');
     } else {
       $('#save-fasta-action').attr('disabled','disabled');
     }
@@ -86,17 +91,29 @@ function set_window_header(text = null){
   $("h1#window-header").html(header);
 }
 
-function open_tree_action(){
-  fileDialog({ multiple: false }, file => {
-    fangorn.load_tree_file(file[0].path);
-    set_window_header(file[0].path.replace(/^.*[\\\/]/, ''));
-  });
+function open_tree_action(e){
+  dialog.showOpenDialog({ properties: ['openFile'], filters: [{ name: "Trees", extensions: TREE_EXT }] }).then(result => {
+    if (result.filePaths.length == 0)
+      return false
+
+    var path = result.filePaths[0]
+    fangorn.load_tree_file(path)
+    set_window_header(path.replace(/^.*[\\\/]/, ''))
+  })
+}
+
+function save_tree_action(){
+  fangorn.save_tree()
 }
 
 function open_fasta_action(){
-  fileDialog({ multiple: false }, file => {
-    fangorn.load_fasta_file(file[0].path);
-  });
+  dialog.showOpenDialog({ properties: ['openFile'], filters: [{ name: "Fasta", extensions: FASTA_EXT }] }).then(result => {
+    if (result.filePaths.length == 0)
+      return false
+
+    var path = result.filePaths[0]
+    fangorn.load_fasta_file(path);
+  })
 }
 
 function remove_selected_action(){
@@ -155,10 +172,6 @@ function reroot_action(){
   fangorn.reroot_to_selected_node();
 }
 
-function save_tree_action(){
-  fangorn.save_tree();
-}
-
 $(document).ready(function() {
   set_window_header();
 
@@ -171,21 +184,16 @@ $(document).ready(function() {
 
   init_sizes();
 
-  const findInPage = new FindInPage(app.remote.getCurrentWebContents(), {
-    parentElement: document.querySelector("#main-tree-container"),
-    offsetTop: 65,
-    duration: 150
-  })
 
-  // *** Actions *** //
+  // *** Menu actions *** //
 
-  menu = app.remote.Menu.getApplicationMenu();
+  menu.setCallbackOnItem('open-tree', open_tree_action)
+  menu.setCallbackOnItem('save-tree', save_tree_action)
 
-  $("#open-tree").on("click", open_tree_action);
-  menu.setCallbackOnItem('open-tree', open_tree_action);
+  menu.setCallbackOnItem('open-fasta', open_fasta_action)
+  menu.setCallbackOnItem('save-fasta', save_fasta_action)
 
-  $("#open-fasta").on("click", open_fasta_action);
-  menu.setCallbackOnItem('open-fasta', open_fasta_action);
+
 
   $(window).on("resize", function(){
     init_sizes();
@@ -206,7 +214,6 @@ $(document).ready(function() {
   $("#restore-selected-action").on("click", restore_selected_action);
 
   $("#show-fasta-action").on("click", show_fasta_action);
-  $("#save-fasta-action").on("click", save_fasta_action);
 
   $('#annotate-node-action').on("click", annotate_node_action);
 

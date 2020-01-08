@@ -20,7 +20,7 @@ function FastaRepresentation(){
     var str = fs.readFileSync(path, 'utf8')
     fasta.read_from_str(str, function(entries){
       fasta.path = path
-      fasta.out_path = fangorize_path(path)
+      fasta.out_path = path_is_fangorized(path) ? path : fangorize_path(path)
 
       callback(entries)
     })
@@ -45,7 +45,6 @@ function FastaRepresentation(){
   // returns true if fasta is compatible with tree
   // returns object { not_in_fasta: [...], not_in_tree: [...] } if problems found
   fasta.check_consistency = function(leave_ids){
-
     var not_in_fasta = [];
     var not_in_tree = [];
 
@@ -84,7 +83,7 @@ FastaRepresentation.extract_id = function(title){
 }
 
 function FastaEntry(json){
-  entry = this
+  var entry = this
   entry.json = json
 
   entry.original_title = json.parsedSequence.name
@@ -92,7 +91,7 @@ function FastaEntry(json){
   entry.sequence = json.parsedSequence.sequence
 
   entry.to_fasta = function(){
-    content = '>' + entry.original_title + '\n'
+    var content = '>' + entry.original_title + '\n'
     content += entry.sequence + '\n'
     return content
   }

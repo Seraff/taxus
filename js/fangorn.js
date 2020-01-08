@@ -2,6 +2,7 @@ const fs = require('fs')
 const Node = require('./node.js')
 const FastaRepresentation = require('./fasta_representation.js')
 const apply_extensions = require('./phylotree-ext.js')
+const pako = require('pako')
 
 t = null
 
@@ -51,6 +52,18 @@ function Fangorn(){
 
   fangorn.get_selected_internals = function(){
     return fangorn.get_selection().filter(function(node){ return node.is_internal() })
+  }
+
+  fangorn.get_marked_leaves = function(){
+    return fangorn.get_leaves().filter(function(node){ return node.is_marked() })
+  }
+
+  fangorn.get_marked_leaves = function(){
+    return fangorn.get_leaves().filter(function(node){ return node.is_marked() })
+  }
+
+  fangorn.get_marked_leaf_names = function(){
+    return fangorn.get_leaves().filter(function(node){ return node.is_marked() }).map(function(node){ return node.name })
   }
 
   fangorn.is_one_leaf_selected = function(){
@@ -124,11 +137,34 @@ function Fangorn(){
   }
 
   fangorn.save_tree = function(path = null){
+    if (!fangorn.tree_is_loaded())
+      return false
+
     if (!path)
-      path = fangorize_path(fangorn.tree_path)
+      path = fangorn.tree_path
+
+
+    if (fangorn.get_tree().is_nexus())
+      fangorn.get_tree().apply_json_metadata(fangorn.metadata_json())
 
     var data = fangorn.get_tree().output_tree()
     fs.writeFileSync(path, data, 'utf8')
+  }
+
+  fangorn.save_fasta = function(path = null){
+    if (!fangorn.fasta_is_loaded())
+      return false
+
+    if (!path)
+      path = fangorn.fasta.out_path
+
+    var content = fangorn.output_fasta()
+
+    fs.writeFile(fangorn.fasta.out_path, content, function(err) {
+      if(err) {
+        return console.error(err)
+      }
+    })
   }
 
   fangorn.load_fasta_file = function(path){
@@ -148,9 +184,22 @@ function Fangorn(){
   }
 
   fangorn.apply_fasta = function(fasta_rep){
-    var consistency = fasta_rep.check_consistency(fangorn.get_leave_names())
+    var leave_ids = fangorn.get_leaves().map(function(node){ return node.name })
+    var consistency = fasta_rep.check_consistency(leave_ids)
+
+    // check if not_in_fasta contains seqs which are marked in the tree
+    var fasta_without_marked_nodes = false
 
     if (consistency != true){
+      if (consistency['not_in_fasta'].length > 0 && consistency['not_in_tree'].length === 0){
+        var marked_ids = fangorn.get_marked_leaf_names()
+
+        if (marked_ids.sort().join(',') === consistency['not_in_fasta'].sort().join(','))
+          fasta_without_marked_nodes = true
+      }
+    }
+
+    if (consistency != true && !fasta_without_marked_nodes){
       fangorn.fasta = null
       var rows = []
 
@@ -170,24 +219,28 @@ function Fangorn(){
     } else {
       fangorn.fasta = fasta_rep
 
-      fangorn.each_leaf(function(leaf){
-        leaf.apply_fasta(fasta_rep.sequences[leaf.name])
+      // Apply fasta records from fasta file
+      fangorn.get_leaves().forEach(function(leaf){
+        if (fasta_rep.sequences.hasOwnProperty(leaf.name))
+          leaf.apply_fasta(fasta_rep.sequences[leaf.name])
       })
+
+      // Apply fasta records for marked leaves from metadata
+      if (fasta_without_marked_nodes) {
+        show_alert("Warning", "Sequences for restoring removed taxa will be taken from Nexus file")
+
+        var removed_fasta_rep = new FastaRepresentation()
+        removed_fasta_rep.read_from_str(fangorn.get_removed_fasta_metadata(), function(seqs){
+          fangorn.get_marked_leaves().forEach(function(leaf){
+            leaf.apply_fasta(seqs[leaf.name])
+          })
+        })
+      }
 
       fangorn.init_fasta_sidebar()
       fangorn.dispatch_state_update()
       fangorn.get_tree().refresh()
     }
-  }
-
-  fangorn.save_fasta = function(){
-    var content = fangorn.output_fasta()
-
-    fs.writeFile(fangorn.fasta.out_path, content, function(err) {
-      if(err) {
-        return console.error(err)
-      }
-    })
   }
 
   fangorn.output_fasta = function(){
@@ -281,30 +334,38 @@ function Fangorn(){
     })
   }
 
-  fangorn.save_project = function(path){
-    data = {}
-    data['tree_path'] = fangorn.tree_path
-    data['tree_str'] = fangorn.get_tree().output_tree()
+  fangorn.metadata_json = function(){
+    result = {}
 
     if (fangorn.fasta_is_loaded()){
-      data['fasta_path'] = fangorn.fasta.path
-      data['original_fasta_str'] = fangorn.fasta.original_str
+      removed_seqs = []
+
+      fangorn.get_leaves().forEach(function(node){
+        if (node.is_marked())
+          removed_seqs.push(node.fasta)
+      })
+
+      if (removed_seqs.length > 0){
+        result['removed_seqs'] = removed_seqs.map(function(e){ return e.to_fasta() }).join('')
+        result['removed_seqs'] = btoa(pako.deflate(result['removed_seqs'], {to: 'string'}))
+      }
     }
-    fs.writeFileSync(path, JSON.stringify(data), 'utf8')
+
+    return result;
   }
 
-  fangorn.open_project = function(path){
-    var str = fs.readFileSync(path, 'utf8')
-    var json = JSON.parse(str)
+  fangorn.get_removed_fasta_metadata  = function(){
+    var tree = fangorn.get_tree()
 
-    fangorn.tree_path = json['tree_path']
-    fangorn.load_tree_string(json['tree_str'])
+    if (!tree.is_nexus() || !tree.nexus.fangorn || !tree.nexus.fangorn.removed_seqs)
+      return false
 
-    if (json['fasta_path'] && json['original_fasta_str']){
-      fangorn.fasta = new FastaRepresentation()
-      fangorn.fasta.path = json['fasta_path']
-      fangorn.load_fasta_string(json['original_fasta_str'])
-    }
+    var removed_seqs = tree.nexus.fangorn.removed_seqs
+    removed_seqs = pako.inflate(atob(removed_seqs), {to: 'string'})
+
+
+
+    return removed_seqs
   }
 
   return this

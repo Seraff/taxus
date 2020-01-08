@@ -401,8 +401,8 @@ function NexusReader()
 {
   Scanner.apply(this, arguments);
 
-  this.nexusCommands = ['begin', 'dimensions', 'end', 'endblock', 'link', 'taxa', 'taxlabels', 'title', 'translate', 'tree'];
-  this.nexusBlocks = ['taxa', 'trees'];
+  this.nexusCommands = ['begin', 'dimensions', 'end', 'endblock', 'link', 'taxa', 'taxlabels', 'title', 'translate', 'tree', 'set'];
+  this.nexusBlocks = ['taxa', 'trees', 'fangorn'];
 };
 
 //----------------------------------------------------------------------------------------------
@@ -512,95 +512,95 @@ function parse(str)
   }
 
   var blockname = nx.GetBlock();
+  var last_error = NexusError.ok;
 
-  //console.log("BLOCK="+blockname);
+  while(blockname != ""){
 
-
-  if (blockname == 'taxa')
-  {
-    var command = nx.GetCommand();
-
-    while (
-      (command != 'end')
-      && (command != 'endblock')
-      && (nx.error == NexusError.ok)
-      )
+    if (blockname == 'taxa')
     {
-      switch (command)
-      {
-        case 'taxlabels':
-          nx.SkipCommand();
-          command = nx.GetCommand();
-          break;
+      var command = nx.GetCommand();
 
-        default:
-          //echo "Command to skip: $command\n";
-          nx.SkipCommand();
-          command = nx.GetCommand();
-          break;
+      while (
+        (command != 'end')
+        && (command != 'endblock')
+        && (nx.error == NexusError.ok)
+        )
+      {
+        switch (command)
+        {
+          case 'taxlabels':
+            nx.SkipCommand();
+            command = nx.GetCommand();
+            break;
+
+          default:
+            nx.SkipCommand();
+            command = nx.GetCommand();
+            break;
+        }
+
+        // If end command eat the semicolon
+        if ((command == 'end') || (command == 'endblock'))
+        {
+          nx.GetToken();
+        }
       }
 
-      // If end command eat the semicolon
-      if ((command == 'end') || (command == 'endblock'))
-      {
-        nx.GetToken();
-      }
-    }
-
-    blockname = nx.GetBlock();
-
-  }
-
-
-  if (blockname == 'trees')
-  {
-    nexus.treesblock = {};
-    nexus.treesblock.trees = [];
-
-    command = nx.GetCommand();
-
-    while (
-      ((command != 'end') && (command != 'endblock'))
-      && (nx.error == NexusError.ok)
-      )
+      // blockname = nx.GetBlock();
+    } else if (blockname == 'trees')
     {
-      switch (command)
+      nexus.treesblock = {}
+      nexus.treesblock.trees = [];
+
+      command = nx.GetCommand();
+
+      while (
+        ((command != 'end') && (command != 'endblock'))
+        && (nx.error == NexusError.ok)
+        )
       {
-        case 'translate':
+        switch (command)
+        {
+          case 'translate':
 
-          // translation table is an associative array
-          nexus.treesblock.translate = {};
+            // translation table is an associative array
+            nexus.treesblock.translate = {};
 
-          var done = false;
-          while (!done && (nx.error == NexusError.ok))
-          {
-            var t = nx.GetToken();
-
-            if ([TokenTypes.Number, TokenTypes.String, TokenTypes.QuotedString].indexOf(t) != -1)
+            var done = false;
+            while (!done && (nx.error == NexusError.ok))
             {
-              var otu = nx.buffer;
-              t = nx.GetToken();
+              var t = nx.GetToken();
 
               if ([TokenTypes.Number, TokenTypes.String, TokenTypes.QuotedString].indexOf(t) != -1)
               {
-                // cast otu to string
-                nexus.treesblock.translate[String(otu)] = nx.buffer;
-
-                //console.log(otu + ' ' + nx.buffer);
-
+                var otu = nx.buffer;
                 t = nx.GetToken();
-                switch (t)
+
+                if ([TokenTypes.Number, TokenTypes.String, TokenTypes.QuotedString].indexOf(t) != -1)
                 {
-                  case TokenTypes.Comma:
-                    break;
+                  // cast otu to string
+                  nexus.treesblock.translate[String(otu)] = nx.buffer;
 
-                  case TokenTypes.SemiColon:
-                    done = true;
-                    break;
+                  //console.log(otu + ' ' + nx.buffer);
 
-                  default:
-                    nx.error = NexusError.syntax;
-                    break;
+                  t = nx.GetToken();
+                  switch (t)
+                  {
+                    case TokenTypes.Comma:
+                      break;
+
+                    case TokenTypes.SemiColon:
+                      done = true;
+                      break;
+
+                    default:
+                      nx.error = NexusError.syntax;
+                      break;
+                  }
+                }
+                else
+                {
+                  nx.error = NexusError.syntax;
                 }
               }
               else
@@ -608,76 +608,173 @@ function parse(str)
                 nx.error = NexusError.syntax;
               }
             }
-            else
+
+            command = nx.GetCommand();
+            break;
+
+          case 'tree':
+            if (command == 'tree')
             {
-              nx.error = NexusError.syntax;
-            }
-          }
+              var tree = {};
 
-          command = nx.GetCommand();
-          break;
-
-        case 'tree':
-          if (command == 'tree')
-          {
-            var tree = {};
-
-            t = nx.GetToken();
-            if (t == TokenTypes.Asterix)
-            {
-              tree.default = true;
               t = nx.GetToken();
-            }
-            if (t == TokenTypes.String)
-            {
-              tree.label = nx.buffer;
-            }
-            t = nx.GetToken();
-            if (t == TokenTypes.Equals)
-            {
-              tree.newick = '';
-              t = nx.GetToken();
-              while (t != TokenTypes.SemiColon)
+              if (t == TokenTypes.Asterix)
               {
-                if (t == TokenTypes.QuotedString)
-                {
-                  var s = nx.buffer;
-                  s = s.replace("'", "''");
-                  s = "'" + s + "'";
-                  tree.newick += s;
-                }
-                else
-                {
-                  tree.newick += nx.buffer;
-                }
+                tree.default = true;
                 t = nx.GetToken();
               }
-              tree.newick += ';';
+              if (t == TokenTypes.String)
+              {
+                tree.label = nx.buffer;
+              }
+              t = nx.GetToken();
+              if (t == TokenTypes.Equals)
+              {
+                tree.newick = '';
+                t = nx.GetToken();
+                while (t != TokenTypes.SemiColon)
+                {
+                  if (t == TokenTypes.QuotedString)
+                  {
+                    var s = nx.buffer;
+                    s = s.replace("'", "''");
+                    s = "'" + s + "'";
+                    tree.newick += s;
+                  }
+                  else
+                  {
+                    tree.newick += nx.buffer;
+                  }
+                  t = nx.GetToken();
+                }
+                tree.newick += ';';
 
-              nexus.treesblock.trees.push(tree);
+                nexus.treesblock.trees.push(tree);
+              }
+
+            }
+            command = nx.GetCommand();
+            break;
+
+          default:
+            //echo "Command to skip: $command\n";
+            nx.SkipCommand();
+            command = nx.GetCommand();
+            break;
+        }
+
+        // If end command eat the semicolon
+        if ((command == 'end') || (command == 'endblock'))
+        {
+          nx.GetToken();
+        }
+
+
+      }
+
+      // blockname = nx.GetBlock();
+    } else if (blockname == 'fangorn')
+    {
+      nexus.fangorn = {}
+
+      var command = nx.GetCommand();
+      var counter = 0;
+
+      while (
+        (command != 'end')
+        && (command != 'endblock')
+        && (nx.error == NexusError.ok)
+        )
+      {
+
+        switch (command)
+        {
+          case 'set':
+            var key = "";
+            var value = "";
+
+            var t = nx.GetToken();
+
+            // key="some value"
+            // key
+            if (t == TokenTypes.QuotedString || t == TokenTypes.String){
+              key = nx.buffer;
+            } else {
+              nx.error = NexusError.syntax;
+              break;
             }
 
-          }
-          command = nx.GetCommand();
-          break;
+            // =
+            t = nx.GetToken();
 
-        default:
-          //echo "Command to skip: $command\n";
+            if (t != TokenTypes.Equals){
+              nx.error = NexusError.syntax;
+              break;
+            }
+
+            t = nx.GetToken();
+
+            while (t != TokenTypes.SemiColon){
+              if ([TokenTypes.Number, TokenTypes.String, TokenTypes.Equals].indexOf(t) != -1){
+                value += nx.buffer;
+              }
+
+              t = nx.GetToken();
+            }
+
+            nexus.fangorn[key] = value;
+
+            command = nx.GetCommand();
+            break;
+
+          default:
+            nx.SkipCommand();
+            command = nx.GetCommand();
+            break;
+        }
+
+        if (counter >= 128){
+          endNotFounds = true;
+          break;
+        }
+        counter += 1;
+
+        if ((command == 'end') || (command == 'endblock'))
+        {
+          nx.GetToken();
+        }
+      }
+    } else {
+      var command = null;
+      var counter = 0;
+      var endNotFound = false;
+
+      while ((command != 'end') && (command != 'endblock')) {
+        command = nx.GetCommand();
+
+        if ((command != 'end') && (command != 'endblock')){
+          nx.error = NexusError.ok;
           nx.SkipCommand();
-          command = nx.GetCommand();
+        } else
+          nx.GetToken();
+
+        if (counter >= 128){
+          endNotFounds = true;
           break;
+        }
+        counter += 1;
       }
 
-      // If end command eat the semicolon
-      if ((command == 'end') || (command == 'endblock'))
-      {
-        nx.GetToken();
-      }
-
-
+      nx.error = endNotFound ? NexusError.badblock : NexusError.ok;
     }
 
+    last_error = nx.error;
+
+    blockname = nx.GetBlock()
   }
+
+  if (nx.error == NexusError.nobegin)
+    nx.error = last_error;
 
   nexus.status = nx.error;
 

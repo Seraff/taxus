@@ -1,6 +1,7 @@
 var electron = require("electron")
 var app = electron.app
 var Menu = electron.Menu
+var BrowserWindow = electron.BrowserWindow
 
 const template = [
   {
@@ -9,28 +10,50 @@ const template = [
       {
         id: "open-tree",
         label: "Open tree",
-        accelerator: "CmdOrCtrl+O",
-        click: function() { }
+        accelerator: "CmdOrCtrl+O"
       },
       {
-        id: "open-fasta",
-        label: "Open fasta",
-        click: function() { }
+        id: "save-tree",
+        label: "Save tree",
+        accelerator: "CmdOrCtrl+S"
+      },
+      {
+        id: "save-tree-as",
+        label: "Save tree as...",
+        accelerator: "CmdOrCtrl+Shift+S"
       },
       {
         type: 'separator'
       },
       {
-        id: "save-tree",
-        label: "Save",
-        accelerator: 'CmdOrCtrl+S',
-        click: function() { }
+        id: "open-fasta",
+        label: "Open fasta",
+        accelerator: "CmdOrCtrl+Shift+O"
       },
       {
-        id: "save-tree-as",
-        label: "Save as...",
-        accelerator: 'CmdOrCtrl+Shift+S',
-        click: function() { }
+        id: "save-fasta",
+        label: "Save fasta"
+      },
+      {
+        id: "save-fasta-as",
+        label: "Save fasta as..."
+      },
+      {
+        type: 'separator'
+      },
+      {
+        id: "export",
+        label: "Export to...",
+        submenu: [
+        {
+          id: "export-to-png",
+          label: "Png"
+        },
+        {
+          id: "export-to-pdf",
+          label: "Pdf"
+        },
+        ]
       }
     ]
   },
