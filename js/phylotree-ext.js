@@ -1,5 +1,6 @@
 var Mousetrap = require('mousetrap');
 const nexus = require('./nexus.js');
+const pako = require('pako')
 
 function apply_extensions(phylotree){
   // console.log(phylotree)
@@ -205,9 +206,29 @@ function apply_extensions(phylotree){
     return phylotree.nexus != null;
   }
 
-  phylotree.apply_json_metadata = function(json){
-    if (phylotree.is_nexus())
+  // Metadata comes from Fangorn in it's format (when saving)
+  phylotree.apply_fangorn_metadata = function(json){
+    if (phylotree.is_nexus()){
+      if (json.hasOwnProperty('removed_seqs')){
+        json.removed_seqs = btoa(pako.deflate(json.removed_seqs, {to: 'string'}))
+      }
+
       phylotree.nexus.fangorn = json
+    }
+  }
+
+  // Convert metadata to Fangorn format (when opening)
+  phylotree.nexus_to_fangorn_metadata = function(){
+    var result = {}
+
+    if (phylotree.nexus.hasOwnProperty('fangorn')) {
+      if (phylotree.nexus.fangorn.hasOwnProperty('removed_seqs')){
+        result['removed_seqs'] = pako.inflate(atob(phylotree.nexus.fangorn.removed_seqs),
+                                              {to: 'string'})
+      }
+    }
+
+    return result
   }
 
   phylotree.output_tree = function(metadata_json){

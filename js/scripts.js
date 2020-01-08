@@ -92,7 +92,11 @@ function set_window_header(text = null){
 }
 
 function open_tree_action(e){
-  dialog.showOpenDialog({ properties: ['openFile'], filters: [{ name: "Trees", extensions: TREE_EXT }] }).then(result => {
+  var options = { properties: ['openFile'],
+                  filters: [{ name: "Trees", extensions: TREE_EXT }],
+                  title: "Open tree" }
+
+  dialog.showOpenDialog(options).then(result => {
     if (result.filePaths.length == 0)
       return false
 
@@ -106,9 +110,25 @@ function save_tree_action(){
   fangorn.save_tree()
 }
 
+function save_tree_as_action(){
+  var options = { title: "Save tree as...", defaultPath: fangorn.tree_path }
+  dialog.showSaveDialog(options).then(result => {
+    if (result.canceled || result.filePath.length === 0)
+      return true
+
+    fangorn.save_tree(result.filePath)
+    fangorn.load_tree_file(result.filePath)
+    set_window_header(result.filePath.replace(/^.*[\\\/]/, ''))
+  })
+}
+
 function open_fasta_action(){
-  dialog.showOpenDialog({ properties: ['openFile'], filters: [{ name: "Fasta", extensions: FASTA_EXT }] }).then(result => {
-    if (result.filePaths.length == 0)
+  var options = { properties: ['openFile'],
+                  filters: [{ name: "Fasta", extensions: FASTA_EXT }],
+                  title: "Open fasta file" }
+
+  dialog.showOpenDialog(options).then(result => {
+    if (result.filePaths.length === 0)
       return false
 
     var path = result.filePaths[0]
@@ -141,7 +161,20 @@ function restore_selected_action(){
 }
 
 function save_fasta_action(){
-  fangorn.save_fasta();
+  fangorn.save_fasta()
+}
+
+function save_fasta_as_action(){
+  var options = { title: "Save fasta as...", defaultPath: fangorn.fasta.out_path }
+
+  dialog.showSaveDialog(options).then(result => {
+    if (result.canceled || result.filePath.length === 0)
+      return true
+
+    fangorn.save_fasta(result.filePath, function(){
+      fangorn.load_fasta_file(result.filePath)
+    })
+  })
 }
 
 function show_fasta_action(){
@@ -189,9 +222,11 @@ $(document).ready(function() {
 
   menu.setCallbackOnItem('open-tree', open_tree_action)
   menu.setCallbackOnItem('save-tree', save_tree_action)
+  menu.setCallbackOnItem('save-tree-as', save_tree_as_action)
 
   menu.setCallbackOnItem('open-fasta', open_fasta_action)
   menu.setCallbackOnItem('save-fasta', save_fasta_action)
+  menu.setCallbackOnItem('save-fasta-as', save_fasta_as_action)
 
 
 
