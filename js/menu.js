@@ -47,11 +47,11 @@ const template = [
         submenu: [
         {
           id: "export-to-png",
-          label: "Png"
+          label: "PNG"
         },
         {
-          id: "export-to-pdf",
-          label: "Pdf"
+          id: "export-to-svg",
+          label: "SVG"
         },
         ]
       }

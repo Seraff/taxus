@@ -7,6 +7,7 @@ const FindInPage = require('electron-find').FindInPage
 const AColorPicker = require('a-color-picker');
 const Fangorn = require('./js/fangorn.js');
 const ColorPicker = require('./js/color_picker.js');
+const svgToPng = require('save-svg-as-png');
 var fg = null;
 
 var fangorn = null;
@@ -205,6 +206,16 @@ function reroot_action(){
   fangorn.reroot_to_selected_node();
 }
 
+function export_to_png_action(){
+  options = {fonts: [], scale: 1.5}
+  svgToPng.saveSvgAsPng(d3.select('svg#tree_display').node(), 'tree.png', options);
+}
+
+function export_to_svg_action(){
+  options = {fonts: []}
+  svgToPng.saveSvg(d3.select('svg#tree_display').node(), 'tree.svg', options)
+}
+
 $(document).ready(function() {
   set_window_header();
 
@@ -228,6 +239,8 @@ $(document).ready(function() {
   menu.setCallbackOnItem('save-fasta', save_fasta_action)
   menu.setCallbackOnItem('save-fasta-as', save_fasta_as_action)
 
+  menu.setCallbackOnItem('export-to-png', export_to_png_action)
+  menu.setCallbackOnItem('export-to-svg', export_to_svg_action)
 
 
   $(window).on("resize", function(){
