@@ -3,7 +3,8 @@ const fs = require('fs');
 const p = require('path');
 /**
  * FastaRepresentation class doesn't know anything about Fangorn
- * Stores fasta sequence
+ * Parses fasta sequence
+ * Stores each entry in object { "seq_id": FastaEntry, ... }
  */
 
 function FastaRepresentation(){

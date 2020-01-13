@@ -508,7 +508,7 @@ function parse(str)
 
   if (nx.IsNexusFile())
   {
-    //console.log('Is a NEXUS file');
+    // console.log('Is a NEXUS file');
   }
 
   var blockname = nx.GetBlock();
@@ -715,7 +715,7 @@ function parse(str)
             t = nx.GetToken();
 
             while (t != TokenTypes.SemiColon){
-              if ([TokenTypes.Number, TokenTypes.String, TokenTypes.Equals].indexOf(t) != -1){
+              if ([TokenTypes.DoubleQuote].indexOf(t) == -1){
                 value += nx.buffer;
               }
 

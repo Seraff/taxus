@@ -1,5 +1,6 @@
 const fs = require('fs')
 const Node = require('./node.js')
+const FastaPane = require('./fasta_pane.js')
 const FastaRepresentation = require('./fasta_representation.js')
 const apply_extensions = require('./phylotree-ext.js')
 
@@ -10,8 +11,9 @@ function Fangorn(){
   fangorn.fasta_path = null
 
   fangorn.fasta = null
+  fangorn.fasta_pane = new FastaPane()
 
-  var _nodes = null
+  var _nodes = []
   var _branches = null
   var _tree = null
 
@@ -111,7 +113,6 @@ function Fangorn(){
     })
 
     fangorn.fasta = null
-    fangorn.init_fasta_sidebar()
     fangorn.dispatch_state_update()
 
   }
@@ -128,6 +129,7 @@ function Fangorn(){
   }
 
   fangorn.load_tree_string = function(content){
+    fangorn.close_fasta()
     fangorn.init_phylotree(content)
     fangorn.reinit_nodes()
     fangorn.get_tree().update(); // for initial node styling.
@@ -230,7 +232,7 @@ function Fangorn(){
         show_alert("Warning", "Sequences for restoring removed taxa will be taken from Nexus file")
       }
 
-      fangorn.init_fasta_sidebar()
+      fangorn.redraw_fasta_sidebar()
       fangorn.dispatch_state_update()
       fangorn.get_tree().refresh()
     }
@@ -246,6 +248,11 @@ function Fangorn(){
     })
 
     return content
+  }
+
+  fangorn.close_fasta = function(){
+    fangorn.fasta = null
+    fangorn.fasta_pane.show_no_fasta()
   }
 
   // wrap phylotree nodes with fangorn nodes
@@ -268,19 +275,9 @@ function Fangorn(){
     return fangorn.fasta != null
   }
 
-  fangorn.init_fasta_sidebar = function(){
-    var content = ''
-
-    if (fangorn.fasta_is_loaded()){
-      content = '<b class="ui-text">' + fangorn.fasta._out_filename + '</b></br>'
-      fangorn.each_leaf(function(leaf){
-        content += leaf.init_fasta_bar_entry()
-      })
-    } else {
-      content += '<b class="ui-text">No fasta loaded...</b>'
-    }
-
-    $('#fasta-panel').html(content)
+  fangorn.redraw_fasta_sidebar = function(){
+    fangorn.fasta_pane.set_title_from_path(fangorn.fasta.path)
+    fangorn.fasta_pane.draw_fasta(fangorn.get_leaves())
   }
 
   fangorn.dispatch_state_update = function(){
@@ -303,7 +300,7 @@ function Fangorn(){
     node.fasta.id = new_id
     node.fasta.title = title
 
-    fangorn.init_fasta_sidebar()
+    fangorn.redraw_fasta_sidebar()
   }
 
   fangorn.reroot_to_selected_node = function(){

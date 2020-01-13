@@ -6,6 +6,7 @@ function Node(fangorn, phylotree_node){
   var fangorn = fangorn
   var fasta_bar_entry_selector = null
 
+  node.fangorn = fangorn
   node.is_fangorn_node = true
   node.parsed_annotation = {}
 
@@ -64,7 +65,7 @@ function Node(fangorn, phylotree_node){
       return null
   }
 
-  node.init_fasta_bar_entry = function(){
+  node.fasta_bar_entry = function(){
     if (!node.fasta_is_loaded())
       return '';
 

@@ -14,18 +14,18 @@ function NodeStyler(node){
     }
 
     if (this.node.fasta_is_loaded()){
-      var fasta_entry = this.node.get_fasta_bar_entry();
+      var pane = styler.node.fangorn.fasta_pane
 
       if (this.node.selected == true){
-        fasta_entry.addClass('fasta-node-selected');
+        pane.highlight_entry_for_node(node)
       } else {
-        fasta_entry.removeClass("fasta-node-selected");
+        pane.unhighlight_entry_for_node(node)
       }
 
       if (this.node.is_marked() == true){
-        $(fasta_entry).hide();
+        pane.hide_entry_for_node(node)
       } else {
-        $(fasta_entry).show();
+        pane.unhide_entry_for_node(node)
       }
     }
   }
@@ -42,37 +42,6 @@ function NodeStyler(node){
   this.redraw_color_annotation = function(value){
     this.node.prev_branch.get_element().attr('style', "stroke: " + value + " !important");
   }
-
-  // Under reconstruction
-  this.redraw_hilight_annotation = function(value){
-    styler.drawn_shapes.forEach(function(sh){ sh.remove() });
-    styler.drawn_shapes = [];
-
-    var el = this.node.prev_branch.get_element();
-    var color = value.match(/#\w+/)[0];
-    e = el;
-    n = this.node;
-
-    var rects = this.node.children.map(function(nd){ return nd.getBBox() });
-    console.log(rects)
-
-    var min_x = el.node().getBBox().x;
-    var min_y = Math.min(...rects.map(function(rect){ return rect.y }));
-    var max_x = Math.max(...rects.map(function(rect){ return rect.x + rect.width }));
-    var max_y = Math.max(...rects.map(function(rect){ return rect.y + rect.height }));
-    var width = Math.abs(max_x) - Math.abs(min_x) + 10;
-    var height = Math.abs(max_y) - Math.abs(min_y);
-
-    var bbox = this.node.getBBox();
-    var bbox_t = this.node.getTranslatedBBox();
-
-    var rect = d3.select('.phylotree-container').append('rect').attr("x", min_x).attr("y", min_y).attr("height", height).attr("width", width).attr('fill', color);
-    styler.drawn_shapes.push(rect);
-
-    var first_el = d3.select('.phylotree-container').node().firstChild;
-    d3.select('.phylotree-container').node().insertBefore(rect.node(), first_el);
-  }
-
 }
 
 module.exports = NodeStyler;
