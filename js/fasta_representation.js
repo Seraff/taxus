@@ -1,4 +1,3 @@
-const parser = require('bio-parsers')
 const fs = require('fs');
 const p = require('path');
 /**
@@ -6,6 +5,26 @@ const p = require('path');
  * Parses fasta sequence
  * Stores each entry in object { "seq_id": FastaEntry, ... }
  */
+
+function fasta_to_json(fasta_str){
+  var json = []
+
+  var fasta = fasta_str.split('>')
+  fasta.shift()
+
+  fasta.forEach(function(rec){
+    var splitted = rec.trim().split('\n').map(function(el){ return el.trim() })
+
+    var header = splitted[0]
+    var id = splitted[0].split(/\s/)[0]
+    splitted.shift()
+    var seq = splitted.join('').toUpperCase()
+
+    json.push({ header: header, id: id, sequence: seq })
+  })
+
+  return json
+}
 
 function FastaRepresentation(){
   var fasta = this;
@@ -19,27 +38,22 @@ function FastaRepresentation(){
     fasta.sequences = {}
 
     var str = fs.readFileSync(path, 'utf8')
-    fasta.read_from_str(str, function(entries){
-      fasta.path = path
-      fasta.out_path = path_is_fangorized(path) ? path : fangorize_path(path)
-
-      callback(entries)
-    })
+    fasta.read_from_str(str)
+    fasta.path = path
+    fasta.out_path = path_is_fangorized(path) ? path : fangorize_path(path)
   }
 
-  fasta.read_from_str = function(str, callback){
+  fasta.read_from_str = function(str){
     fasta.sequences = {}
 
-    fasta = parser.fastaToJson(str, function(json){
-      json.forEach(function(el){
-        var entry = new FastaEntry(el)
-        fasta.sequences[entry.id] = entry;
-      })
+    var json = fasta_to_json(str)
 
-      fasta.original_str = str
+    json.forEach(function(el){
+      var entry = new FastaEntry(el)
+      fasta.sequences[entry.id] = entry;
+    })
 
-      callback(fasta.sequences)
-    });
+    fasta.original_str = str
   }
 
   // Checks if fasta is compatible for the names provided
@@ -87,12 +101,12 @@ function FastaEntry(json){
   var entry = this
   entry.json = json
 
-  entry.original_title = json.parsedSequence.name
-  entry.id = entry.original_title.split(/\s/)[0]
-  entry.sequence = json.parsedSequence.sequence
+  entry.header = json.header
+  entry.id = json.id
+  entry.sequence = json.sequence
 
   entry.to_fasta = function(){
-    var content = '>' + entry.original_title + '\n'
+    var content = '>' + entry.header + '\n'
     content += entry.sequence + '\n'
     return content
   }

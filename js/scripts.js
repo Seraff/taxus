@@ -285,10 +285,16 @@ $(document).ready(function() {
     $("#universal-dialog")[0].close(false);
   });
 
-  $("[data-direction]").on ("click", function () {
+  $("[data-direction]").on("click", function () {
     var which_function = $(this).data ("direction") == 'vertical' ? fangorn.get_tree().spacing_x : fangorn.get_tree().spacing_y;
     which_function (which_function () + (+ $(this).data ("amount"))).safe_update();
   });
+
+  $(document).on("click", '.fasta-pane-entry', function(e){
+    var id = $(e.target).parent('.fasta-pane-entry').attr('id')
+    var node = fangorn.fasta_pane.node_by_id(id)
+    fangorn.get_tree().modify_selection(function(n){ return node == n.target })
+  })
 
   // picker logic
 

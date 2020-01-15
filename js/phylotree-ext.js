@@ -4,6 +4,12 @@ const pako = require('pako')
 
 function apply_extensions(phylotree){
   // console.log(phylotree)
+  const basic_nexus_pattern = `#NEXUS
+begin trees;
+\ttree tree = [&R] %NEWICK%
+end;
+`
+
   var svg = phylotree.get_svg();
   var zoom_mode = false;
 
@@ -167,6 +173,13 @@ function apply_extensions(phylotree){
     phylotree.original_newick = null;
     phylotree.original_file_template = null;
 
+    str = $.trim(str);
+
+    // if it looks like newick, make a basic nexus
+    if (str[0] == '(' && str[str.length-1] == ';'){
+      str = basic_nexus_pattern.replace("%NEWICK%", str);
+    }
+
     // try with nexus
     var parsed_nexus = nexus.parse(str);
 
@@ -182,8 +195,10 @@ function apply_extensions(phylotree){
         phylotree.original_file_template = phylotree.original_file_template.replace(fangorn_block, "%FG_BLK%");
       }
 
-    } else
+    } else {
       newick = str;
+      throw "Unable to open the tree file";
+    }
 
     phylotree.original_newick = newick;
 

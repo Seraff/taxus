@@ -104,7 +104,12 @@ function Fangorn(){
     _tree.node_circle_size(0)
     _tree.style_edges(edgeStyler)
     _tree.style_nodes(nodeStyler)
-    _tree.read_tree(str).layout() // renders the tree
+
+    try {
+      _tree.read_tree(str).layout() // renders the tree
+    } catch(err) {
+      show_alert('Error', 'Unable to open tree');
+    }
 
     d3.select(".phylotree-container").attr("align", "center")
 
@@ -172,9 +177,8 @@ function Fangorn(){
   fangorn.load_fasta_file = function(path){
     var fasta_rep = new FastaRepresentation()
 
-    fasta_rep.read_from_file(path, function(){
-      fangorn.apply_fasta(fasta_rep)
-    })
+    fasta_rep.read_from_file(path)
+    fangorn.apply_fasta(fasta_rep)
   }
 
   fangorn.load_fasta_string = function(str){

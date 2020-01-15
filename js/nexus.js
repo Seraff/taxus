@@ -107,6 +107,7 @@ NexusError.badcommand   = 4;
 NexusError.noblockname  = 5;
 NexusError.badblock   = 6;
 NexusError.nosemicolon  = 7;
+NexusError.notnexus  = 8;
 
 //--------------------------------------------------------------------------------------------------
 function Scanner(str)
@@ -506,9 +507,10 @@ function parse(str)
 
   var nx = new NexusReader(str);
 
-  if (nx.IsNexusFile())
+  if (!nx.IsNexusFile())
   {
-    // console.log('Is a NEXUS file');
+    nexus.status = NexusError.notnexus;
+    return nexus;
   }
 
   var blockname = nx.GetBlock();
@@ -769,7 +771,6 @@ function parse(str)
     }
 
     last_error = nx.error;
-
     blockname = nx.GetBlock()
   }
 

@@ -39,8 +39,20 @@
   fill: #3182bd !important;
 }
 
-.fasta-node-selected {
+span.fasta-pane-entry {
+  white-space: nowrap;
+}
+
+span.fasta-pane-entry.selected {
   color: #3182bd;
+}
+
+span.fasta-pane-entry-header{
+  font-weight: bold;
+}
+
+span.fasta-pane-entry-sequence{
+  font-family: Courier, Monaco, monospace;
 }
 
 .branch-selected {
