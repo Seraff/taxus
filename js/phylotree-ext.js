@@ -1,3 +1,4 @@
+const $ = require('jquery')
 var Mousetrap = require('mousetrap');
 const nexus = require('./nexus.js');
 const pako = require('pako')
@@ -224,7 +225,7 @@ end;
   // Metadata comes from Fangorn in it's format (when saving)
   phylotree.apply_fangorn_metadata = function(json){
     if (phylotree.is_nexus()){
-      if (json.hasOwnProperty('removed_seqs')){
+      if (hasOwnProperty(json, 'removed_seqs')){
         json.removed_seqs = btoa(pako.deflate(json.removed_seqs, {to: 'string'}))
       }
 
@@ -236,10 +237,12 @@ end;
   phylotree.nexus_to_fangorn_metadata = function(){
     var result = {}
 
-    if (phylotree.nexus.hasOwnProperty('fangorn')) {
-      if (phylotree.nexus.fangorn.hasOwnProperty('removed_seqs')){
-        result['removed_seqs'] = pako.inflate(atob(phylotree.nexus.fangorn.removed_seqs),
-                                              {to: 'string'})
+    if (hasOwnProperty(phylotree.nexus, 'fangorn')) {
+      Object.assign(result, phylotree.nexus.fangorn)
+
+      if (hasOwnProperty(phylotree.nexus.fangorn, 'removed_seqs')){
+        var encoded = phylotree.nexus.fangorn.removed_seqs
+        result['removed_seqs'] = pako.inflate(atob(encoded), {to: 'string'})
       }
     }
 

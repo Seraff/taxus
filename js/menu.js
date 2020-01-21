@@ -1,5 +1,6 @@
 var electron = require("electron")
 var app = electron.app
+const path = require('path')
 var Menu = electron.Menu
 var BrowserWindow = electron.BrowserWindow
 
@@ -158,6 +159,22 @@ if (process.platform === 'darwin') {
       {
         label: 'About Fangorn',
         role: 'about'
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Preferences',
+        accelerator: 'Command+,',
+        role: 'preferences',
+        click: _ => {
+            const htmlPath = 'preferences.html'
+
+            var prefWindow = new BrowserWindow({ width: 500, height: 300, resizable: false })
+            prefWindow.loadURL(htmlPath)
+            prefWindow.show()
+            // on window closed
+        },
       },
       {
         type: 'separator'

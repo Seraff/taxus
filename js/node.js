@@ -1,3 +1,4 @@
+const $ = require('jquery')
 const FastaRepresentation = require('./fasta_representation.js');
 const NodeStyler = require('./node_styler.js');
 

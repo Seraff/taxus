@@ -1,3 +1,4 @@
+const $ = require('jquery')
 /**
  * Very basic NEXUS parser
  *

@@ -1,3 +1,4 @@
+const _ = require('underscore');
 const parseString = require('xml2js').parseString;
 
 (function() {

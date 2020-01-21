@@ -1,3 +1,4 @@
+const $ = require('jquery')
 const Path = require('path')
 
 function FastaPane(){
