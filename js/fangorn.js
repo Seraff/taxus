@@ -322,7 +322,7 @@ function Fangorn () {
     return fangorn.get_tree().nexus_to_fangorn_metadata()
   }
 
-  // make metadata from current tree
+  // Make metadata from current tree
 
   fangorn.metadata_from_current_state = function () {
     var result = {}
@@ -335,14 +335,14 @@ function Fangorn () {
       result.removed_seqs = our_removed_seqs.map(function (e) { return e.to_fasta() }).join('')
     }
 
-    // apply preferences
+    // Apply preferences
 
-    Object.assign(result, fangorn.preferences.preferences)
+    Object.assign(result, fangorn.preferences.forNexus())
 
     return result
   }
 
-  // extract metadata from nexus and apply to current tree
+  // Extract metadata from nexus and apply to current tree
 
   fangorn.apply_metadata_from_nexus = function () {
     var metadata = fangorn.metadata_from_nexus()
@@ -359,7 +359,6 @@ function Fangorn () {
     }
 
     fangorn.preferences.applyToDefaults(metadata)
-    fangorn.preferences.dispathPreferencesUpdate()
   }
 
   return this

@@ -1,16 +1,13 @@
-e = null
-n = null;
-
 function NodeStyler(node){
-  styler = this;
-  this.node = node;
-  this.drawn_shapes = [];
+  styler = this
+  this.node = node
+  this.drawn_shapes = []
 
   this.style_leaf = function(dom_element){
     if (this.node.is_marked() == true){
-      var klass = dom_element.attr('class');
-      klass += " node-fangorn-marked";
-      dom_element.attr('class', klass);
+      var klass = dom_element.attr('class')
+      klass += " node-fangorn-marked"
+      dom_element.attr('class', klass)
     }
 
     if (this.node.fasta_is_loaded()){
@@ -31,16 +28,30 @@ function NodeStyler(node){
   }
 
   this.style = function(){
-    for (var prop in this.node.parsed_annotation){
-      var val = this.node.parsed_annotation[prop];
+    this.setColor(this.defaultColor())
+    this.setWidth()
 
-      if (prop === 'color')
-        this.redraw_color_annotation(val);
+    for (var prop in this.node.parsed_annotation){
+      var val = this.node.parsed_annotation[prop]
+
+      if (prop === 'color') { this.setColor(val) }
     }
   }
 
-  this.redraw_color_annotation = function(value){
-    this.node.prev_branch.get_element().attr('style', "stroke: " + value + " !important");
+  this.setColor = function(value){
+    if (this.node.prev_branch)
+      $(this.node.prev_branch.get_element()[0]).css('stroke', value)
+  }
+
+  this.setWidth = function(){
+    if (this.node.prev_branch) {
+      var value = this.node.fangorn.preferences.getPreference('branchWidth')
+      $(this.node.prev_branch.get_element()[0]).css('stroke-width', value + 'px')
+    }
+  }
+
+  this.defaultColor = function() {
+    return this.node.fangorn.preferences.getPreference('branchColor')
   }
 }
 

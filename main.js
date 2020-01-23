@@ -1,7 +1,7 @@
-const { app, BrowserWindow } = require('electron');
-const menu = require('./js/menu.js');
+const { app, BrowserWindow } = require('electron')
+const menu = require('./js/menu.js')
 
-process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true
 
 function createWindow () {
   let win = new BrowserWindow({
@@ -12,7 +12,7 @@ function createWindow () {
       nodeIntegration: true
     }
   })
-  menu.build_menu();
+  menu.build_menu()
   win.loadFile('index.html')
 }
 

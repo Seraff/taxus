@@ -1,5 +1,6 @@
 const app = require('electron')
 const { BrowserWindow, dialog } = require('electron').remote
+const ipcRenderer = require('electron').ipcRenderer
 
 const cp = require('child_process')
 const fileDialog = require('file-dialog')
@@ -208,31 +209,8 @@ function export_to_svg_action () {
   svgToPng.saveSvg(d3.select('svg#tree_display').node(), 'tree.svg', options)
 }
 
-function set_branch_width (new_width) {
-  var value = new_width + 'px'
-  $('.branch').css('stroke-width', value)
-}
-
-function set_branch_color (new_color) {
-  $('.branch').filter(function () {
-    var style = $(this).attr('style')
-    return (!style || !style.includes('stroke'))
-  }).css('stroke', new_color)
-}
-
 function applyPreferences () {
-  var prefs = fangorn.preferences.preferences
-
-  for (key in prefs) {
-    switch (key){
-      case 'branchWidth':
-        set_branch_width(prefs[key])
-        break
-      case 'branchColor':
-        set_branch_color(prefs[key])
-        break
-    }
-  }
+  fangorn.get_tree().safe_update()
 }
 
 $(document).ready(function () {
@@ -328,4 +306,13 @@ $(document).ready(function () {
   // Preferences logic
 
   document.addEventListener('preferences_update', applyPreferences)
+
+  ipcRenderer.on('give_current_prefs', (event, message) => {
+    ipcRenderer.send('take_current_prefs', fangorn.preferences)
+  })
+
+  ipcRenderer.on('take_new_prefs', (event, message) => {
+    fangorn.preferences.applyToCurrent(message)
+    ipcRenderer.send('new_preferences_taken')
+  })
 })

@@ -86,7 +86,7 @@ function FastaRepresentation(){
 
   fasta.each_sequence = function(f){
     for (var k in fasta.sequences){
-      if (fasta.sequences.hasOwnProperty(k)) {
+      if (hasOwnProperty(fasta.sequences, k)) {
         f(fasta.sequences[k]);
       }
     }

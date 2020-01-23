@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Preferences</title>
+    <link rel="stylesheet" href="css/vendor/photon.min.css">
+
+    <style type="text/css">
+      .preferences-form {
+          padding: 10px;
+      }
+
+      .toolbar-header {
+          -webkit-app-region: drag;
+          padding: 8px;
+      }
+
+      .window {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+
+          background-color: #f5f5f4;
+      }
+
+      .form-control {
+        border-radius: 0px !important;
+      }
+
+      .a-color-picker {
+        border-radius: 0px !important;
+        box-shadow: none !important;
+        border: 1px solid #ddd;
+      }
+      .a-color-picker-sl {
+        width: 278px !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="window">
+      <form class="preferences-form">
+        <div class="form-group">
+          <label>Branch width</label>
+          <input data-pref-id="branchWidth" type="number" class="form-control fangorn-preference" placeholder="">
+        </div>
+        <div class="form-group">
+          <label>Default branch color</label>
+          <input data-pref-id="branchColor" type="hidden" class="form-control fangorn-preference" placeholder="">
+
+          <div id="default-branch-color-picker"
+               acp-color="#cddc39"
+               acp-show-rgb="no"
+               acp-show-hsl="no"
+               acp-show-hex="no">
+          </div>
+
+        </div>
+      </form>
+
+
+
+      <footer class="toolbar toolbar-footer">
+        <div class="toolbar-actions">
+          <button id="cancel-button" class="btn btn-default">
+            Cancel
+          </button>
+
+          <button id ="save-button" class="btn btn-primary pull-right">
+            Save
+          </button>
+        </div>
+      </footer>
+    </div>
+
+  <script type="text/javascript">
+    const $ = require('jquery')
+    const remote = require('electron').remote;
+
+    const ipcRenderer = require('electron').ipcRenderer
+
+    const AColorPicker = require('a-color-picker')
+
+    function collectPreferences () {
+      var result = {}
+      $('.fangorn-preference').each( function () {
+        result[$(this).attr('data-pref-id')] = $(this).val()
+      })
+
+      return result
+    }
+
+    function removeCallbacks () {
+      ipcRenderer.removeAllListeners('take_current_prefs', 'give_current_prefs')
+    }
+
+    $(document).ready(function () {
+      var picker = AColorPicker.createPicker('#default-branch-color-picker', { hueBarSize: [150, 11], slBarSize: [280, 50] }).on('change', (picker, color) => {
+        var hex = AColorPicker.parseColor(color, 'hex')
+        $('.fangorn-preference[data-pref-id=branchColor]').val(hex)
+      })
+
+      ipcRenderer.on('take_current_prefs', (event, message) => {
+        for (key in message.preferences) {
+          $('.fangorn-preference[data-pref-id=' + key + ']').val(message.preferences[key])
+
+          if (key === 'branchColor') { picker.setColor(message.preferences[key]) }
+        }
+      })
+
+      ipcRenderer.send('give_current_prefs')
+
+      $('#cancel-button').on('click', () => {
+        var win = remote.getCurrentWindow()
+        removeCallbacks()
+        win.close()
+      })
+
+      $('#save-button').on('click', () => {
+        var prefs = collectPreferences()
+        ipcRenderer.send('take_new_prefs', prefs)
+      })
+
+      ipcRenderer.on('new_preferences_taken', (event, message) => {
+        var win = remote.getCurrentWindow()
+        removeCallbacks()
+        win.close()
+      })
+    })
+  </script>
+  </body>
+</html>
