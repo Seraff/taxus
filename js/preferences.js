@@ -5,7 +5,8 @@ const DEFAULTS = {
 
 class Preferences {
   constructor () {
-    this.preferences = DEFAULTS
+    this.preferences = {}
+    this.resetToDefaults()
   }
 
   getPreferences () {
@@ -16,8 +17,14 @@ class Preferences {
     return this.preferences[key]
   }
 
+  resetToDefaults () {
+    for (var key in DEFAULTS) {
+      this.preferences[key] = DEFAULTS[key]
+    }
+  }
+
   applyToDefaults (otherPreferences) {
-    this.preferences = DEFAULTS
+    this.resetToDefaults()
     this.applyToCurrent(otherPreferences)
 
     return this.preferences

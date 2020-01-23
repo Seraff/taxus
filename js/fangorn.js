@@ -14,7 +14,7 @@ function Fangorn () {
   fangorn.fasta = null
   fangorn.fasta_pane = new FastaPane()
 
-  fangorn.preferences = new Preferences()
+  fangorn.preferences = null
 
   var _nodes = []
   var _branches = null
@@ -136,6 +136,7 @@ function Fangorn () {
   fangorn.load_tree_string = function (content) {
     fangorn.close_fasta()
     fangorn.init_phylotree(content)
+    fangorn.preferences = new Preferences()
     fangorn.reinit_nodes()
     fangorn.get_tree().update() // for initial node styling.
     fangorn.apply_metadata_from_nexus()
@@ -357,7 +358,6 @@ function Fangorn () {
         leaf.apply_fasta(removed_fasta_rep.sequences[leaf.name])
       })
     }
-
     fangorn.preferences.applyToDefaults(metadata)
   }
 
