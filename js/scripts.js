@@ -15,12 +15,6 @@ var fangorn = null
 const TREE_EXT = ['tre', 'tree', 'nexus', 'nex', 'nxs', 'newick', 'txt']
 const FASTA_EXT = ['fa', 'fas', 'fasta', 'fna', 'faa', 'ffn', 'frn']
 
-function init_sizes () {
-  var bounds = app.remote.getCurrentWindow().webContents.getOwnerBrowserWindow().getBounds()
-  width = $('#main-tree-container')[0].clientWidth
-  $('svg#tree_display').css({ width: width - 30, height: bounds.height - 120 })
-}
-
 function update_controls (fangorn) {
   menu = app.remote.Menu.getApplicationMenu()
 
@@ -177,11 +171,9 @@ function show_fasta_action () {
   if ($('#fasta-panel').is(':hidden')) {
     $('#fasta-panel').show()
     $('#show-fasta-action').addClass('btn-pressed')
-    init_sizes()
   } else {
     $('#fasta-panel').hide()
     $('#show-fasta-action').removeClass('btn-pressed')
-    init_sizes()
   }
 }
 
@@ -223,8 +215,6 @@ $(document).ready(function () {
   fangorn = Fangorn()
   fangorn.dispatch_state_update()
 
-  init_sizes()
-
   // *** Menu actions *** //
 
   menu.setCallbackOnItem('open-tree', open_tree_action)
@@ -237,10 +227,6 @@ $(document).ready(function () {
 
   menu.setCallbackOnItem('export-to-png', export_to_png_action)
   menu.setCallbackOnItem('export-to-svg', export_to_svg_action)
-
-  $(window).on('resize', function () {
-    init_sizes()
-  })
 
   $(window).on('keydown', function (e) {
     if ((e.ctrlKey || e.metaKey) && e.keyCode === 70) {
