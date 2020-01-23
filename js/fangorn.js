@@ -89,7 +89,8 @@ function Fangorn () {
         collapsible: false,
         selectable: true,
         'align-tips': false,
-        transitions: false
+        transitions: false,
+        'internal-names': true
       })
 
     function edgeStyler (dom_element, edge_object) {
