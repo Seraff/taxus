@@ -294,11 +294,11 @@ $(document).ready(function () {
   document.addEventListener('preferences_update', applyPreferences)
 
   ipcRenderer.on('give_current_prefs', (event, message) => {
-    ipcRenderer.send('take_current_prefs', fangorn.preferences)
+    ipcRenderer.send('take_current_prefs', fangorn.preferences || {})
   })
 
   ipcRenderer.on('take_new_prefs', (event, message) => {
-    fangorn.preferences.applyToCurrent(message)
+    if (fangorn.preferences) { fangorn.preferences.applyToCurrent(message) }
     ipcRenderer.send('new_preferences_taken')
   })
 })
