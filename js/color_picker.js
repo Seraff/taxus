@@ -53,6 +53,14 @@ function ColorPicker (pickerSelector, actionSelector, coloredSelectors = []) {
     picker.a_color_picker.color = color
   }
 
+  picker.remove_color = function () {
+    picker.a_color_picker.color = null
+    coloredSelectors.forEach(function (s) {
+      $(s).css({ background: "" })
+      $(s).addClass('no-color')
+    })
+  }
+
   picker.add_color_change_callback = function (callback) {
     picker.color_change_callbacks.push(callback)
   }

@@ -124,3 +124,19 @@ dialog {
   margin-top: 10px;
   margin-left: 430px;
 }
+
+#branch-color {
+  width:16px;
+  height:16px;
+
+}
+
+#branch-color.no-color {
+  background: repeating-linear-gradient(
+    45deg,
+    grey,
+    grey 5px,
+    white 5px,
+    white 10px
+  );
+}

@@ -286,7 +286,16 @@ $(document).ready(function () {
 
   document.addEventListener('selection_modified', function (e) {
     var selection = fangorn.get_selection()
-    if (selection.length === 1) { picker.set_color(selection[0].parsed_annotation.color) } else { picker.set_color() }
+
+    if (selection.length === 1) {
+      var color = selection[0].parsed_annotation.color
+
+      if (color) {
+        picker.set_color(color)
+      } else {
+        picker.remove_color()
+      }
+    } else { picker.remove_color() }
   })
 
   // Preferences logic
