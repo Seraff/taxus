@@ -306,8 +306,8 @@ function Fangorn () {
       fangorn.get_tree().reroot(node)
     }
 
-    fangorn.reinit_nodes()
     fangorn.get_tree().safe_update()
+    fangorn.reinit_nodes()
   }
 
   fangorn.set_selected_nodes_annotation = function (annotation) {
