@@ -295,7 +295,18 @@ $(document).ready(function () {
       } else {
         picker.remove_color()
       }
-    } else { picker.remove_color() }
+    } else if (selection.length > 1) {
+      var set = new Set(selection.map((e) => { return e.parsed_annotation.color }))
+      var first_color = set.values().next().value
+
+      if (set.size === 1 && first_color !== undefined){
+        picker.set_color(first_color)
+      } else {
+        picker.remove_color()
+      }
+    } else {
+      picker.remove_color()
+    }
   })
 
   // Preferences logic
