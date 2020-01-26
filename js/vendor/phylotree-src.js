@@ -1347,9 +1347,7 @@ const parseString = require('xml2js').parseString;
         selection_callback(phylotree.get_selection());
       }
 
-      // Fangorn stuff
-      var event = new Event('selection_modified');
-      document.dispatchEvent(event);
+      phylotree.dispatch_selection_modified_event();
 
       return phylotree;
     };

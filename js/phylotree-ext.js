@@ -290,6 +290,12 @@ end;
     return result
   }
 
+  phylotree.dispatch_selection_modified_event = function () {
+    // Fangorn stuff
+    var event = new Event('selection_modified');
+    document.dispatchEvent(event);
+  }
+
 }
 
 module.exports = apply_extensions;

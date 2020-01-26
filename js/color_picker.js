@@ -9,7 +9,11 @@ function ColorPicker (pickerSelector, actionSelector, coloredSelectors = []) {
   picker.a_color_picker.hide()
 
   $(actionSelector).on('click', function () {
-    picker.a_color_picker.toggle()
+    if (picker.is_shown()) {
+      picker.saveAndHide()
+    } else {
+      picker.a_color_picker.toggle()
+    }
   })
 
   $(window).on('mousedown', function (e) {

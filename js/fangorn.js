@@ -77,6 +77,14 @@ function Fangorn () {
     return fangorn.get_selected_internals().length === 1
   }
 
+  fangorn.is_one_selected = function () {
+    return fangorn.is_one_internal_selected() || fangorn.is_one_leaf_selected()
+  }
+
+  fangorn.select_none = function () {
+    fangorn.get_tree().modify_selection(function (n) { return false })
+  }
+
   fangorn.init_phylotree = function (str) {
     _tree = d3.layout
       .phylotree()
@@ -313,7 +321,12 @@ function Fangorn () {
   fangorn.set_selected_nodes_annotation = function (annotation) {
     fangorn.get_selection().forEach(function (node) {
       Object.keys(annotation).forEach(function (key) {
-        node.parsed_annotation[key] = annotation[key]
+        var value = annotation[key]
+        if (value){
+          node.parsed_annotation[key] = annotation[key]
+        } else if (node.parsed_annotation[key]) {
+          delete node.parsed_annotation[key]
+        }
       })
     })
   }

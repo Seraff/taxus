@@ -28,6 +28,7 @@ function update_controls (fangorn) {
   $('[data-direction]').attr('disabled', 'disabled')
   $('.mark-button').attr('disabled', 'disabled')
   $('#change-branch-color-action').attr('disabled', 'disabled')
+  $('#remove-branch-color-action').attr('disabled', 'disabled')
 
   if (fangorn.tree_is_loaded()) {
     $('[data-direction]').removeAttr('disabled')
@@ -37,12 +38,15 @@ function update_controls (fangorn) {
 
     if (fangorn.fasta_is_loaded() && fangorn.is_one_leaf_selected()) { $('#annotate-node-action').removeAttr('disabled') }
 
-    if (fangorn.get_selection().length == 1) {
+    if (fangorn.is_one_selected()) {
       $('#reroot-action').removeAttr('disabled')
       menu.enableItemById('reroot')
     }
 
-    if (fangorn.get_selection().length > 0) { $('#change-branch-color-action').removeAttr('disabled') }
+    if (fangorn.get_selection().length > 0) {
+      $('#change-branch-color-action').removeAttr('disabled')
+      $('#remove-branch-color-action').removeAttr('disabled')
+    }
 
     if (fangorn.fasta_is_loaded() && fangorn.get_selected_leaves().length > 0) { $('.mark-button').removeAttr('disabled') }
 
@@ -131,7 +135,7 @@ function open_fasta_action () {
 function remove_selected_action () {
   fangorn.get_selection().forEach(function (n) { n.mark() })
   fangorn.get_tree().refresh()
-  fangorn.get_tree().modify_selection(function (n) { return false })
+  fangorn.select_none()
 }
 
 function remove_unselected_action () {
@@ -142,13 +146,13 @@ function remove_unselected_action () {
   })
 
   fangorn.get_tree().refresh()
-  fangorn.get_tree().modify_selection(function (n) { return false })
+  fangorn.select_none()
 }
 
 function restore_selected_action () {
   fangorn.get_selection().forEach(function (n) { n.unmark() })
   fangorn.get_tree().refresh()
-  fangorn.get_tree().modify_selection(function () {})
+  fangorn.select_none()
 }
 
 function save_fasta_action () {
@@ -199,6 +203,11 @@ function export_to_png_action () {
 function export_to_svg_action () {
   options = { fonts: [] }
   svgToPng.saveSvg(d3.select('svg#tree_display').node(), 'tree.svg', options)
+}
+
+function remove_branch_color_action () {
+  fangorn.set_selected_nodes_annotation({ color: undefined })
+  fangorn.get_tree().dispatch_selection_modified_event() // for picker to reset color
 }
 
 function applyPreferences () {
@@ -279,7 +288,7 @@ $(document).ready(function () {
 
   // Picker logic
 
-  var picker = new ColorPicker('#branch-color-picker', '#change-branch-color-action', ['#branch-color'])
+  var picker = new ColorPicker('#branch-color-picker', '#change-branch-color-action', ['#change-branch-color-box'])
   picker.add_color_change_callback(function (color) {
     fangorn.set_selected_nodes_annotation({ color: color })
   })
@@ -308,6 +317,8 @@ $(document).ready(function () {
       picker.remove_color()
     }
   })
+
+  $('#remove-branch-color-action').on('click', remove_branch_color_action)
 
   // Preferences logic
 
