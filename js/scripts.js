@@ -237,6 +237,13 @@ $(document).ready(function () {
   menu.setCallbackOnItem('export-to-png', export_to_png_action)
   menu.setCallbackOnItem('export-to-svg', export_to_svg_action)
 
+
+  const findInPage = new FindInPage(app.remote.getCurrentWebContents(), {
+    parentElement: document.querySelector("#main-tree-container"),
+    offsetTop: 65,
+    duration: 150
+  })
+
   $(window).on('keydown', function (e) {
     if ((e.ctrlKey || e.metaKey) && e.keyCode === 70) {
       findInPage.openFindWindow()
