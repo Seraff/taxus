@@ -149,3 +149,8 @@ dialog {
     red 13px
   );
 }
+
+.gutter {
+  cursor: col-resize;
+  background-color: #f5f5f4;
+}

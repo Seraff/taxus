@@ -9,6 +9,7 @@ const AColorPicker = require('a-color-picker')
 const Fangorn = require('./js/fangorn.js')
 const ColorPicker = require('./js/color_picker.js')
 const svgToPng = require('save-svg-as-png')
+const Split = require('split.js')
 
 var fangorn = null
 
@@ -215,6 +216,8 @@ function applyPreferences () {
 }
 
 $(document).ready(function () {
+  var split = Split(['#pane-with-bg', '#fasta-panel'], { gutterSize: 10, cursor: 'col-resize' })
+
   set_window_header()
 
   document.addEventListener('fangorn_state_update', function (e) {
