@@ -19,7 +19,7 @@ const FASTA_EXT = ['fa', 'fas', 'fasta', 'fna', 'faa', 'ffn', 'frn']
 function update_controls (fangorn) {
   menu = app.remote.Menu.getApplicationMenu()
 
-  var disabled_menu_items = ['open-fasta', 'save-fasta', 'save-fasta-as', 'reroot', 'select-all']
+  var disabled_menu_items = ['open-fasta', 'save-fasta', 'save-fasta-as', 'reroot', 'select-all', 'remove-selected', 'remove-unselected', 'restore-selected']
   disabled_menu_items.forEach(function (item) {
     menu.disableItemById(item)
   })
@@ -49,7 +49,12 @@ function update_controls (fangorn) {
       $('#remove-branch-color-action').removeAttr('disabled')
     }
 
-    if (fangorn.fasta_is_loaded() && fangorn.get_selected_leaves().length > 0) { $('.mark-button').removeAttr('disabled') }
+    if (fangorn.fasta_is_loaded() && fangorn.get_selected_leaves().length > 0) {
+      $('.mark-button').removeAttr('disabled')
+      menu.enableItemById('remove-selected')
+      menu.enableItemById('remove-unselected')
+      menu.enableItemById('restore-selected')
+    }
 
     if (fangorn.fasta_is_loaded()) {
       $('#save-fasta-action').removeAttr('disabled')
@@ -239,6 +244,10 @@ $(document).ready(function () {
 
   menu.setCallbackOnItem('export-to-png', export_to_png_action)
   menu.setCallbackOnItem('export-to-svg', export_to_svg_action)
+
+  menu.setCallbackOnItem('remove-selected', remove_selected_action)
+  menu.setCallbackOnItem('remove-unselected', remove_unselected_action)
+  menu.setCallbackOnItem('restore-selected', restore_selected_action)
 
 
   const findInPage = new FindInPage(app.remote.getCurrentWebContents(), {

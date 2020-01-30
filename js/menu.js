@@ -70,6 +70,21 @@ const template = [
         accelerator: 'CmdOrCtrl+Shift+R'
       },
       {
+        id: "remove-selected",
+        label: 'Remove selected',
+        accelerator: 'D'
+      },
+      {
+        id: "remove-unselected",
+        label: 'Remove unselected',
+        accelerator: 'U'
+      },
+      {
+        id: "restore-selected",
+        label: 'Restore selected',
+        accelerator: 'R'
+      },
+      {
         id: "copy",
         label: 'Copy',
         accelerator: 'CmdOrCtrl+C',

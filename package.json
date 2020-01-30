@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "start-no-gpu": "electron . --disable-gpu --force-cpu-draw",
     "test": "standard",
     "pack": "electron-builder --dir",
     "dist": "electron-builder -mwl",
