@@ -66,26 +66,11 @@ function Node(fangorn, phylotree_node){
       return null
   }
 
-  node.fasta_bar_entry = function(){
-    if (!node.fasta_is_loaded())
-      return '';
-
-    var rnd = Math.random().toString(36).substring(7);
-    klass = node.selected == true ? 'fasta-node-selected' : '';
-    hidden = node.is_marked() ? 'hidden' : '';
-    content = '<span id="' + rnd + '" ' + hidden + ' class="' + klass + '">';
-    content += "<b>>" + node.fasta.original_title + "</b><br>";
-    content += node.fasta.sequence + "<br></span>";
-    node.fasta_bar_entry_selector = "span#"+rnd;
-
-    return content;
-  }
-
   node.raw_fasta_entry = function(){
     if (!node.fasta_is_loaded() || node.is_marked())
       return null;
 
-    content = '>' + node.fasta.original_title + '\n';
+    content = '>' + node.fasta.id + '\n';
     content += node.fasta.sequence + '\n';
 
     return content;
