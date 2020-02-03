@@ -118,7 +118,13 @@ function save_tree_as_action () {
     if (result.canceled || result.filePath.length === 0) { return true }
 
     fangorn.save_tree(result.filePath)
+
+    var fasta_is_loaded = fangorn.fasta_is_loaded()
+    var fasta_path = fasta_is_loaded && fangorn.fasta.path
+
     fangorn.load_tree_file(result.filePath)
+    if (fasta_is_loaded) { fangorn.load_fasta_file(fasta_path, true) }
+
     set_window_header(result.filePath.replace(/^.*[\\\/]/, ''))
   })
 }

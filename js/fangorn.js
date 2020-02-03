@@ -156,7 +156,9 @@ function Fangorn () {
 
     if (!path) { path = fangorn.tree_path }
 
-    if (fangorn.get_tree().is_nexus()) { fangorn.get_tree().apply_fangorn_metadata(fangorn.metadata_from_current_state()) }
+    if (fangorn.get_tree().is_nexus()) {
+      fangorn.get_tree().apply_fangorn_metadata(fangorn.metadata_from_current_state())
+    }
 
     var data = fangorn.get_tree().output_tree()
     fs.writeFileSync(path, data, 'utf8')
