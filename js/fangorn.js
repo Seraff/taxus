@@ -177,11 +177,11 @@ function Fangorn () {
     })
   }
 
-  fangorn.load_fasta_file = function (path) {
+  fangorn.load_fasta_file = function (path, quiet = false) {
     var fasta_rep = new FastaRepresentation()
 
     fasta_rep.read_from_file(path)
-    fangorn.apply_fasta(fasta_rep)
+    fangorn.apply_fasta(fasta_rep, quiet)
   }
 
   fangorn.load_fasta_string = function (str) {
@@ -192,7 +192,7 @@ function Fangorn () {
     })
   }
 
-  fangorn.apply_fasta = function (fasta_rep) {
+  fangorn.apply_fasta = function (fasta_rep, quiet = false) {
     var leave_ids = fangorn.get_leaves().map(function (node) { return node.name })
     var consistency = fasta_rep.check_consistency(leave_ids)
 
@@ -233,7 +233,7 @@ function Fangorn () {
       })
 
       // Apply fasta records for marked leaves from metadata
-      if (fasta_without_marked_nodes) {
+      if (fasta_without_marked_nodes && !quiet) {
         show_alert('Warning', 'Sequences for restoring removed taxa will be taken from Nexus file')
       }
 

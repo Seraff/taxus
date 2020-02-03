@@ -172,7 +172,7 @@ function save_fasta_as_action () {
     if (result.canceled || result.filePath.length === 0) { return true }
 
     fangorn.save_fasta(result.filePath, function () {
-      fangorn.load_fasta_file(result.filePath)
+      fangorn.load_fasta_file(result.filePath, true)
     })
   })
 }
