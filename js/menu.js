@@ -186,8 +186,7 @@ if (process.platform === 'darwin') {
         accelerator: 'Command+,',
         role: 'preferences',
         click: _ => {
-          var prefWindow = new PreferencesWindow()
-          prefWindow.show()
+          new PreferencesWindow()
         },
       },
       {

@@ -6,9 +6,16 @@ class PreferencesWindow {
   constructor () {
     this.mainWindow = BrowserWindow.getAllWindows()[0]
 
-    this.window = new BrowserWindow({ width: 300, height: 320, resizable: false, parent: this.mainWindow, webPreferences: { nodeIntegration: true }})
+    this.window = new BrowserWindow({ width: 300, height: 320,
+                                                               modal: true,
+                                                               parent: this.mainWindow,
+                                                               webPreferences: { nodeIntegration: true }})
     const htmlPath = path.join(__dirname, '../preferences.html')
     this.window.loadFile(htmlPath)
+
+    this.window.once('ready-to-show', () => {
+      this.window.show()
+    })
 
     // Preferences window asks us to get current preferences
     ipcMain.on('give_current_prefs', (event) => {
