@@ -303,6 +303,7 @@ $(document).ready(function () {
   $('[data-direction]').on('click', function () {
     var which_function = $(this).data('direction') == 'vertical' ? fangorn.get_tree().spacing_x : fangorn.get_tree().spacing_y
     which_function(which_function() + (+$(this).data('amount'))).safe_update()
+    fangorn.get_tree().redraw_scale_bar()
   })
 
   $(document).on('click', '.fasta-pane-entry', function (e) {

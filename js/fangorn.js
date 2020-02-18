@@ -98,7 +98,8 @@ function Fangorn () {
         selectable: true,
         'align-tips': false,
         transitions: false,
-        'internal-names': true
+        'internal-names': true,
+        'show-scale': true
       })
 
     function edgeStyler (dom_element, edge_object) {
@@ -119,6 +120,7 @@ function Fangorn () {
     try {
       _tree.read_tree(str).layout() // renders the tree
     } catch (err) {
+      console.log(err)
       show_alert('Error', 'Unable to open tree')
     }
 
@@ -149,6 +151,7 @@ function Fangorn () {
     fangorn.reinit_nodes()
     fangorn.get_tree().update() // for initial node styling.
     fangorn.apply_metadata_from_nexus()
+    fangorn.get_tree().redraw_scale_bar()
   }
 
   fangorn.save_tree = function (path = null) {

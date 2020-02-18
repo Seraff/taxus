@@ -154,3 +154,11 @@ dialog {
   cursor: col-resize;
   background-color: #f5f5f4;
 }
+
+.tree-scale-bar .domain, .tree-scale-bar .tick line {
+  stroke: #999;
+}
+
+.tree-scale-bar .tick text {
+  fill: #999;
+}

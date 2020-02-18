@@ -4,7 +4,6 @@ const nexus = require('./nexus.js');
 const pako = require('pako')
 
 function apply_extensions(phylotree){
-  // console.log(phylotree)
   const basic_nexus_pattern = `#NEXUS
 begin trees;
 \ttree tree = [&R] %NEWICK%
@@ -47,6 +46,7 @@ end;
   phylotree.current_transform = [0, 0];
   phylotree.current_zoom = 1;
 
+  // Zoom and Pan event
   var zoom = d3.behavior.zoom()
     .scaleExtent([.1, 10])
     .on("zoom", function(){
@@ -58,8 +58,13 @@ end;
       translate[0] += phylotree.get_offsets()[1] + phylotree.get_options()["left-offset"];
       translate[1] += phylotree.pad_height();
 
-      d3.select("."+phylotree.get_css_classes()["tree-container"])
+      d3.select("." + phylotree.get_css_classes()["tree-container"])
         .attr("transform", "translate(" + translate + ")scale(" + d3.event.scale + ")");
+
+      // Scale bar stuff
+
+      phylotree.redraw_scale_bar()
+
     });
 
   /* Add link to SVG object to node */
@@ -296,6 +301,22 @@ end;
     document.dispatchEvent(event);
   }
 
+  // Scale bar stuff
+
+  phylotree.redraw_scale_bar = function(){
+    var tree_transform = d3.transform(d3.select("." + phylotree.get_css_classes()["tree-container"]).attr('transform'));
+    var tree_container = d3.select("." + phylotree.get_css_classes()["tree-container"]).node();
+
+    var scale = tree_transform.scale[0];
+    var translate = [];
+    translate[0] = tree_transform.translate[0];
+    translate[1] = ((tree_container.getBBox().height + 40) * scale) + tree_transform.translate[1];
+
+    d3.select("." + phylotree.get_css_classes()["tree-scale-bar"])
+      .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
+  }
+
+  phylotree.pad_height = function() { return 0; }
 }
 
 module.exports = apply_extensions;

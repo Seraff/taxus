@@ -12,10 +12,10 @@
     "dist-mac": "electron-builder -m"
   },
   "devDependencies": {
-    "electron": "^7.1.1",
+    "electron": "^8.0.0",
     "electron-builder": "^21.2.0",
-    "xml2js": "0.4.19",
-    "standard": "*"
+    "standard": "*",
+    "xml2js": "0.4.19"
   },
   "keywords": [
     "phylogeny",
