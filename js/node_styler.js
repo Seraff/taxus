@@ -39,8 +39,12 @@ function NodeStyler(node){
   }
 
   this.setColor = function(value){
-    if (this.node.prev_branch)
+    if (this.node.prev_branch){
       $(this.node.prev_branch.get_element()[0]).css('stroke', value)
+      if (this.node.is_leaf()){
+        $(this.node.get_html_element()).css('fill', value)
+      }
+    }
   }
 
   this.setWidth = function(){

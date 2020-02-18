@@ -1,6 +1,6 @@
 const DEFAULTS = {
   branchWidth: 2,
-  branchColor: '#999'
+  branchColor: '#303030'
 }
 
 class Preferences {
