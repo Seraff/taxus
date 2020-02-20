@@ -13,14 +13,6 @@ end;
   var svg = phylotree.get_svg();
   var zoom_mode = false;
 
-  phylotree.set_leaf_bgcolor = function(node, color){
-    if (!node || !phylotree.is_leafnode(node) || !color) return null;
-
-    // add rectangle with the
-
-    return node;
-  }
-
   $(window).on("keydown", function(e) {
     if (e.ctrlKey){
       svg.call(zoom);
@@ -250,6 +242,34 @@ end;
         result['removed_seqs'] = pako.inflate(atob(encoded), {to: 'string'})
       }
     }
+
+    return result
+  }
+
+  phylotree.taxlabels_data = function(){
+    var taxablock = phylotree.nexus.taxablock
+    if (taxablock === undefined &&
+        taxablock.constructor !== Object &&
+        taxablock.taxlabels === undefined &&
+        taxablock.taxlabels.constructor !== Object)
+      return {}
+
+    var taxlabels = taxablock.taxlabels
+    var result = {}
+    var last_label = null
+
+    taxlabels.forEach(function(label){
+      if (label.match(/^\[.+\]$/)){
+        var attrs = label.match(/\w+\=.+?(?=[,\]])/g)
+        attrs.forEach(function(attr){
+          var kv = attr.split('=')
+          result[last_label][kv[0]] = kv[1]
+        })
+      } else {
+        result[label] = {}
+        last_label = label
+      }
+    })
 
     return result
   }

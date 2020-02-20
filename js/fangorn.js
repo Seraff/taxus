@@ -149,8 +149,12 @@ function Fangorn () {
     fangorn.init_phylotree(content)
     fangorn.preferences = new Preferences()
     fangorn.reinit_nodes()
-    fangorn.get_tree().update() // for initial node styling.
+
     fangorn.apply_metadata_from_nexus()
+    fangorn.apply_taxa_colors_from_figtree()
+
+    fangorn.get_tree().update() // for initial node styling.
+
     fangorn.get_tree().redraw_scale_bar()
   }
 
@@ -363,7 +367,6 @@ function Fangorn () {
   }
 
   // Extract metadata from nexus and apply to current tree
-
   fangorn.apply_metadata_from_nexus = function () {
     var metadata = fangorn.metadata_from_nexus()
 
@@ -378,6 +381,20 @@ function Fangorn () {
       })
     }
     fangorn.preferences.applyToDefaults(metadata)
+  }
+
+  // Workaround for FigTree files: get colors of taxa from taxa block
+  fangorn.apply_taxa_colors_from_figtree = function () {
+    var figtree_data = fangorn.get_tree().taxlabels_data()
+
+    if (Object.keys(figtree_data).length === 0)
+      return true
+
+    fangorn.get_leaves().forEach(function(leave){
+      var data = figtree_data[leave.name]
+      if (data !== undefined && data.constructor === Object)
+        leave.add_annotation(data)
+    })
   }
 
   return this

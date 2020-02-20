@@ -532,8 +532,20 @@ function parse(str)
         switch (command)
         {
           case 'taxlabels':
-            nx.SkipCommand();
+            // nx.SkipCommand();
+            var labels = [];
+            var t = nx.GetToken();
+
+            while (t != TokenTypes.SemiColon) {
+              labels.push(nx.buffer)
+              t = nx.GetToken();
+            }
+
+            nexus.taxablock = {}
+            nexus.taxablock.taxlabels = labels
+
             command = nx.GetCommand();
+
             break;
 
           default:
