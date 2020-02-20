@@ -92,7 +92,6 @@ function Fangorn () {
       .options({
         'context-menu-event': false,
         zoom: true,
-        'show-scale': false,
         brush: false,
         collapsible: false,
         selectable: true,
@@ -154,8 +153,6 @@ function Fangorn () {
     fangorn.apply_taxa_colors_from_figtree()
 
     fangorn.get_tree().update() // for initial node styling.
-
-    fangorn.get_tree().redraw_scale_bar()
   }
 
   fangorn.save_tree = function (path = null) {

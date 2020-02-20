@@ -27,6 +27,20 @@ end;
     $("#tree_display").css('cursor', '');
   });
 
+  phylotree.original_update = phylotree.update;
+
+  phylotree.update = function(transitions, safe=false){
+    phylotree.original_update(transitions, safe)
+    phylotree.redraw_scale_bar() // We draw scale bar in different way
+  }
+
+  phylotree.original_safe_update = phylotree.safe_update;
+
+  phylotree.safe_update = function(transitions){
+    phylotree.original_safe_update(transitions)
+    phylotree.redraw_scale_bar() // We draw scale bar in different way
+  }
+
   phylotree.update_zoom_transform = function(){
     var translate = phylotree.current_transform;
     var scale = phylotree.current_zoom;
