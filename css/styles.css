@@ -61,7 +61,7 @@ span.fasta-pane-entry-sequence{
 }
 
 .node-fangorn-marked {
-  fill: #e6550d;
+  fill: #e6550d !important;
   font-weight: bold;
 }
 

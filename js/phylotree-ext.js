@@ -262,9 +262,9 @@ end;
 
   phylotree.taxlabels_data = function(){
     var taxablock = phylotree.nexus.taxablock
-    if (taxablock === undefined &&
-        taxablock.constructor !== Object &&
-        taxablock.taxlabels === undefined &&
+    if (taxablock === undefined ||
+        taxablock.constructor !== Object ||
+        taxablock.taxlabels === undefined ||
         taxablock.taxlabels.constructor !== Object)
       return {}
 
