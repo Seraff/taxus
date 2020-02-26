@@ -15,7 +15,9 @@ function Node(fangorn, phylotree_node){
   node.next_branch = null
   node.styler = new NodeStyler(node)
 
-  node.fasta = null;
+  if (!hasOwnProperty(phylotree_node, 'fasta')){
+    node.fasta = null;
+  }
 
   node.is_leaf = function(){
     return d3.layout.phylotree.is_leafnode(node)
