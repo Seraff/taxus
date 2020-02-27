@@ -265,7 +265,7 @@ end;
     if (taxablock === undefined ||
         taxablock.constructor !== Object ||
         taxablock.taxlabels === undefined ||
-        taxablock.taxlabels.constructor !== Object)
+        !Array.isArray(taxablock.taxlabels))
       return {}
 
     var taxlabels = taxablock.taxlabels
