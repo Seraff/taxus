@@ -222,6 +222,10 @@ function remove_branch_color_action () {
   fangorn.get_tree().dispatch_selection_modified_event() // for picker to reset color
 }
 
+function selectAllAction () {
+  fangorn.select_all()
+}
+
 function applyPreferences () {
   fangorn.get_tree().safe_update()
 }
@@ -275,6 +279,8 @@ $(document).ready(function () {
   $('#remove-selected-action').on('click', remove_selected_action)
   $('#remove-unselected-action').on('click', remove_unselected_action)
   $('#restore-selected-action').on('click', restore_selected_action)
+
+  menu.setCallbackOnItem('select-all', selectAllAction)
 
   $('#show-fasta-action').on('click', show_fasta_action)
 

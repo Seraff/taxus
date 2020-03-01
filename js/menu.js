@@ -23,8 +23,7 @@ const template = [
       },
       {
         id: "save-tree-as",
-        label: "Save tree as...",
-        accelerator: "CmdOrCtrl+Shift+S"
+        label: "Save tree as..."
       },
       {
         type: 'separator'
@@ -36,7 +35,8 @@ const template = [
       },
       {
         id: "save-fasta",
-        label: "Save fasta"
+        label: "Save fasta",
+        accelerator: "CmdOrCtrl+Shift+S"
       },
       {
         id: "save-fasta-as",
@@ -67,34 +67,22 @@ const template = [
       {
         id: "reroot",
         label: 'Reroot',
-        accelerator: 'CmdOrCtrl+Shift+R'
+        accelerator: 'CmdOrCtrl+R'
       },
       {
         id: "remove-selected",
-        label: 'Remove selected',
-        accelerator: 'D'
+        label: 'Delete selected',
+        accelerator: 'CmdOrCtrl+D'
       },
       {
         id: "remove-unselected",
-        label: 'Remove unselected',
-        accelerator: 'U'
+        label: 'Delete unselected',
+        accelerator: 'CmdOrCtrl+U'
       },
       {
         id: "restore-selected",
-        label: 'Restore selected',
-        accelerator: 'R'
-      },
-      {
-        id: "copy",
-        label: 'Copy',
-        accelerator: 'CmdOrCtrl+C',
-        selector: "copy:"
-      },
-      {
-        id: "paste",
-        label: 'Paste',
-        accelerator: 'CmdOrCtrl+V',
-        selector: "paste:"
+        label: 'Keep selected',
+        accelerator: 'CmdOrCtrl+K'
       },
       {
         id: "select-all",
@@ -108,7 +96,7 @@ const template = [
     submenu: [
       {
         label: 'Reload',
-        accelerator: 'CmdOrCtrl+R',
+        accelerator: 'CmdOrCtrl+Alt+R',
         click: function(item, focusedWindow) {
           if (focusedWindow)
             focusedWindow.reload();

@@ -85,6 +85,11 @@ function Fangorn () {
     fangorn.get_tree().modify_selection(function (n) { return false })
   }
 
+  fangorn.select_all = function () {
+    var all = fangorn.get_leaves()
+    fangorn.get_tree().modify_selection(function (n) { return all.includes(n.target) })
+  }
+
   fangorn.init_phylotree = function (str) {
     _tree = d3.layout
       .phylotree()
