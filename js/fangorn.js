@@ -11,6 +11,8 @@ function Fangorn () {
   fangorn.tree_path = null
   fangorn.fasta_path = null
 
+  fangorn.tree_is_dirty = false
+
   fangorn.fasta = null
   fangorn.fasta_pane = new FastaPane()
 
@@ -143,6 +145,8 @@ function Fangorn () {
       var content = fs.readFileSync(path, 'utf8')
       fangorn.load_tree_string(content)
       fangorn.tree_path = path
+
+      fangorn.make_tree_clean()
     } catch (err) {
       console.error(err)
     }
@@ -171,6 +175,8 @@ function Fangorn () {
 
     var data = fangorn.get_tree().output_tree()
     fs.writeFileSync(path, data, 'utf8')
+
+    fangorn.make_tree_clean()
   }
 
   fangorn.save_fasta = function (path = null, success_callback = null) {
@@ -296,8 +302,7 @@ function Fangorn () {
   }
 
   fangorn.dispatch_state_update = function () {
-    var event = new Event('fangorn_state_update')
-    document.dispatchEvent(event)
+    dispatchDocumentEvent('fangorn_state_update')
   }
 
   fangorn.each_leaf = function (f) {
@@ -315,6 +320,7 @@ function Fangorn () {
     node.fasta.title = title
 
     fangorn.redraw_fasta_sidebar()
+    fangorn.make_tree_dirty()
   }
 
   fangorn.reroot_to_selected_node = function () {
@@ -327,6 +333,7 @@ function Fangorn () {
 
     fangorn.get_tree().safe_update()
     fangorn.reinit_nodes()
+    fangorn.make_tree_dirty()
   }
 
   fangorn.set_selected_nodes_annotation = function (annotation) {
@@ -340,6 +347,8 @@ function Fangorn () {
         }
       })
     })
+
+    fangorn.make_tree_dirty()
   }
 
   // Nexus metdata stuff
@@ -397,6 +406,32 @@ function Fangorn () {
       if (data !== undefined && data.constructor === Object)
         leave.add_annotation(data)
     })
+  }
+
+  // Dirty tree/fasta functionality
+
+  fangorn.make_tree_dirty = function () {
+    fangorn.tree_is_dirty = true
+    dispatchDocumentEvent('fangorn_header_update')
+  }
+
+  fangorn.make_tree_clean = function () {
+    fangorn.tree_is_dirty = false
+    dispatchDocumentEvent('fangorn_header_update')
+  }
+
+  fangorn.tree_title = function () {
+    var title = fangorn.tree_path.replace(/^.*[\\\/]/, '')
+    if (fangorn.tree_is_dirty) { title += "*" }
+
+    return title
+  }
+
+  // Preferences
+
+  fangorn.apply_new_preferences = function (prefs) {
+    fangorn.preferences.applyToCurrent(prefs)
+    fangorn.make_tree_dirty()
   }
 
   return this

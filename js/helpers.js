@@ -27,3 +27,8 @@ function path_is_fangorized (pth) {
 function hasOwnProperty (object, property) {
   return Object.prototype.hasOwnProperty.call(object, property)
 }
+
+function dispatchDocumentEvent (name) {
+  var event = new Event(name)
+  document.dispatchEvent(event)
+}

@@ -104,7 +104,6 @@ function open_tree_action (e) {
 
     var path = result.filePaths[0]
     fangorn.load_tree_file(path)
-    set_window_header(path.replace(/^.*[\\\/]/, ''))
   })
 }
 
@@ -124,8 +123,6 @@ function save_tree_as_action () {
 
     fangorn.load_tree_file(result.filePath)
     if (fasta_is_loaded) { fangorn.load_fasta_file(fasta_path, true) }
-
-    set_window_header(result.filePath.replace(/^.*[\\\/]/, ''))
   })
 }
 
@@ -361,7 +358,13 @@ $(document).ready(function () {
   })
 
   ipcRenderer.on('take_new_prefs', (event, message) => {
-    if (fangorn.preferences) { fangorn.preferences.applyToCurrent(message) }
+    if (fangorn.preferences) { fangorn.apply_new_preferences(message) }
     ipcRenderer.send('new_preferences_taken')
+  })
+
+  // Header update logic
+
+  document.addEventListener('fangorn_header_update', function (e) {
+    set_window_header(fangorn.tree_title())
   })
 })

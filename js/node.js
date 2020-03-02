@@ -29,10 +29,12 @@ function Node(fangorn, phylotree_node){
 
   node.mark = function(){
     node.add_annotation({ fangorn_marked: true })
+    node.fangorn.make_tree_dirty()
   }
 
   node.unmark = function(){
     node.remove_annotation("fangorn_marked")
+    node.fangorn.make_tree_dirty()
   }
 
   node.is_marked = function(){
