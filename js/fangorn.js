@@ -12,9 +12,10 @@ function Fangorn () {
   fangorn.fasta_path = null
 
   fangorn.tree_is_dirty = false
+  fangorn.fasta_is_dirty = false
 
   fangorn.fasta = null
-  fangorn.fasta_pane = new FastaPane()
+  fangorn.fasta_pane = new FastaPane(fangorn)
 
   fangorn.preferences = null
 
@@ -189,8 +190,9 @@ function Fangorn () {
     fs.writeFile(path, content, function (err) {
       if (err) {
         return console.error(err)
-      } else
-      if (success_callback) { success_callback() }
+      } else {
+        if (success_callback) { success_callback() }
+      }
     })
   }
 
@@ -254,7 +256,7 @@ function Fangorn () {
         show_alert('Warning', 'Sequences for restoring removed taxa will be taken from Nexus file')
       }
 
-      fangorn.redraw_fasta_sidebar()
+      fangorn.redraw_fasta_pane()
       fangorn.dispatch_state_update()
       fangorn.get_tree().refresh()
     }
@@ -296,7 +298,7 @@ function Fangorn () {
     return fangorn.fasta != null
   }
 
-  fangorn.redraw_fasta_sidebar = function () {
+  fangorn.redraw_fasta_pane = function () {
     fangorn.fasta_pane.set_title_from_path(fangorn.fasta.path)
     fangorn.fasta_pane.draw_fasta(fangorn.get_leaves())
   }
@@ -319,7 +321,7 @@ function Fangorn () {
     node.fasta.id = new_id
     node.fasta.title = title
 
-    fangorn.redraw_fasta_sidebar()
+    fangorn.redraw_fasta_pane()
     fangorn.make_tree_dirty()
   }
 
@@ -412,12 +414,22 @@ function Fangorn () {
 
   fangorn.make_tree_dirty = function () {
     fangorn.tree_is_dirty = true
-    dispatchDocumentEvent('fangorn_header_update')
+    dispatchDocumentEvent('fangorn_tree_header_update')
   }
 
   fangorn.make_tree_clean = function () {
     fangorn.tree_is_dirty = false
-    dispatchDocumentEvent('fangorn_header_update')
+    dispatchDocumentEvent('fangorn_tree_header_update')
+  }
+
+  fangorn.make_fasta_dirty = function () {
+    fangorn.fasta_is_dirty = true
+    dispatchDocumentEvent('fangorn_fasta_header_update')
+  }
+
+  fangorn.make_fasta_clean = function () {
+    fangorn.fasta_is_dirty = false
+    dispatchDocumentEvent('fangorn_fasta_header_update')
   }
 
   fangorn.tree_title = function () {

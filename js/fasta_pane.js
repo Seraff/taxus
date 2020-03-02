@@ -1,13 +1,18 @@
 const $ = require('jquery')
 const Path = require('path')
 
-function FastaPane(){
+function FastaPane(fangorn){
   var pane = this
 
+  pane.fangorn = fangorn
   pane.fasta_is_loaded = false
   pane.title = null
   pane.entries = {}
   pane.nodes = {}
+
+  document.addEventListener('fangorn_fasta_header_update', function (e) {
+    pane.update_title()
+  })
 
   pane.set_title_from_path = function(path){
     pane.title = Path.basename(path)
@@ -34,7 +39,7 @@ function FastaPane(){
       content += current_content
     })
 
-    content = '<b class="ui-text">' + pane.title + '</b></br>' + content
+    content = '<b class="ui-text" id="fasta-title">' + pane.title + '</b></br>' + content
     $('#fasta-panel').html(content)
 
     pane.fasta_is_loaded = true
@@ -87,6 +92,13 @@ function FastaPane(){
 
   pane.node_by_id = function(id){
     return pane.nodes[id]
+  }
+
+  pane.update_title = function(){
+    var title_el = document.getElementById('fasta-title')
+    title_el.innerHTML = pane.title
+
+    if (pane.fangorn.tree_is_dirty) { title_el.innerHTML += "*" }
   }
 
   pane.show_no_fasta()

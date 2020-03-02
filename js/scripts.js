@@ -165,7 +165,9 @@ function restore_selected_action () {
 }
 
 function save_fasta_action () {
-  fangorn.save_fasta()
+  fangorn.save_fasta(null, function () {
+    fangorn.load_fasta_file(fangorn.fasta.out_path, true)
+  })
 }
 
 function save_fasta_as_action () {
@@ -364,7 +366,7 @@ $(document).ready(function () {
 
   // Header update logic
 
-  document.addEventListener('fangorn_header_update', function (e) {
+  document.addEventListener('fangorn_tree_header_update', function (e) {
     set_window_header(fangorn.tree_title())
   })
 })
