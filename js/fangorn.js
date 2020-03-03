@@ -201,14 +201,7 @@ function Fangorn () {
 
     fasta_rep.read_from_file(path)
     fangorn.apply_fasta(fasta_rep, quiet)
-  }
-
-  fangorn.load_fasta_string = function (str) {
-    var fasta_rep = new FastaRepresentation()
-
-    fasta_rep.read_from_str(str, function () {
-      fangorn.apply_fasta(fasta_rep)
-    })
+    fangorn.make_fasta_clean()
   }
 
   fangorn.apply_fasta = function (fasta_rep, quiet = false) {

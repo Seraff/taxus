@@ -98,7 +98,7 @@ function FastaPane(fangorn){
     var title_el = document.getElementById('fasta-title')
     title_el.innerHTML = pane.title
 
-    if (pane.fangorn.tree_is_dirty) { title_el.innerHTML += "*" }
+    if (pane.fangorn.fasta_is_dirty) { title_el.innerHTML += "*" }
   }
 
   pane.show_no_fasta()
