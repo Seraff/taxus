@@ -32,3 +32,20 @@ function dispatchDocumentEvent (name) {
   var event = new Event(name)
   document.dispatchEvent(event)
 }
+
+function showUnsavedFileAlert(callback){
+  var options = {
+    type: 'question',
+    buttons: ['Cancel', 'Don\'t save'],
+    title: 'Question',
+    defaultId: 0,
+    message: 'You have unsaved files',
+    detail: 'All unsaved data will be lost',
+  }
+
+  dialog.showMessageBox(null, options).then((resp) => {
+    if (resp.response === 1){
+      callback()
+    }
+  })
+}

@@ -138,12 +138,7 @@ const template = [
         label: 'Minimize',
         accelerator: 'CmdOrCtrl+M',
         role: 'minimize'
-      },
-      {
-        label: 'Close',
-        accelerator: 'CmdOrCtrl+W',
-        role: 'close'
-      },
+      }
     ]
   },
   {
@@ -206,9 +201,10 @@ if (process.platform === 'darwin') {
         type: 'separator'
       },
       {
+
         label: 'Quit',
-        accelerator: 'Command+Q',
-        click: function() { app.quit(); }
+        id: 'quit',
+        accelerator: 'Command+Q'
       },
     ]
   });

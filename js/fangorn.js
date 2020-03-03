@@ -432,6 +432,10 @@ function Fangorn () {
     dispatchDocumentEvent('fangorn_fasta_header_update')
   }
 
+  fangorn.has_dirty_files = function () {
+    return (fangorn.tree_is_dirty || fangorn.fasta_is_dirty)
+  }
+
   fangorn.tree_title = function () {
     var title = fangorn.tree_path.replace(/^.*[\\\/]/, '')
     if (fangorn.tree_is_dirty) { title += "*" }

@@ -93,18 +93,25 @@ function set_window_header (text = null) {
 }
 
 function open_tree_action (e) {
-  var options = {
-    properties: ['openFile'],
-    filters: [{ name: 'Trees', extensions: TREE_EXT }],
-    title: 'Open tree'
+  var open_tree = function () {
+    var options = {
+      properties: ['openFile'],
+      filters: [{ name: 'Trees', extensions: TREE_EXT }],
+      title: 'Open tree'
+    }
+
+    dialog.showOpenDialog(options).then(result => {
+      if (result.filePaths.length == 0) { return false }
+
+      var path = result.filePaths[0]
+      fangorn.load_tree_file(path)
+    })
   }
 
-  dialog.showOpenDialog(options).then(result => {
-    if (result.filePaths.length == 0) { return false }
-
-    var path = result.filePaths[0]
-    fangorn.load_tree_file(path)
-  })
+  if (fangorn.tree_is_dirty){
+    showUnsavedFileAlert(open_tree)
+  } else
+    open_tree()
 }
 
 function save_tree_action () {
@@ -127,18 +134,26 @@ function save_tree_as_action () {
 }
 
 function open_fasta_action () {
-  var options = {
-    properties: ['openFile'],
-    filters: [{ name: 'Fasta', extensions: FASTA_EXT }],
-    title: 'Open fasta file'
+  var open_fasta = function () {
+    var options = {
+      properties: ['openFile'],
+      filters: [{ name: 'Fasta', extensions: FASTA_EXT }],
+      title: 'Open fasta file'
+    }
+
+    dialog.showOpenDialog(options).then(result => {
+      if (result.filePaths.length === 0) { return false }
+
+      var path = result.filePaths[0]
+      fangorn.load_fasta_file(path)
+    })
   }
 
-  dialog.showOpenDialog(options).then(result => {
-    if (result.filePaths.length === 0) { return false }
+  if (fangorn.fasta_is_dirty){
+    showUnsavedFileAlert(open_fasta)
+  } else
+    open_fasta()
 
-    var path = result.filePaths[0]
-    fangorn.load_fasta_file(path)
-  })
 }
 
 function remove_selected_action () {
@@ -229,6 +244,13 @@ function applyPreferences () {
   fangorn.get_tree().safe_update()
 }
 
+function quitAction () {
+  if (fangorn.has_dirty_files()){
+    showUnsavedFileAlert((e) => app.remote.app.quit())
+  } else
+    app.remote.app.quit()
+}
+
 $(document).ready(function () {
   var split = Split(['#pane-with-bg', '#fasta-panel'], { gutterSize: 10, cursor: 'col-resize' })
 
@@ -287,6 +309,8 @@ $(document).ready(function () {
 
   $('#reroot-action').on('click', reroot_action)
   menu.setCallbackOnItem('reroot', reroot_action)
+
+  menu.setCallbackOnItem('quit', quitAction)
 
   $('#annotation-dialog-cancel').on('click', function () {
     $('#seq-title-input').val('')
