@@ -2353,7 +2353,6 @@ const parseString = require('xml2js').parseString;
     };
 
     phylotree.init_zoom = function(){
-      console.log('old zoom')
       if(options["zoom"]) {
         var zoom = d3.behavior.zoom()
           .scaleExtent([.1, 10])
@@ -2366,8 +2365,6 @@ const parseString = require('xml2js').parseString;
             d3.select("."+css_classes["tree-container"])
               .attr("transform", "translate(" + translate + ")scale(" + d3.event.scale + ")");
           });
-        console.log(svg);
-        console.log(phylotree.svg);
         svg.call(zoom);
       }
     };

@@ -18,14 +18,45 @@ end;
       svg.call(zoom);
       zoom_mode = true;
       $("#tree_display").css('cursor', 'grab');
+    } else {
+      var delta = e.shiftKey ? 15 : 5
+
+      switch(e.code){
+        case('ArrowUp'):
+          phylotree.move("N", delta)
+          break
+        case('ArrowDown'):
+          phylotree.move("S", delta)
+          break
+        case('ArrowLeft'):
+          phylotree.move("W", delta)
+          break
+        case('ArrowRight'):
+          phylotree.move("E", delta)
+          break
+      }
     }
   });
 
   $(window).on("keyup", function(e) {
-    svg.on(".zoom", null);
-    zoom_mode = false;
-    $("#tree_display").css('cursor', '');
+    if (e.key == 'Control'){
+      svg.on(".zoom", null);
+      zoom_mode = false;
+      $("#tree_display").css('cursor', '');
+    }
   });
+
+  $(window).on("wheel", function(e) {
+    if (e.originalEvent.deltaY < 0) {
+      phylotree.move("S", 15)
+    } else if (e.originalEvent.deltaY > 0) {
+      phylotree.move("N", 15)
+    } else if (e.originalEvent.deltaX < 0) {
+      phylotree.move("E", 15)
+    } else if (e.originalEvent.deltaX > 0) {
+      phylotree.move("W", 15)
+    }
+  })
 
   phylotree.original_update = phylotree.update;
 
@@ -42,21 +73,21 @@ end;
   }
 
   phylotree.update_zoom_transform = function(){
-    var translate = phylotree.current_transform;
+    var translate = phylotree.current_translate;
     var scale = phylotree.current_zoom;
 
     d3.select("."+phylotree.get_css_classes()["tree-container"])
       .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
   }
 
-  phylotree.current_transform = [0, 0];
+  phylotree.current_translate = [0, 0];
   phylotree.current_zoom = 1;
 
   // Zoom and Pan event
   var zoom = d3.behavior.zoom()
     .scaleExtent([.1, 10])
     .on("zoom", function(){
-      phylotree.current_transform = d3.event.translate;
+      phylotree.current_translate = d3.event.translate;
       phylotree.current_zoom = d3.event.scale;
 
       var translate = d3.event.translate;
@@ -72,6 +103,34 @@ end;
       phylotree.redraw_scale_bar()
 
     });
+
+  phylotree.move = function(direction, delta = 5) {
+    var transform = phylotree.get_current_transform()
+
+    switch(direction){
+      case "N":
+        transform.translate[1] -= delta
+        break
+      case "S":
+        transform.translate[1] += delta
+        break
+      case "W":
+        transform.translate[0] -= delta
+        break
+      case "E":
+        transform.translate[0] += delta
+        break
+    }
+
+    phylotree.current_translate = transform.translate
+
+    d3.select("." + phylotree.get_css_classes()["tree-container"])
+        .attr("transform", "translate(" + transform.translate + ")scale(" + transform.scale + ")");
+
+    zoom.translate(transform.translate)
+
+    phylotree.redraw_scale_bar()
+  }
 
   /* Add link to SVG object to node */
   var _draw_node = phylotree.draw_node;
@@ -338,7 +397,7 @@ end;
   // Scale bar stuff
 
   phylotree.redraw_scale_bar = function(){
-    var tree_transform = d3.transform(d3.select("." + phylotree.get_css_classes()["tree-container"]).attr('transform'));
+    var tree_transform = phylotree.get_current_transform();
     var tree_container = d3.select("." + phylotree.get_css_classes()["tree-container"]).node();
 
     var scale = tree_transform.scale[0];
@@ -348,6 +407,10 @@ end;
 
     d3.select("." + phylotree.get_css_classes()["tree-scale-bar"])
       .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
+  }
+
+  phylotree.get_current_transform = function(){
+    return d3.transform(d3.select("." + phylotree.get_css_classes()["tree-container"]).attr('transform'));
   }
 
   phylotree.pad_height = function() { return 0; }
