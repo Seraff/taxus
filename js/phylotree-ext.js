@@ -62,9 +62,9 @@ end;
       } else if (e.originalEvent.deltaY > 0) {
         phylotree.move("N", 10)
       } else if (e.originalEvent.deltaX < 0) {
-        phylotree.move("E", 10)
+        phylotree.move("E", 5)
       } else if (e.originalEvent.deltaX > 0) {
-        phylotree.move("W", 10)
+        phylotree.move("W", 5)
       }
     }
   })
