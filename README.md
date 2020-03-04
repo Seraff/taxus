@@ -1,5 +1,5 @@
 # Fangorn
-Newick + Fasta = Fangorn ❤️
+Nexus + Fasta = Fangorn ❤️
 
 # The latest release
 [Fangorn for Mac (x64)](https://github.com/Seraff/fangorn/releases/latest/download/fangorn_mac.dmg)
