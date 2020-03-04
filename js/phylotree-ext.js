@@ -12,6 +12,7 @@ end;
 
   var svg = phylotree.get_svg();
   var zoom_mode = false;
+  var cursor_above_tree = false;
 
   $(window).on("keydown", function(e) {
     if (e.ctrlKey){
@@ -46,15 +47,25 @@ end;
     }
   });
 
+  $("#tree_display").mouseenter(function(e){
+    cursor_above_tree = true
+  })
+
+  $("#tree_display").mouseleave(function(e){
+    cursor_above_tree = false
+  })
+
   $(window).on("wheel", function(e) {
-    if (e.originalEvent.deltaY < 0) {
-      phylotree.move("S", 15)
-    } else if (e.originalEvent.deltaY > 0) {
-      phylotree.move("N", 15)
-    } else if (e.originalEvent.deltaX < 0) {
-      phylotree.move("E", 15)
-    } else if (e.originalEvent.deltaX > 0) {
-      phylotree.move("W", 15)
+    if (cursor_above_tree){
+      if (e.originalEvent.deltaY < 0) {
+        phylotree.move("S", 10)
+      } else if (e.originalEvent.deltaY > 0) {
+        phylotree.move("N", 10)
+      } else if (e.originalEvent.deltaX < 0) {
+        phylotree.move("E", 10)
+      } else if (e.originalEvent.deltaX > 0) {
+        phylotree.move("W", 10)
+      }
     }
   })
 
