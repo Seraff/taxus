@@ -23,16 +23,16 @@ end;
 
       switch(e.code){
         case('ArrowUp'):
-          phylotree.move("N", delta)
-          break
-        case('ArrowDown'):
           phylotree.move("S", delta)
           break
+        case('ArrowDown'):
+          phylotree.move("N", delta)
+          break
         case('ArrowLeft'):
-          phylotree.move("W", delta)
+          phylotree.move("E", delta)
           break
         case('ArrowRight'):
-          phylotree.move("E", delta)
+          phylotree.move("W", delta)
           break
       }
     }
