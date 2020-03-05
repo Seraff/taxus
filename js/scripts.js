@@ -11,6 +11,8 @@ const ColorPicker = require('./js/color_picker.js')
 const svgToPng = require('save-svg-as-png')
 const Split = require('split.js')
 
+const unhandled = require('electron-unhandled');
+
 var fangorn = null
 
 const TREE_EXT = ['tre', 'tree', 'nexus', 'nex', 'nxs', 'newick', 'txt']
@@ -252,6 +254,8 @@ function quitAction () {
 }
 
 $(document).ready(function () {
+  unhandled({ showDialog: true })
+
   var split = Split(['#pane-with-bg', '#fasta-panel'], { gutterSize: 10, cursor: 'col-resize' })
 
   set_window_header()

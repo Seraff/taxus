@@ -31,6 +31,7 @@
     "bio-parsers": "^6.0.0",
     "electron-find": "^1.0.5",
     "electron-in-page-search": "^1.3.2",
+    "electron-unhandled": "^3.0.2",
     "file-dialog": "0.0.7",
     "jquery": "^3.4.1",
     "mousetrap": "^1.6.3",
