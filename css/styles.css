@@ -31,13 +31,6 @@
 }
 
 /* phylotree */
-.node {
-  font-style: italic;
-}
-
-.node-selected {
-  fill: #3182bd !important;
-}
 
 span.fasta-pane-entry {
   white-space: nowrap;
@@ -63,6 +56,14 @@ span.fasta-pane-entry-sequence{
 .node-fangorn-marked {
   fill: #e6550d !important;
   font-weight: bold;
+}
+
+.node {
+  font-style: italic;
+}
+
+.node-selected {
+  fill: #3182bd !important;
 }
 
 .selection {
