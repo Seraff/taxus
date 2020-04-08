@@ -1,6 +1,7 @@
 const DEFAULTS = {
   branchWidth: 2,
-  branchColor: '#303030'
+  branchColor: '#303030',
+  displayAlignmentCoverage: 'true'
 }
 
 class Preferences {

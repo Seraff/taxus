@@ -66,6 +66,11 @@ span.fasta-pane-entry-sequence{
   fill: #3182bd !important;
 }
 
+.alignment-coverage {
+  fill: #999 !important;
+  font-weight: normal !important;
+}
+
 .selection {
   fill: #ADD8E6;
   stroke: #ADD8E6;

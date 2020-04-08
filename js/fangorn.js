@@ -161,6 +161,7 @@ function Fangorn () {
 
     fangorn.apply_metadata_from_nexus()
     fangorn.apply_taxa_colors_from_figtree()
+    fangorn.redraw_features()
 
     fangorn.get_tree().update() // for initial node styling.
   }
@@ -202,6 +203,7 @@ function Fangorn () {
     fasta_rep.read_from_file(path)
     fangorn.apply_fasta(fasta_rep, quiet)
     fangorn.make_fasta_clean()
+    fangorn.redraw_features()
   }
 
   fangorn.apply_fasta = function (fasta_rep, quiet = false) {
@@ -441,6 +443,10 @@ function Fangorn () {
   fangorn.apply_new_preferences = function (prefs) {
     fangorn.preferences.applyToCurrent(prefs)
     fangorn.make_tree_dirty()
+  }
+
+  fangorn.redraw_features = function (argument) {
+    fangorn.get_leaves().forEach((n) => { n.redraw_features() })
   }
 
   return this

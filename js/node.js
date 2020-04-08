@@ -1,6 +1,7 @@
 const $ = require('jquery')
 const FastaRepresentation = require('./fasta_representation.js');
 const NodeStyler = require('./node_styler.js');
+const features = require('./node_features')
 
 function Node(fangorn, phylotree_node){
   var node = phylotree_node
@@ -14,6 +15,8 @@ function Node(fangorn, phylotree_node){
   node.prev_branch = null
   node.next_branch = null
   node.styler = new NodeStyler(node)
+
+  node.features = []
 
   if (!hasOwnProperty(phylotree_node, 'fasta')){
     node.fasta = null;
@@ -49,9 +52,8 @@ function Node(fangorn, phylotree_node){
     if (node.is_leaf()){
       node.styler.style_leaf(dom_element)
     } else {
-      node.add_tip(node.bootstrap())
+      node.add_tip_to_branch(node.bootstrap())
     }
-    // dom_element.attr('style', "fill: blue !important;")
   }
 
   node.apply_fasta = function(fasta){
@@ -88,7 +90,7 @@ function Node(fangorn, phylotree_node){
     }
   }
 
-  node.add_tip = function(text){
+  node.add_tip_to_branch = function(text){
     if (node.is_leaf() || !text)
       return;
 
@@ -186,8 +188,21 @@ function Node(fangorn, phylotree_node){
     node.build_annotation()
   }
 
-  node.parse_annotation();
-  return node;
+  node.init_features = function () {
+    if (!node.is_leaf()) { return false }
+
+    node.features.push(new features.AlignmentCoverage(node))
+  }
+
+  node.redraw_features = function () {
+    if (!node.is_leaf()) { return false }
+
+    node.features.forEach((f) => { f.redraw() })
+  }
+
+  node.init_features()
+  node.parse_annotation()
+  return node
 }
 
-module.exports = Node;
+module.exports = Node

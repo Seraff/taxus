@@ -244,6 +244,7 @@ function selectAllAction () {
 
 function applyPreferences () {
   fangorn.get_tree().safe_update()
+  fangorn.redraw_features()
 }
 
 function quitAction () {
