@@ -14,6 +14,10 @@ end;
   var zoom_mode = false;
   var cursor_above_tree = false;
 
+  $(window).unbind("keydown")
+  $(window).unbind("keyup")
+  $(window).unbind("wheel")
+
   $(window).on("keydown", function(e) {
     if (e.ctrlKey){
       svg.call(zoom);
@@ -56,7 +60,7 @@ end;
   })
 
   $(window).on("wheel", function(e) {
-    if (cursor_above_tree){
+    if (!zoom_mode && cursor_above_tree){
       if (e.originalEvent.deltaY < 0) {
         phylotree.move("S", 10)
       } else if (e.originalEvent.deltaY > 0) {
