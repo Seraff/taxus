@@ -3,6 +3,7 @@ const { BrowserWindow, dialog } = require('electron').remote
 const { clipboard } = require('electron')
 const ipcRenderer = require('electron').ipcRenderer
 
+const fs = require('fs')
 const cp = require('child_process')
 const fileDialog = require('file-dialog')
 const FindInPage = require('electron-find').FindInPage
@@ -22,7 +23,8 @@ const FASTA_EXT = ['fa', 'fas', 'fasta', 'fna', 'faa', 'ffn', 'frn']
 function update_controls (fangorn) {
   menu = app.remote.Menu.getApplicationMenu()
 
-  var disabled_menu_items = ['open-fasta', 'save-fasta', 'save-fasta-as', 'reroot', 'select-all', 'remove-selected', 'remove-unselected', 'restore-selected']
+  var disabled_menu_items = ['open-fasta', 'save-fasta', 'save-fasta-as', 'save-selection-as-fasta',
+                             'reroot', 'select-all', 'remove-selected', 'remove-unselected', 'restore-selected']
   disabled_menu_items.forEach(function (item) {
     menu.disableItemById(item)
   })
@@ -65,6 +67,10 @@ function update_controls (fangorn) {
       menu.enableItemById('save-fasta-as')
     } else {
       $('#save-fasta-action').attr('disabled', 'disabled')
+    }
+
+    if (fangorn.get_selected_leaves_fasta()){
+      menu.enableItemById('save-selection-as-fasta')
     }
   }
 }
@@ -205,6 +211,24 @@ function save_fasta_as_action () {
   })
 }
 
+function save_selection_as_fasta_action () {
+  var fasta = fangorn.get_selected_leaves_fasta()
+
+  if (!fasta) { return false }
+
+  var options = { title: 'Save selection as fasta' }
+
+  dialog.showSaveDialog(options).then(result => {
+    if (result.canceled || result.filePath.length === 0) { return true }
+
+    fs.writeFile(result.filePath, fasta, function (err) {
+      if (err) {
+        return console.error(err)
+      }
+    })
+  })
+}
+
 function show_fasta_action () {
   if ($('#fasta-panel').is(':hidden')) {
     $('#fasta-panel').show()
@@ -284,6 +308,7 @@ $(document).ready(function () {
   menu.setCallbackOnItem('open-fasta', open_fasta_action)
   menu.setCallbackOnItem('save-fasta', save_fasta_action)
   menu.setCallbackOnItem('save-fasta-as', save_fasta_as_action)
+  menu.setCallbackOnItem('save-selection-as-fasta', save_selection_as_fasta_action)
 
   menu.setCallbackOnItem('export-to-png', export_to_png_action)
   menu.setCallbackOnItem('export-to-svg', export_to_svg_action)

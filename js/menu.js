@@ -43,6 +43,10 @@ const template = [
         label: "Save fasta as..."
       },
       {
+        id: "save-selection-as-fasta",
+        label: "Save selection as fasta"
+      },
+      {
         type: 'separator'
       },
       {
