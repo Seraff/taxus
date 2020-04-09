@@ -105,7 +105,7 @@ function open_tree_action (e) {
   var open_tree = function () {
     var options = {
       properties: ['openFile'],
-      filters: [{ name: 'Trees', extensions: TREE_EXT }],
+      filters: [{ name: 'Tree files', extensions: TREE_EXT }, { name: 'All files', extensions: ['*'] }],
       title: 'Open tree'
     }
 
@@ -146,7 +146,7 @@ function open_fasta_action () {
   var open_fasta = function () {
     var options = {
       properties: ['openFile'],
-      filters: [{ name: 'Fasta', extensions: FASTA_EXT }],
+      filters: [{ name: 'Fasta files', extensions: FASTA_EXT }, { name: 'All files', extensions: ['*'] }],
       title: 'Open fasta file'
     }
 
