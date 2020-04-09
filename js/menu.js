@@ -65,6 +65,14 @@ const template = [
     label: 'Edit',
     submenu: [
       {
+        id: "copy",
+        label: 'Copy',
+        accelerator: 'CmdOrCtrl+C'
+      },
+      {
+        type: 'separator'
+      },
+      {
         id: "reroot",
         label: 'Reroot',
         accelerator: 'CmdOrCtrl+R'

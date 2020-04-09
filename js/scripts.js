@@ -1,5 +1,6 @@
 const app = require('electron')
 const { BrowserWindow, dialog } = require('electron').remote
+const { clipboard } = require('electron')
 const ipcRenderer = require('electron').ipcRenderer
 
 const cp = require('child_process')
@@ -158,6 +159,11 @@ function open_fasta_action () {
 
 }
 
+function copy_action () {
+  var fasta = fangorn.get_selected_leaves_fasta()
+  if (fasta) { clipboard.writeText(fasta) }
+}
+
 function remove_selected_action () {
   fangorn.get_selection().forEach(function (n) { n.mark() })
   fangorn.get_tree().refresh()
@@ -270,6 +276,7 @@ $(document).ready(function () {
 
   // *** Menu actions *** //
 
+  // File
   menu.setCallbackOnItem('open-tree', open_tree_action)
   menu.setCallbackOnItem('save-tree', save_tree_action)
   menu.setCallbackOnItem('save-tree-as', save_tree_as_action)
@@ -281,6 +288,8 @@ $(document).ready(function () {
   menu.setCallbackOnItem('export-to-png', export_to_png_action)
   menu.setCallbackOnItem('export-to-svg', export_to_svg_action)
 
+  // Edit
+  menu.setCallbackOnItem('copy', copy_action)
   menu.setCallbackOnItem('remove-selected', remove_selected_action)
   menu.setCallbackOnItem('remove-unselected', remove_unselected_action)
   menu.setCallbackOnItem('restore-selected', restore_selected_action)

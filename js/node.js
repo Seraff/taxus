@@ -75,7 +75,7 @@ function Node(fangorn, phylotree_node){
   }
 
   node.raw_fasta_entry = function(){
-    if (!node.fasta_is_loaded() || node.is_marked())
+    if (!node.fasta_is_loaded())
       return null;
 
     content = '>' + node.fasta.id + '\n';

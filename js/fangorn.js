@@ -298,6 +298,19 @@ function Fangorn () {
     fangorn.fasta_pane.draw_fasta(fangorn.get_leaves())
   }
 
+  fangorn.get_selected_leaves_fasta = function () {
+    var selected = fangorn.get_selected_leaves()
+    var result = ""
+
+    selected.forEach((e) => {
+      if (e.raw_fasta_entry()) {
+        result += e.raw_fasta_entry()
+      }
+    })
+
+    return(result == "" ? null : result)
+  }
+
   fangorn.dispatch_state_update = function () {
     dispatchDocumentEvent('fangorn_state_update')
   }
