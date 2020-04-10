@@ -427,9 +427,23 @@ $(document).ready(function () {
     ipcRenderer.send('new_preferences_taken')
   })
 
+  ipcRenderer.on('open_file', (event, message) => {
+    var open_tree = function () {
+      fangorn.load_tree_file(message)
+    }
+
+    if (fangorn.tree_is_dirty){
+      showUnsavedFileAlert(open_tree)
+    } else {
+      open_tree()
+    }
+  })
+
   // Header update logic
 
   document.addEventListener('fangorn_tree_header_update', function (e) {
     set_window_header(fangorn.tree_title())
   })
+
+  ipcRenderer.send('scripts_loaded')
 })

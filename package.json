@@ -22,7 +22,14 @@
     "bioinformatics"
   ],
   "build": {
-    "appId": "com.kolisko-lab.fangorn"
+    "appId": "com.kolisko-lab.fangorn",
+    "fileAssociations": [
+      {
+        "ext": ["tre", "tree", "nexus", "nex", "nxs", "newick"],
+        "name": "Tree file",
+        "role": "Editor"
+      }
+    ]
   },
   "author": "Serafim Nenarokov",
   "license": "ISC",
