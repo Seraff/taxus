@@ -20,7 +20,9 @@ function createWindow () {
   win.loadFile('index.html')
 
   ipcMain.on('scripts_loaded', (event) => {
-    win.webContents.send('open_file', file_to_open)
+    if (file_to_open) {
+      win.webContents.send('open_file', file_to_open)
+    }
   })
 }
 
