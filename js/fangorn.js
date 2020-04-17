@@ -262,7 +262,7 @@ function Fangorn () {
 
     fangorn.each_leaf(function (leaf) {
       var raw_fasta = leaf.raw_fasta_entry()
-      if (raw_fasta != null) { content += raw_fasta }
+      if (!leaf.is_marked() && raw_fasta != null) { content += raw_fasta }
     })
 
     return content
