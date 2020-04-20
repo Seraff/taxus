@@ -43,10 +43,17 @@ def get_fasta_path(tree_path, fasta_folder_path):
   tree_name = os.path.basename(tree_path)
   fasta_name = re.findall(FASTA_FILE_REGEX, tree_name)
 
-  if (not fasta_name):
-    return None
-  else:
+
+
+  if (fasta_name):
     fasta_name = fasta_name[0]
+
+    fasta_name_splitted = fasta_name.split('.')
+    fasta_name_splitted.insert(-1, 'fangorn')
+
+    fasta_name = '.'.join(fasta_name_splitted)
+  else:
+    return None
 
   fasta_path = glob.glob(os.path.join(fasta_folder_path, fasta_name))
 
@@ -106,11 +113,11 @@ def main():
     if (fasta_path):
       result = compare_files(tree_path, fasta_path)
       if (result):
-        print(f"{BColors.OKGREEN}OK: {tree_path}")
+        print(f"{BColors.OKGREEN}OK: {tree_path}{BColors.ENDC}")
       else:
-        print(f"{BColors.FAIL}FAIL: {tree_path}")
+        print(f"{BColors.FAIL}FAIL: {tree_path}{BColors.ENDC}")
     else:
-      print(f"{BColors.WARNING}Warning: cannot find fasta for file {tree_path}")
+      print(f"{BColors.WARNING}Warning: cannot find fasta for file {tree_path}{BColors.ENDC}")
       pass
 
 
