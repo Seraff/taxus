@@ -77,6 +77,14 @@ const template = [
         type: 'separator'
       },
       {
+        id: "find",
+        label: 'Find',
+        accelerator: 'CmdOrCtrl+F'
+      },
+      {
+        type: 'separator'
+      },
+      {
         id: "reroot",
         label: 'Reroot',
         accelerator: 'CmdOrCtrl+R'

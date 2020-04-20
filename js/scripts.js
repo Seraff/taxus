@@ -15,10 +15,11 @@ const Split = require('split.js')
 
 const unhandled = require('electron-unhandled');
 
-var fangorn = null
-
 const TREE_EXT = ['tre', 'tree', 'nexus', 'nex', 'nxs', 'newick', 'txt']
 const FASTA_EXT = ['fa', 'fas', 'fasta', 'fna', 'faa', 'ffn', 'frn']
+
+var fangorn = null
+var findInPage = null
 
 function update_controls (fangorn) {
   menu = app.remote.Menu.getApplicationMenu()
@@ -170,6 +171,10 @@ function copy_action () {
   if (fasta) { clipboard.writeText(fasta) }
 }
 
+function find_action () {
+  findInPage.openFindWindow()
+}
+
 function remove_selected_action () {
   fangorn.get_selection().forEach(function (n) { n.mark() })
   fangorn.get_tree().refresh()
@@ -315,12 +320,13 @@ $(document).ready(function () {
 
   // Edit
   menu.setCallbackOnItem('copy', copy_action)
+  menu.setCallbackOnItem('find', find_action)
   menu.setCallbackOnItem('remove-selected', remove_selected_action)
   menu.setCallbackOnItem('remove-unselected', remove_unselected_action)
   menu.setCallbackOnItem('restore-selected', restore_selected_action)
 
 
-  const findInPage = new FindInPage(app.remote.getCurrentWebContents(), {
+  findInPage = new FindInPage(app.remote.getCurrentWebContents(), {
     parentElement: document.querySelector("#main-tree-container"),
     offsetTop: 65,
     duration: 150
