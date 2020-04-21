@@ -69,9 +69,24 @@ const template = [
     label: 'Edit',
     submenu: [
       {
-        id: "copy",
+        label: "Cut",
+        accelerator: "CmdOrCtrl+X",
+        role: "cut"
+      },
+      {
         label: 'Copy',
-        accelerator: 'CmdOrCtrl+C'
+        accelerator: 'CmdOrCtrl+C',
+        role: "copy"
+      },
+      {
+        label: "Paste",
+        accelerator: "CmdOrCtrl+V",
+        role: "paste"
+      },
+      {
+        label: "Select All",
+        accelerator: "CmdOrCtrl+A",
+        role: "selectAll"
       },
       {
         type: 'separator'
@@ -105,9 +120,9 @@ const template = [
         accelerator: 'CmdOrCtrl+K'
       },
       {
-        id: "select-all",
-        label: 'Select All',
-        accelerator: 'CmdOrCtrl+A'
+        id: 'select-all-taxa',
+        label: 'Select All Taxa',
+        accelerator: 'CmdOrCtrl+Shift+A'
       },
     ]
   },

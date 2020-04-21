@@ -25,7 +25,7 @@ function update_controls (fangorn) {
   menu = app.remote.Menu.getApplicationMenu()
 
   var disabled_menu_items = ['open-fasta', 'save-fasta', 'save-fasta-as', 'save-selection-as-fasta',
-                             'reroot', 'select-all', 'remove-selected', 'remove-unselected', 'restore-selected']
+                             'reroot', 'select-all-taxa', 'remove-selected', 'remove-unselected', 'restore-selected']
   disabled_menu_items.forEach(function (item) {
     menu.disableItemById(item)
   })
@@ -41,7 +41,7 @@ function update_controls (fangorn) {
     $('[data-direction]').removeAttr('disabled')
     $('#open-fasta').removeAttr('disabled')
     menu.enableItemById('open-fasta')
-    menu.enableItemById('select-all')
+    menu.enableItemById('select-all-taxa')
 
     if (fangorn.fasta_is_loaded() && fangorn.is_one_leaf_selected()) { $('#annotate-node-action').removeAttr('disabled') }
 
@@ -167,6 +167,10 @@ function open_fasta_action () {
 }
 
 function copy_action () {
+  if (!fangorn.tree_is_loaded()){
+    return
+  }
+
   var fasta = fangorn.get_selected_leaves_fasta()
   if (fasta) { clipboard.writeText(fasta) }
 }
@@ -319,23 +323,25 @@ $(document).ready(function () {
   menu.setCallbackOnItem('export-to-svg', export_to_svg_action)
 
   // Edit
-  menu.setCallbackOnItem('copy', copy_action)
+
+  document.addEventListener('copy', function(e) {
+    if (e.target.tagName == 'BODY'){
+      copy_action()
+      e.preventDefault()
+    }
+  })
+
   menu.setCallbackOnItem('find', find_action)
   menu.setCallbackOnItem('remove-selected', remove_selected_action)
   menu.setCallbackOnItem('remove-unselected', remove_unselected_action)
   menu.setCallbackOnItem('restore-selected', restore_selected_action)
+  menu.setCallbackOnItem('select-all-taxa', selectAllAction)
 
 
   findInPage = new FindInPage(app.remote.getCurrentWebContents(), {
     parentElement: document.querySelector("#main-tree-container"),
     offsetTop: 65,
     duration: 150
-  })
-
-  $(window).on('keydown', function (e) {
-    if ((e.ctrlKey || e.metaKey) && e.keyCode === 70) {
-      findInPage.openFindWindow()
-    }
   })
 
   $('#search-action').on('click', function () {
@@ -346,7 +352,6 @@ $(document).ready(function () {
   $('#remove-unselected-action').on('click', remove_unselected_action)
   $('#restore-selected-action').on('click', restore_selected_action)
 
-  menu.setCallbackOnItem('select-all', selectAllAction)
 
   $('#show-fasta-action').on('click', show_fasta_action)
 

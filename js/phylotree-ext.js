@@ -1,5 +1,4 @@
 const $ = require('jquery')
-var Mousetrap = require('mousetrap');
 const nexus = require('./nexus.js');
 const pako = require('pako')
 
