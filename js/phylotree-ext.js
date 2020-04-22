@@ -11,17 +11,15 @@ end;
 
   var svg = phylotree.get_svg();
   var zoom_mode = false;
-  var cursor_above_tree = false;
 
   $(window).unbind("keydown")
   $(window).unbind("keyup")
   $(window).unbind("wheel")
+  $(window).unbind("focus")
 
   $(window).on("keydown", function(e) {
     if (e.ctrlKey){
-      svg.call(zoom);
-      zoom_mode = true;
-      $("#tree_display").css('cursor', 'grab');
+      phylotree.enter_zoom_mode()
     } else {
       var delta = e.shiftKey ? 15 : 5
 
@@ -42,23 +40,19 @@ end;
     }
   });
 
+  $(window).on('focus', function(e) {
+    phylotree.exit_zoom_mode()
+  })
+
   $(window).on("keyup", function(e) {
     if (e.key == 'Control'){
-      svg.on(".zoom", null);
-      zoom_mode = false;
-      $("#tree_display").css('cursor', '');
+      phylotree.exit_zoom_mode()
     }
   });
 
-  $("#tree_display").mouseenter(function(e){
-    cursor_above_tree = true
-  })
-
-  $("#tree_display").mouseleave(function(e){
-    cursor_above_tree = false
-  })
-
   $(window).on("wheel", function(e) {
+    var cursor_above_tree = ($("#tree-pane:hover").length != 0)
+
     if (!zoom_mode && cursor_above_tree){
       if (e.originalEvent.deltaY < 0) {
         phylotree.move("S", 10)
@@ -71,6 +65,18 @@ end;
       }
     }
   })
+
+  phylotree.enter_zoom_mode = function(){
+    svg.call(zoom);
+    zoom_mode = true;
+    $("#tree_display").css('cursor', 'grab');
+  }
+
+  phylotree.exit_zoom_mode = function(){
+    svg.on(".zoom", null);
+    zoom_mode = false;
+    $("#tree_display").css('cursor', '');
+  }
 
   phylotree.original_update = phylotree.update;
 

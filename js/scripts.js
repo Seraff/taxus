@@ -296,7 +296,7 @@ function quitAction () {
 $(document).ready(function () {
   unhandled({ showDialog: true })
 
-  var split = Split(['#pane-with-bg', '#fasta-panel'], { gutterSize: 10, cursor: 'col-resize' })
+  Split(['#tree-pane', '#fasta-panel'], { gutterSize: 10, cursor: 'col-resize' })
 
   set_window_header()
 
