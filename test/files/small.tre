@@ -1,0 +1,28 @@
+#NEXUS
+begin taxa;
+	dimensions ntax=4;
+	taxlabels
+	Aranaeus
+	Drosophila
+	Lupus
+	Scarabaeus
+;
+end;
+
+begin trees;
+	tree basic_bush = [&R] ((Scarabaeus[&!color=#fa3a00]:3,Drosophila:1):1.5,(Aranaeus[&!color=#808080]:1.3,Lupus:1.9)[&!hilight={2,1.6,#e6da00},!color=#4f98ff]:1)rootrootrootroot;
+end;
+
+begin figtree;
+	set appearance.backgroundColorAttribute="Default";
+	set appearance.backgroundColour=#ffffff;
+	set appearance.branchColorAttribute="User selection";
+	set appearance.branchColorGradient=false;
+end;
+
+begin fangorn;
+	set removed_seqs="eJyzcynKL84vyMjMSeQKcYRAdzDkAgCA5QhU";
+	set branchWidth="2";
+	set branchColor="434242";
+	set displayAlignmentCoverage="true";
+end;
