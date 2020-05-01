@@ -11,6 +11,7 @@ end;
 
   var svg = phylotree.get_svg();
   var zoom_mode = false;
+  var selection_mode = 'taxa'
 
   $(window).unbind("keydown")
   $(window).unbind("keyup")
@@ -173,6 +174,47 @@ end;
     return xOverlap && yOverlap;
   }
 
+  function get_current_transform () {
+    return d3.transform(d3.select("."+phylotree.get_css_classes()["tree-container"]).attr("transform"))
+  }
+
+  function get_leaf_geometry (node) {
+    var current_transform = get_current_transform()
+    var bbox = d3.select(node.container).node().getBBox()
+    var convert = makeAbsoluteContext(d3.select(node.container).node())
+
+    var bbox_translated = {}
+    bbox_translated.x = (convert(bbox.x, bbox.y).x)
+    bbox_translated.y = (convert(bbox.x, bbox.y).y)
+    bbox_translated.width = bbox.width * current_transform.scale[0]
+    bbox_translated.height = bbox.height * current_transform.scale[1]
+
+    return [bbox_translated]
+  }
+
+  function get_branch_geometry (node) {
+    if (node.prev_branch === undefined) {
+      return []
+    }
+
+    var current_transform = get_current_transform()
+    var branch = node.prev_branch
+    var bbox = branch.get_element().node().getBBox()
+    var convert = makeAbsoluteContext(branch.get_element().node())
+
+    var bbox_translated = {}
+    bbox_translated.x = (convert(bbox.x, bbox.y).x)
+    bbox_translated.y = (convert(bbox.x, bbox.y).y)
+    bbox_translated.width = bbox.width * current_transform.scale[0]
+    bbox_translated.height = bbox.height * current_transform.scale[1]
+
+    return [bbox_translated]
+  }
+
+  function rect_overlaps_geometry (rect, geometry) {
+    return geometry.some( (g) => { return rects_overlap(rect, g) } )
+  }
+
   var selection = svg.append("path")
     .attr("class", "selection")
     .attr("visibility", "hidden");
@@ -181,60 +223,42 @@ end;
     if (zoom_mode) return false;
 
     var _svg = svg[0][0];
-    var subject = d3.select(window),
-        start = d3.mouse(this);
+    var subject = d3.select(window)
+    var start = d3.mouse(this);
 
     selection.attr("d", rect(start[0], start[0], 0, 0))
         .attr("visibility", "visible");
 
-    leafs = phylotree.get_nodes().filter(function(n){ return phylotree.is_leafnode(n) });
+    nodes = phylotree.get_nodes().filter(function(n){ return phylotree.is_leafnode(n) })
 
-    current_transform = d3.transform(d3.select("."+phylotree.get_css_classes()["tree-container"]).attr("transform"));
-
-    leafs.forEach(function(n){
-      n.bbox = d3.select(n.container).node().getBBox();
-
-      var convert = makeAbsoluteContext(d3.select(n.container).node());
-
-      n.bbox_translated = d3.select(n.container).node().getBBox();
-      n.bbox_translated.x = (convert(n.bbox.x, n.bbox.y).x);
-      n.bbox_translated.y = (convert(n.bbox.x, n.bbox.y).y);
-      n.bbox_translated.width = n.bbox.width * current_transform.scale[0]
-      n.bbox_translated.height = n.bbox.height * current_transform.scale[1]
+    nodes.forEach(function(n){
+      n.geometry = get_leaf_geometry(n)
     });
-
-    // svg.append("rect")
-    // .attr("x", leafs[3].bbox_translated.x)
-    // .attr("y", leafs[3].bbox_translated.y)
-    // .attr("width", leafs[3].bbox_translated.width)
-    // .attr("height", leafs[3].bbox_translated.height)
-    // .style("fill", "#ccc")
-    // .style("fill-opacity", "0.5")
-    // .style("stroke", "#red")
-    // .style("stroke-width", "3px");
 
     subject
       .on("mousemove.selection", function() {
         var current = d3.mouse(_svg);
-        selection.attr("d", rect(start[0], start[1], current[0]-start[0], current[1]-start[1]));
+        selection.attr("d", rect(start[0], start[1], current[0]-start[0], current[1]-start[1]))
       }).on("mouseup.selection", function() {
         var finish = d3.mouse(_svg);
         var selection_rect = { x: Math.min(start[0], finish[0]),
                                y: Math.min(start[1], finish[1]),
                                width: Math.abs(start[0] - finish[0]),
                                height: Math.abs(start[1] - finish[1]) }
-        var selected_leafs = leafs.filter(function(n){ return rects_overlap(selection_rect, n.bbox_translated) });
+
+        var selected_leafs = nodes.filter(function(n){ return rect_overlaps_geometry(selection_rect, n.geometry) })
+
         phylotree.modify_selection(function(n){ return selected_leafs.includes(n.target) })
         selection.attr("visibility", "hidden");
-        subject.on("mousemove.selection", null).on("mouseup.selection", null);
+        subject.on("mousemove.selection", null).on("mouseup.selection", null)
       });
   });
 
   phylotree.to_fangorn_newick = function(annotations = false){
     if (annotations){
-      return phylotree.get_newick(function(e){ return e.annotation ? "[" + e.annotation + "]" : "" });
+      return phylotree.get_newick(function(e){ return e.annotation ? "[" + e.annotation + "]" : "" })
     } else {
-      return phylotree.get_newick(function(e){ return "" });
+      return phylotree.get_newick(function(e){ return "" })
     }
   }
 
@@ -434,6 +458,12 @@ end;
   }
 
   phylotree.pad_height = function() { return 0; }
+
+  phylotree.set_selection_mode = function (new_mode) {
+    if (['taxa', 'branch'].includes(new_mode)) {
+      selection_mode = new_mode
+    }
+  }
 }
 
 module.exports = apply_extensions;
