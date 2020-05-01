@@ -462,6 +462,13 @@ function Fangorn () {
     fangorn.get_leaves().forEach((n) => { n.redraw_features() })
   }
 
+  fangorn.set_selection_mode = function(mode) {
+    if (!fangorn.tree_is_loaded()) { return false }
+
+    fangorn.select_none()
+    fangorn.get_tree().set_selection_mode(mode)
+  }
+
   return this
 }
 
