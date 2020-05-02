@@ -14,6 +14,7 @@ end;
 
   var svg = phylotree.get_svg();
   var zoom_mode = false;
+  var shift_mode = false;
   var selection_mode = 'taxa'
 
   $(window).unbind("keydown")
@@ -24,6 +25,8 @@ end;
   $(window).on("keydown", function(e) {
     if (e.ctrlKey){
       phylotree.enter_zoom_mode()
+    } else if (e.shiftKey) {
+      phylotree.enter_shift_mode()
     } else {
       var delta = e.shiftKey ? 15 : 5
 
@@ -46,11 +49,14 @@ end;
 
   $(window).on('focus', function(e) {
     phylotree.exit_zoom_mode()
+    phylotree.exit_shift_mode()
   })
 
   $(window).on("keyup", function(e) {
     if (e.key == 'Control'){
       phylotree.exit_zoom_mode()
+    } else if (e.key == 'Shift') {
+      phylotree.exit_shift_mode()
     }
   });
 
@@ -80,6 +86,14 @@ end;
     svg.on(".zoom", null);
     zoom_mode = false;
     $("#tree_display").css('cursor', '');
+  }
+
+  phylotree.enter_shift_mode = function(){
+    shift_mode = true;
+  }
+
+  phylotree.exit_shift_mode = function(){
+    shift_mode = false;
   }
 
   phylotree.original_update = phylotree.update;
@@ -253,13 +267,48 @@ end;
                                width: Math.abs(start[0] - finish[0]),
                                height: Math.abs(start[1] - finish[1]) }
 
-        var selected_leafs = nodes.filter(function(n){ return rect_overlaps_geometry(selection_rect, n.geometry) });
+        var to_select = nodes.filter(function(n){ return rect_overlaps_geometry(selection_rect, n.geometry) });
 
-        phylotree.modify_selection(function(n){ return selected_leafs.includes(n.target) })
+        if (shift_mode) {
+          to_select = to_select.concat(phylotree.get_selection())
+        }
+
+        phylotree.modify_selection(function(n){ return to_select.includes(n.target) })
+
         selection.attr("visibility", "hidden");
         subject.on("mousemove.selection", null).on("mouseup.selection", null)
       });
   });
+
+  // Branches and taxa selection-by-click logic
+  document.addEventListener('d3.layout.phylotree.event', function(e) {
+    if (e.detail[0] === 'count_update') {
+
+      // Branch selection in branch mode
+      d3.selectAll('path.branch').on('click', null)
+
+      d3.selectAll('path.branch').on('mousedown', function(e){
+        d3.event.stopPropagation()
+      })
+
+      d3.selectAll('path.branch').on('mouseup', function(e){
+        if (selection_mode === 'branch') {
+          var to_select = [e.target]
+
+          if (shift_mode) {
+            to_select = to_select.concat(phylotree.get_selection())
+          }
+
+          phylotree.modify_selection(function(n){ return to_select.includes(n.target) })
+        }
+      })
+
+      // Taxa selection in taxa mode
+      d3.selectAll('g.node').on('mousedown', null)
+      d3.selectAll('g.node').on('mouseup', null)
+      d3.selectAll('g.node').on('mousemove', null)
+    }
+  })
 
   phylotree.to_fangorn_newick = function(annotations = false){
     if (annotations){
