@@ -1,6 +1,9 @@
 const $ = require('jquery')
-const nexus = require('./nexus.js');
 const pako = require('pako')
+require('path-data-polyfill')
+
+const nexus = require('./nexus.js')
+const GeometryHelper = require('./geometry_helper.js')
 
 function apply_extensions(phylotree){
   const basic_nexus_pattern = `#NEXUS
@@ -161,19 +164,6 @@ end;
     _draw_node(container, node, transitions);
   }
 
-
-  /* rect selection */
-  function rect(x, y, w, h) { return "M"+[x,y]+" l"+[w,0]+" l"+[0,h]+" l"+[-w,0]+"z"; }
-
-  function valueInRange(value, min, max){ return (value >= min) && (value <= max); }
-
-  function rects_overlap(A, B){
-    xOverlap = valueInRange(A.x, B.x, B.x + B.width) || valueInRange(B.x, A.x, A.x + A.width);
-    yOverlap = valueInRange(A.y, B.y, B.y + B.height) || valueInRange(B.y, A.y, A.y + A.height);
-
-    return xOverlap && yOverlap;
-  }
-
   function get_current_transform () {
     return d3.transform(d3.select("."+phylotree.get_css_classes()["tree-container"]).attr("transform"))
   }
@@ -193,7 +183,7 @@ end;
   }
 
   function get_branch_geometry (node) {
-    if (node.prev_branch === undefined) {
+    if (!node.prev_branch) {
       return []
     }
 
@@ -208,11 +198,28 @@ end;
     bbox_translated.width = bbox.width * current_transform.scale[0]
     bbox_translated.height = bbox.height * current_transform.scale[1]
 
-    return [bbox_translated]
+    // detect, if the branch ┌─ or └─
+
+    var path_data = branch.get_element().node().getPathData()
+    var branch_goes_up = path_data[0].values[1] > path_data[1].values[0]
+
+    geometry = []
+
+    // adding | line
+    geometry.push({ x: bbox_translated.x, y: bbox_translated.y, width: 0, height: bbox_translated.height })
+
+    //adding ── line
+    if (branch_goes_up) {
+      geometry.push({ x: bbox_translated.x, y: bbox_translated.y, width: bbox_translated.width, height: 0 })
+    } else {
+      geometry.push({ x: bbox_translated.x, y: bbox_translated.y + bbox_translated.height, width: bbox_translated.width, height: 0 })
+    }
+
+    return geometry
   }
 
   function rect_overlaps_geometry (rect, geometry) {
-    return geometry.some( (g) => { return rects_overlap(rect, g) } )
+    return geometry.some( (g) => { return GeometryHelper.rectsOverlap(rect, g) } )
   }
 
   var selection = svg.append("path")
@@ -226,19 +233,19 @@ end;
     var subject = d3.select(window)
     var start = d3.mouse(this);
 
-    selection.attr("d", rect(start[0], start[0], 0, 0))
+    selection.attr("d", GeometryHelper.rect(start[0], start[0], 0, 0))
         .attr("visibility", "visible");
 
-    nodes = phylotree.get_nodes().filter(function(n){ return phylotree.is_leafnode(n) })
+    nodes = phylotree.get_nodes().filter(function(n){ return selection_mode == 'taxa' ? phylotree.is_leafnode(n) : true })
 
     nodes.forEach(function(n){
-      n.geometry = get_leaf_geometry(n)
+      n.geometry = (selection_mode == 'taxa') ? get_leaf_geometry(n) : get_branch_geometry(n)
     });
 
     subject
       .on("mousemove.selection", function() {
         var current = d3.mouse(_svg);
-        selection.attr("d", rect(start[0], start[1], current[0]-start[0], current[1]-start[1]))
+        selection.attr("d", GeometryHelper.rect(start[0], start[1], current[0]-start[0], current[1]-start[1]));
       }).on("mouseup.selection", function() {
         var finish = d3.mouse(_svg);
         var selection_rect = { x: Math.min(start[0], finish[0]),
@@ -246,7 +253,7 @@ end;
                                width: Math.abs(start[0] - finish[0]),
                                height: Math.abs(start[1] - finish[1]) }
 
-        var selected_leafs = nodes.filter(function(n){ return rect_overlaps_geometry(selection_rect, n.geometry) })
+        var selected_leafs = nodes.filter(function(n){ return rect_overlaps_geometry(selection_rect, n.geometry) });
 
         phylotree.modify_selection(function(n){ return selected_leafs.includes(n.target) })
         selection.attr("visibility", "hidden");
