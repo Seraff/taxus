@@ -12,6 +12,7 @@ const Fangorn = require('./js/fangorn.js')
 const ColorPicker = require('./js/color_picker.js')
 const svgToPng = require('save-svg-as-png')
 const Split = require('split.js')
+const BtnGroupRadio = require('./js/btn-group-radio.js')
 
 const unhandled = require('electron-unhandled');
 
@@ -36,12 +37,16 @@ function update_controls (fangorn) {
   $('.mark-button').attr('disabled', 'disabled')
   $('#change-branch-color-action').attr('disabled', 'disabled')
   $('#remove-branch-color-action').attr('disabled', 'disabled')
+  $('#set-mode-to-branch-action').attr('disabled', 'disabled')
+  $('#set-mode-to-taxa-action').attr('disabled', 'disabled')
 
   if (fangorn.tree_is_loaded()) {
     $('[data-direction]').removeAttr('disabled')
     $('#open-fasta').removeAttr('disabled')
     menu.enableItemById('open-fasta')
     menu.enableItemById('select-all-taxa')
+    $('#set-mode-to-branch-action').removeAttr('disabled')
+    $('#set-mode-to-taxa-action').removeAttr('disabled')
 
     if (fangorn.fasta_is_loaded() && fangorn.is_one_leaf_selected()) { $('#annotate-node-action').removeAttr('disabled') }
 
@@ -120,8 +125,11 @@ function open_tree_action (e) {
 
   if (fangorn.tree_is_dirty){
     showUnsavedFileAlert(open_tree)
-  } else
+  } else {
     open_tree()
+  }
+
+  resetSelectionMode()
 }
 
 function save_tree_action () {
@@ -293,6 +301,10 @@ function quitAction () {
     app.remote.app.quit()
 }
 
+function resetSelectionMode () {
+  $('#set-mode-to-taxa-action').click()
+}
+
 $(document).ready(function () {
   unhandled({ showDialog: true })
 
@@ -449,6 +461,20 @@ $(document).ready(function () {
       open_tree()
     }
   })
+
+  // Selection modes logic
+
+  var mode_selector = new BtnGroupRadio($('#mode-select-btn-group'))
+
+  mode_selector.on_change = (new_button) => {
+    var mode = $(new_button).data('mode')
+    if (!fangorn.tree_is_loaded()) { return false }
+
+    fangorn.select_none()
+    fangorn.get_tree().set_selection_mode(mode)
+  }
+
+  resetSelectionMode()
 
   // Header update logic
 

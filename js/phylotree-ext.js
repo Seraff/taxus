@@ -1,6 +1,9 @@
 const $ = require('jquery')
-const nexus = require('./nexus.js');
 const pako = require('pako')
+require('path-data-polyfill')
+
+const nexus = require('./nexus.js')
+const GeometryHelper = require('./geometry_helper.js')
 
 function apply_extensions(phylotree){
   const basic_nexus_pattern = `#NEXUS
@@ -11,6 +14,8 @@ end;
 
   var svg = phylotree.get_svg();
   var zoom_mode = false;
+  var shift_mode = false;
+  var selection_mode = 'taxa'
 
   $(window).unbind("keydown")
   $(window).unbind("keyup")
@@ -20,6 +25,8 @@ end;
   $(window).on("keydown", function(e) {
     if (e.ctrlKey){
       phylotree.enter_zoom_mode()
+    } else if (e.shiftKey) {
+      phylotree.enter_shift_mode()
     } else {
       var delta = e.shiftKey ? 15 : 5
 
@@ -42,11 +49,14 @@ end;
 
   $(window).on('focus', function(e) {
     phylotree.exit_zoom_mode()
+    phylotree.exit_shift_mode()
   })
 
   $(window).on("keyup", function(e) {
     if (e.key == 'Control'){
       phylotree.exit_zoom_mode()
+    } else if (e.key == 'Shift') {
+      phylotree.exit_shift_mode()
     }
   });
 
@@ -76,6 +86,14 @@ end;
     svg.on(".zoom", null);
     zoom_mode = false;
     $("#tree_display").css('cursor', '');
+  }
+
+  phylotree.enter_shift_mode = function(){
+    shift_mode = true;
+  }
+
+  phylotree.exit_shift_mode = function(){
+    shift_mode = false;
   }
 
   phylotree.original_update = phylotree.update;
@@ -160,17 +178,62 @@ end;
     _draw_node(container, node, transitions);
   }
 
+  function get_current_transform () {
+    return d3.transform(d3.select("."+phylotree.get_css_classes()["tree-container"]).attr("transform"))
+  }
 
-  /* rect selection */
-  function rect(x, y, w, h) { return "M"+[x,y]+" l"+[w,0]+" l"+[0,h]+" l"+[-w,0]+"z"; }
+  function get_leaf_geometry (node) {
+    var current_transform = get_current_transform()
+    var bbox = d3.select(node.container).node().getBBox()
+    var convert = makeAbsoluteContext(d3.select(node.container).node())
 
-  function valueInRange(value, min, max){ return (value >= min) && (value <= max); }
+    var bbox_translated = {}
+    bbox_translated.x = (convert(bbox.x, bbox.y).x)
+    bbox_translated.y = (convert(bbox.x, bbox.y).y)
+    bbox_translated.width = bbox.width * current_transform.scale[0]
+    bbox_translated.height = bbox.height * current_transform.scale[1]
 
-  function rects_overlap(A, B){
-    xOverlap = valueInRange(A.x, B.x, B.x + B.width) || valueInRange(B.x, A.x, A.x + A.width);
-    yOverlap = valueInRange(A.y, B.y, B.y + B.height) || valueInRange(B.y, A.y, A.y + A.height);
+    return [bbox_translated]
+  }
 
-    return xOverlap && yOverlap;
+  function get_branch_geometry (node) {
+    if (!node.prev_branch) {
+      return []
+    }
+
+    var current_transform = get_current_transform()
+    var branch = node.prev_branch
+    var bbox = branch.get_element().node().getBBox()
+    var convert = makeAbsoluteContext(branch.get_element().node())
+
+    var bbox_translated = {}
+    bbox_translated.x = (convert(bbox.x, bbox.y).x)
+    bbox_translated.y = (convert(bbox.x, bbox.y).y)
+    bbox_translated.width = bbox.width * current_transform.scale[0]
+    bbox_translated.height = bbox.height * current_transform.scale[1]
+
+    // detect, if the branch ┌─ or └─
+
+    var path_data = branch.get_element().node().getPathData()
+    var branch_goes_up = path_data[0].values[1] > path_data[1].values[0]
+
+    geometry = []
+
+    // adding | line
+    geometry.push({ x: bbox_translated.x, y: bbox_translated.y, width: 0, height: bbox_translated.height })
+
+    //adding ── line
+    if (branch_goes_up) {
+      geometry.push({ x: bbox_translated.x, y: bbox_translated.y, width: bbox_translated.width, height: 0 })
+    } else {
+      geometry.push({ x: bbox_translated.x, y: bbox_translated.y + bbox_translated.height, width: bbox_translated.width, height: 0 })
+    }
+
+    return geometry
+  }
+
+  function rect_overlaps_geometry (rect, geometry) {
+    return geometry.some( (g) => { return GeometryHelper.rectsOverlap(rect, g) } )
   }
 
   var selection = svg.append("path")
@@ -181,60 +244,77 @@ end;
     if (zoom_mode) return false;
 
     var _svg = svg[0][0];
-    var subject = d3.select(window),
-        start = d3.mouse(this);
+    var subject = d3.select(window)
+    var start = d3.mouse(this);
 
-    selection.attr("d", rect(start[0], start[0], 0, 0))
+    selection.attr("d", GeometryHelper.rect(start[0], start[0], 0, 0))
         .attr("visibility", "visible");
 
-    leafs = phylotree.get_nodes().filter(function(n){ return phylotree.is_leafnode(n) });
+    nodes = phylotree.get_nodes().filter(function(n){ return selection_mode == 'taxa' ? phylotree.is_leafnode(n) : true })
 
-    current_transform = d3.transform(d3.select("."+phylotree.get_css_classes()["tree-container"]).attr("transform"));
-
-    leafs.forEach(function(n){
-      n.bbox = d3.select(n.container).node().getBBox();
-
-      var convert = makeAbsoluteContext(d3.select(n.container).node());
-
-      n.bbox_translated = d3.select(n.container).node().getBBox();
-      n.bbox_translated.x = (convert(n.bbox.x, n.bbox.y).x);
-      n.bbox_translated.y = (convert(n.bbox.x, n.bbox.y).y);
-      n.bbox_translated.width = n.bbox.width * current_transform.scale[0]
-      n.bbox_translated.height = n.bbox.height * current_transform.scale[1]
+    nodes.forEach(function(n){
+      n.geometry = (selection_mode == 'taxa') ? get_leaf_geometry(n) : get_branch_geometry(n)
     });
-
-    // svg.append("rect")
-    // .attr("x", leafs[3].bbox_translated.x)
-    // .attr("y", leafs[3].bbox_translated.y)
-    // .attr("width", leafs[3].bbox_translated.width)
-    // .attr("height", leafs[3].bbox_translated.height)
-    // .style("fill", "#ccc")
-    // .style("fill-opacity", "0.5")
-    // .style("stroke", "#red")
-    // .style("stroke-width", "3px");
 
     subject
       .on("mousemove.selection", function() {
         var current = d3.mouse(_svg);
-        selection.attr("d", rect(start[0], start[1], current[0]-start[0], current[1]-start[1]));
+        selection.attr("d", GeometryHelper.rect(start[0], start[1], current[0]-start[0], current[1]-start[1]));
       }).on("mouseup.selection", function() {
         var finish = d3.mouse(_svg);
         var selection_rect = { x: Math.min(start[0], finish[0]),
                                y: Math.min(start[1], finish[1]),
                                width: Math.abs(start[0] - finish[0]),
                                height: Math.abs(start[1] - finish[1]) }
-        var selected_leafs = leafs.filter(function(n){ return rects_overlap(selection_rect, n.bbox_translated) });
-        phylotree.modify_selection(function(n){ return selected_leafs.includes(n.target) })
+
+        var to_select = nodes.filter(function(n){ return rect_overlaps_geometry(selection_rect, n.geometry) });
+
+        if (shift_mode) {
+          to_select = to_select.concat(phylotree.get_selection())
+        }
+
+        phylotree.modify_selection(function(n){ return to_select.includes(n.target) })
+
         selection.attr("visibility", "hidden");
-        subject.on("mousemove.selection", null).on("mouseup.selection", null);
+        subject.on("mousemove.selection", null).on("mouseup.selection", null)
       });
   });
 
+  // Branches and taxa selection-by-click logic
+  document.addEventListener('d3.layout.phylotree.event', function(e) {
+    if (e.detail[0] === 'count_update') {
+
+      // Branch selection in branch mode
+      d3.selectAll('path.branch').on('click', null)
+
+      d3.selectAll('path.branch').on('mousedown', function(e){
+        d3.event.stopPropagation()
+      })
+
+      d3.selectAll('path.branch').on('mouseup', function(e){
+        if (selection_mode === 'branch') {
+          var to_select = [e.target]
+
+          if (shift_mode) {
+            to_select = to_select.concat(phylotree.get_selection())
+          }
+
+          phylotree.modify_selection(function(n){ return to_select.includes(n.target) })
+        }
+      })
+
+      // Taxa selection in taxa mode
+      d3.selectAll('g.node').on('mousedown', null)
+      d3.selectAll('g.node').on('mouseup', null)
+      d3.selectAll('g.node').on('mousemove', null)
+    }
+  })
+
   phylotree.to_fangorn_newick = function(annotations = false){
     if (annotations){
-      return phylotree.get_newick(function(e){ return e.annotation ? "[" + e.annotation + "]" : "" });
+      return phylotree.get_newick(function(e){ return e.annotation ? "[" + e.annotation + "]" : "" })
     } else {
-      return phylotree.get_newick(function(e){ return "" });
+      return phylotree.get_newick(function(e){ return "" })
     }
   }
 
@@ -434,6 +514,12 @@ end;
   }
 
   phylotree.pad_height = function() { return 0; }
+
+  phylotree.set_selection_mode = function (new_mode) {
+    if (['taxa', 'branch'].includes(new_mode)) {
+      selection_mode = new_mode
+    }
+  }
 }
 
 module.exports = apply_extensions;
