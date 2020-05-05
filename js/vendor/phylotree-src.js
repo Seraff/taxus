@@ -1702,17 +1702,25 @@ const parseString = require('xml2js').parseString;
           return n.__mapped_bl;
         });
 
+        // rerooted and inited branch lengths
+
         var remove_me = node,
           current_node = node.parent,
           parent_length = current_node.__mapped_bl,
           stashed_bl = _.noop();
 
+        // if parent node has another parent
         if (current_node.parent) {
+          //shorten current node branch by half
+
           node.__mapped_bl =
             node.__mapped_bl === undefined ? undefined : node.__mapped_bl * 0.5;
+
           stashed_bl = current_node.__mapped_bl;
           current_node.__mapped_bl = node.__mapped_bl;
+
           new_json.children.push(current_node);
+
           while (current_node.parent) {
             var remove_idx = current_node.children.indexOf(remove_me);
             if (current_node.parent.parent) {
@@ -1732,6 +1740,8 @@ const parseString = require('xml2js').parseString;
           var remove_idx = current_node.children.indexOf(remove_me);
           current_node.children.splice(remove_idx, 1);
         } else {
+          // rerooting on one of the root clades
+          // removing node from it's parent
           var remove_idx = current_node.children.indexOf(remove_me);
           current_node.children.splice(remove_idx, 1);
           remove_me = new_json;
@@ -1741,18 +1751,26 @@ const parseString = require('xml2js').parseString;
         // the tree through
 
         if (current_node.children.length == 1) {
+          // if the old root now has only one guy to go, add children
           if (stashed_bl) {
             current_node.children[0].__mapped_bl += stashed_bl;
           }
           remove_me.children = remove_me.children.concat(current_node.children);
         } else {
+          // if the old root now has more than 1 child, add a new node and put it behind
           var new_node = {
             name: "__reroot_top_clade"
           };
-          new_node.__mapped_bl = stashed_bl;
+
+          var new_bl = node.__mapped_bl === undefined ? undefined : node.__mapped_bl * 0.5;
+
+          node.__mapped_bl = new_bl
+          new_node.__mapped_bl = new_bl
+
           new_node.children = current_node.children.map(function(n) {
             return n;
           });
+
           remove_me.children.push(new_node);
         }
 
