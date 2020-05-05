@@ -133,9 +133,14 @@ function Fangorn () {
 
     d3.select('.phylotree-container').attr('align', 'center')
 
-    document.addEventListener('selection_modified', function (e) {
+    function onSelectionModified(){
       fangorn.dispatch_state_update()
-    })
+    }
+
+    if (!document.fangorn_selection_modified_event_set) {
+      document.addEventListener('selection_modified', onSelectionModified)
+    }
+    document.fangorn_selection_modified_event_set = true
 
     fangorn.fasta = null
     fangorn.dispatch_state_update()
