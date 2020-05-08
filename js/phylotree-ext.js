@@ -496,7 +496,7 @@ end;
 
   // Scale bar stuff
 
-  phylotree.redraw_scale_bar = function(){
+  phylotree.redraw_scale_bar = function () {
     var tree_transform = phylotree.get_current_transform();
     var tree_container = d3.select("." + phylotree.get_css_classes()["tree-container"]).node();
 
@@ -509,16 +509,35 @@ end;
       .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
   }
 
-  phylotree.get_current_transform = function(){
+  phylotree.get_current_transform = function () {
     return d3.transform(d3.select("." + phylotree.get_css_classes()["tree-container"]).attr('transform'));
   }
 
-  phylotree.pad_height = function() { return 0; }
+  phylotree.pad_height = function () { return 0; }
 
   phylotree.set_selection_mode = function (new_mode) {
     if (['taxa', 'branch'].includes(new_mode)) {
       selection_mode = new_mode
     }
+  }
+
+  // rotate branch feature
+
+  phylotree.get_root = function () {
+    return phylotree.get_nodes().find(function (n) { return n.is_root() })
+  }
+
+  phylotree.rotate_branch = function (node) {
+    if (node.is_leaf()) {
+      return false
+    }
+
+    var new_children = [node.children[node.children.length-1], node.children[0]]
+    node.children = new_children
+
+    phylotree.update_layout(fangorn.get_tree().get_root(), true)
+
+
   }
 }
 

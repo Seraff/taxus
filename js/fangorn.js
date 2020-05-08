@@ -339,13 +339,27 @@ function Fangorn () {
   }
 
   fangorn.reroot_to_selected_node = function () {
+    if (!fangorn.is_one_selected()) {
+      return false
+    }
     var selection = fangorn.get_selection()
+    var node = selection[0]
 
-    if (selection.length === 1) {
-      var node = selection[0]
-      fangorn.get_tree().reroot(node)
+    fangorn.get_tree().reroot(node)
+    fangorn.get_tree().safe_update()
+    fangorn.reinit_nodes()
+    fangorn.make_tree_dirty()
+  }
+
+  fangorn.rotate_selected_branch = function () {
+    if (!fangorn.is_one_internal_selected()) {
+      return false
     }
 
+    var selection = fangorn.get_selection()
+    var node = selection[0]
+
+    fangorn.get_tree().rotate_branch(node)
     fangorn.get_tree().safe_update()
     fangorn.reinit_nodes()
     fangorn.make_tree_dirty()

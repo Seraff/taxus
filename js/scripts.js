@@ -26,13 +26,14 @@ function update_controls (fangorn) {
   menu = app.remote.Menu.getApplicationMenu()
 
   var disabled_menu_items = ['open-fasta', 'save-fasta', 'save-fasta-as', 'save-selection-as-fasta',
-                             'reroot', 'select-all-taxa', 'remove-selected', 'remove-unselected', 'restore-selected']
+                             'reroot', 'rotate-branch', 'select-all-taxa', 'remove-selected', 'remove-unselected', 'restore-selected']
   disabled_menu_items.forEach(function (item) {
     menu.disableItemById(item)
   })
 
   $('#annotate-node-action').attr('disabled', 'disabled')
   $('#reroot-action').attr('disabled', 'disabled')
+  $('#rotate-branch-action').attr('disabled', 'disabled')
   $('[data-direction]').attr('disabled', 'disabled')
   $('.mark-button').attr('disabled', 'disabled')
   $('#change-branch-color-action').attr('disabled', 'disabled')
@@ -53,6 +54,11 @@ function update_controls (fangorn) {
     if (fangorn.is_one_selected()) {
       $('#reroot-action').removeAttr('disabled')
       menu.enableItemById('reroot')
+    }
+
+    if (fangorn.is_one_internal_selected()) {
+      $('#rotate-branch-action').removeAttr('disabled')
+      menu.enableItemById('rotate-branch')
     }
 
     if (fangorn.get_selection().length > 0) {
@@ -270,6 +276,10 @@ function reroot_action () {
   fangorn.reroot_to_selected_node()
 }
 
+function rotate_branch_action () {
+  fangorn.rotate_selected_branch()
+}
+
 function export_to_png_action () {
   options = { fonts: [], scale: 1.5 }
   svgToPng.saveSvgAsPng(d3.select('svg#tree_display').node(), 'tree.png', options)
@@ -371,6 +381,9 @@ $(document).ready(function () {
 
   $('#reroot-action').on('click', reroot_action)
   menu.setCallbackOnItem('reroot', reroot_action)
+
+  $('#rotate-branch-action').on('click', rotate_branch_action)
+  menu.setCallbackOnItem('rotate-branch', rotate_branch_action)
 
   menu.setCallbackOnItem('quit', quitAction)
 

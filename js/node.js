@@ -30,6 +30,10 @@ function Node(fangorn, phylotree_node){
     return !node.is_leaf()
   }
 
+  node.is_root = function () {
+    return node.parent === undefined
+  }
+
   node.mark = function(){
     node.add_annotation({ fangorn_marked: true })
     node.fangorn.make_tree_dirty()

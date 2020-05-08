@@ -105,6 +105,11 @@ const template = [
         accelerator: 'CmdOrCtrl+R'
       },
       {
+        id: "rotate-branch",
+        label: 'Rotate branch',
+        accelerator: 'CmdOrCtrl+Shift+R'
+      },
+      {
         id: "remove-selected",
         label: 'Delete selected',
         accelerator: 'CmdOrCtrl+D'
