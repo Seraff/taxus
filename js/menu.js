@@ -89,6 +89,10 @@ const template = [
         accelerator: "CmdOrCtrl+A"
       },
       {
+        id: 'select-descendants',
+        label: "Select Descendants"
+      },
+      {
         type: 'separator'
       },
       {

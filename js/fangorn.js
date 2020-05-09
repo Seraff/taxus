@@ -98,6 +98,15 @@ function Fangorn () {
     fangorn.get_tree().modify_selection(function (n) { return all.includes(n.target) })
   }
 
+  fangorn.select_descendants_of_selected = function () {
+    if (fangorn.is_one_internal_selected()){
+      var node = fangorn.get_selection()[0]
+
+      var selection = fangorn.get_tree().select_all_descendants(node, true, true)
+      fangorn.get_tree().modify_selection(function (n) { return selection.includes(n.target) })
+    }
+  }
+
   fangorn.init_phylotree = function (str) {
     _tree = d3.layout
       .phylotree()

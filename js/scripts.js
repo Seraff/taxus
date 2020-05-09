@@ -27,7 +27,9 @@ function update_controls (fangorn) {
   menu = app.remote.Menu.getApplicationMenu()
 
   var disabled_menu_items = ['open-fasta', 'save-fasta', 'save-fasta-as', 'save-selection-as-fasta',
-                             'reroot', 'rotate-branch', 'select-all', 'remove-selected', 'remove-unselected', 'restore-selected']
+                             'reroot', 'rotate-branch', 'select-all', 'select-descendants',
+                             'remove-selected', 'remove-unselected', 'restore-selected']
+
   disabled_menu_items.forEach(function (item) {
     menu.disableItemById(item)
   })
@@ -35,6 +37,7 @@ function update_controls (fangorn) {
   $('#annotate-node-action').attr('disabled', 'disabled')
   $('#reroot-action').attr('disabled', 'disabled')
   $('#rotate-branch-action').attr('disabled', 'disabled')
+  $('#select-descendants-action').attr('disabled', 'disabled')
   $('[data-direction]').attr('disabled', 'disabled')
   $('.mark-button').attr('disabled', 'disabled')
   $('#change-branch-color-action').attr('disabled', 'disabled')
@@ -60,6 +63,8 @@ function update_controls (fangorn) {
     if (fangorn.is_one_internal_selected()) {
       $('#rotate-branch-action').removeAttr('disabled')
       menu.enableItemById('rotate-branch')
+      $('#select-descendants-action').removeAttr('disabled')
+      menu.enableItemById('select-descendants')
     }
 
     if (fangorn.get_selection().length > 0) {
@@ -289,6 +294,10 @@ function rotate_branch_action () {
   fangorn.rotate_selected_branch()
 }
 
+function select_descendants_action () {
+  fangorn.select_descendants_of_selected()
+}
+
 function export_to_png_action () {
   options = { fonts: [], scale: 1.5 }
   svgToPng.saveSvgAsPng(d3.select('svg#tree_display').node(), 'tree.png', options)
@@ -398,6 +407,9 @@ $(document).ready(function () {
 
   $('#rotate-branch-action').on('click', rotate_branch_action)
   menu.setCallbackOnItem('rotate-branch', rotate_branch_action)
+
+  $('#select-descendants-action').on('click', select_descendants_action)
+  menu.setCallbackOnItem('select-descendants', select_descendants_action)
 
   menu.setCallbackOnItem('quit', quitAction)
 
