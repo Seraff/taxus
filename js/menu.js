@@ -85,8 +85,8 @@ const template = [
       },
       {
         label: "Select All",
-        accelerator: "CmdOrCtrl+A",
-        role: "selectAll"
+        id: 'select-all',
+        accelerator: "CmdOrCtrl+A"
       },
       {
         type: 'separator'
@@ -123,12 +123,7 @@ const template = [
         id: "restore-selected",
         label: 'Keep selected',
         accelerator: 'CmdOrCtrl+K'
-      },
-      {
-        id: 'select-all-taxa',
-        label: 'Select All Taxa',
-        accelerator: 'CmdOrCtrl+Shift+A'
-      },
+      }
     ]
   },
   {

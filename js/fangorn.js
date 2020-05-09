@@ -88,8 +88,13 @@ function Fangorn () {
     fangorn.get_tree().modify_selection(function (n) { return false })
   }
 
-  fangorn.select_all = function () {
+  fangorn.select_all_leaves = function () {
     var all = fangorn.get_leaves()
+    fangorn.get_tree().modify_selection(function (n) { return all.includes(n.target) })
+  }
+
+  fangorn.select_all = function () {
+    var all = fangorn.get_nodes()
     fangorn.get_tree().modify_selection(function (n) { return all.includes(n.target) })
   }
 

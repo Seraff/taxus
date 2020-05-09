@@ -21,12 +21,13 @@ const FASTA_EXT = ['fa', 'fas', 'fasta', 'fna', 'faa', 'ffn', 'frn']
 
 var fangorn = null
 var findInPage = null
+var modeSelector = null
 
 function update_controls (fangorn) {
   menu = app.remote.Menu.getApplicationMenu()
 
   var disabled_menu_items = ['open-fasta', 'save-fasta', 'save-fasta-as', 'save-selection-as-fasta',
-                             'reroot', 'rotate-branch', 'select-all-taxa', 'remove-selected', 'remove-unselected', 'restore-selected']
+                             'reroot', 'rotate-branch', 'select-all', 'remove-selected', 'remove-unselected', 'restore-selected']
   disabled_menu_items.forEach(function (item) {
     menu.disableItemById(item)
   })
@@ -45,7 +46,7 @@ function update_controls (fangorn) {
     $('[data-direction]').removeAttr('disabled')
     $('#open-fasta').removeAttr('disabled')
     menu.enableItemById('open-fasta')
-    menu.enableItemById('select-all-taxa')
+    menu.enableItemById('select-all')
     $('#set-mode-to-branch-action').removeAttr('disabled')
     $('#set-mode-to-taxa-action').removeAttr('disabled')
 
@@ -136,6 +137,14 @@ function open_tree_action (e) {
   }
 
   resetSelectionMode()
+}
+
+function getMode () {
+  if (modeSelector) {
+    return modeSelector.active_button.data('mode')
+  }
+
+  return undefined
 }
 
 function save_tree_action () {
@@ -296,7 +305,12 @@ function remove_branch_color_action () {
 }
 
 function selectAllAction () {
-  fangorn.select_all()
+  var mode = getMode()
+  if (mode === 'taxa'){
+    fangorn.select_all_leaves()
+  } else if (mode === 'branch') {
+    fangorn.select_all()
+  }
 }
 
 function applyPreferences () {
@@ -357,7 +371,7 @@ $(document).ready(function () {
   menu.setCallbackOnItem('remove-selected', remove_selected_action)
   menu.setCallbackOnItem('remove-unselected', remove_unselected_action)
   menu.setCallbackOnItem('restore-selected', restore_selected_action)
-  menu.setCallbackOnItem('select-all-taxa', selectAllAction)
+  menu.setCallbackOnItem('select-all', selectAllAction)
 
 
   findInPage = new FindInPage(app.remote.getCurrentWebContents(), {
@@ -477,9 +491,8 @@ $(document).ready(function () {
 
   // Selection modes logic
 
-  var mode_selector = new BtnGroupRadio($('#mode-select-btn-group'))
-
-  mode_selector.on_change = (new_button) => {
+  modeSelector = new BtnGroupRadio($('#mode-select-btn-group'))
+  modeSelector.on_change = (new_button) => {
     var mode = $(new_button).data('mode')
     if (!fangorn.tree_is_loaded()) { return false }
 
