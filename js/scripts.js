@@ -28,7 +28,7 @@ function update_controls (fangorn) {
 
   var disabled_menu_items = ['open-fasta', 'save-fasta', 'save-fasta-as', 'save-selection-as-fasta',
                              'reroot', 'rotate-branch', 'select-all', 'select-descendants',
-                             'remove-selected', 'remove-unselected', 'restore-selected']
+                             'remove-selected', 'remove-unselected', 'restore-selected', 'find', 'toggle-selection-mode']
 
   disabled_menu_items.forEach(function (item) {
     menu.disableItemById(item)
@@ -44,14 +44,19 @@ function update_controls (fangorn) {
   $('#remove-branch-color-action').attr('disabled', 'disabled')
   $('#set-mode-to-branch-action').attr('disabled', 'disabled')
   $('#set-mode-to-taxa-action').attr('disabled', 'disabled')
+  $('#find-action').attr('disabled', 'disabled')
 
   if (fangorn.tree_is_loaded()) {
-    $('[data-direction]').removeAttr('disabled')
-    $('#open-fasta').removeAttr('disabled')
-    menu.enableItemById('open-fasta')
-    menu.enableItemById('select-all')
     $('#set-mode-to-branch-action').removeAttr('disabled')
     $('#set-mode-to-taxa-action').removeAttr('disabled')
+    $('[data-direction]').removeAttr('disabled')
+    $('#open-fasta').removeAttr('disabled')
+    $('#find-action').removeAttr('disabled')
+
+    menu.enableItemById('open-fasta')
+    menu.enableItemById('select-all')
+    menu.enableItemById('find')
+    menu.enableItemById('toggle-selection-mode')
 
     if (fangorn.fasta_is_loaded() && fangorn.is_one_leaf_selected()) { $('#annotate-node-action').removeAttr('disabled') }
 
@@ -205,6 +210,14 @@ function copy_action () {
 
 function find_action () {
   findInPage.openFindWindow()
+}
+
+function toggle_selection_mode_action () {
+  if ($('#set-mode-to-taxa-action').hasClass('active')) {
+    $('#set-mode-to-branch-action').click()
+  } else if ($('#set-mode-to-branch-action').hasClass('active')) {
+    $('#set-mode-to-taxa-action').click()
+  }
 }
 
 function remove_selected_action () {
@@ -377,6 +390,7 @@ $(document).ready(function () {
   })
 
   menu.setCallbackOnItem('find', find_action)
+  menu.setCallbackOnItem('toggle-selection-mode', toggle_selection_mode_action)
   menu.setCallbackOnItem('remove-selected', remove_selected_action)
   menu.setCallbackOnItem('remove-unselected', remove_unselected_action)
   menu.setCallbackOnItem('restore-selected', restore_selected_action)
@@ -389,7 +403,7 @@ $(document).ready(function () {
     duration: 150
   })
 
-  $('#search-action').on('click', function () {
+  $('#find-action').on('click', function () {
     findInPage.openFindWindow()
   })
 

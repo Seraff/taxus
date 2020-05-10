@@ -101,6 +101,11 @@ const template = [
         accelerator: 'CmdOrCtrl+F'
       },
       {
+        id: "toggle-selection-mode",
+        label: 'Toggle selection mode',
+        accelerator: 'Ctrl+Tab'
+      },
+      {
         type: 'separator'
       },
       {
