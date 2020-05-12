@@ -64,6 +64,12 @@
           </label>
         </div>
 
+        <div class="checkbox">
+          <label>
+            <input data-pref-id="displayBootstrap" type="checkbox" class="fangorn-preference" placeholder="">Show bootstrap
+          </label>
+        </div>
+
       </form>
 
 
@@ -118,20 +124,30 @@
         $('.fangorn-preference[data-pref-id=branchColor]').val(hex)
       })
 
+      function takeCheckboxValue(pref_id, message) {
+        var checkbox = $('.fangorn-preference[data-pref-id=' + pref_id + ']')
+
+        if (message.preferences[pref_id] === 'true') {
+          checkbox.prop('checked', true);
+        } else {
+          checkbox.prop('checked', false);
+        }
+      }
+
       ipcRenderer.on('take_current_prefs', (event, message) => {
         for (key in message.preferences) {
-          $('.fangorn-preference[data-pref-id=' + key + ']').val(message.preferences[key])
-
-          if (key === 'branchColor') { picker.setColor(message.preferences[key]) }
-
-          if (key === 'displayAlignmentCoverage') {
-            var checkbox = $('.fangorn-preference[data-pref-id=displayAlignmentCoverage]')
-
-            if (message.preferences[key] == 'true') {
-              checkbox.prop('checked', true);
-            } else {
-              checkbox.prop('checked', false);
-            }
+          switch (key) {
+            case 'branchColor':
+              picker.setColor(message.preferences[key])
+              break
+            case 'displayAlignmentCoverage':
+              takeCheckboxValue(key, message)
+              break
+            case 'displayBootstrap':
+              takeCheckboxValue(key, message)
+              break
+            default:
+              $('.fangorn-preference[data-pref-id=' + key + ']').val(message.preferences[key])
           }
         }
       })

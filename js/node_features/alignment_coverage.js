@@ -14,7 +14,7 @@ class AlignmentCoverage {
       var container = d3.select(this.node.container)
       var my_feature = this.container.selectAll('.alignment-coverage')
 
-      if (this.node.fangorn.preferences.preferences.displayAlignmentCoverage == 'true') {
+      if (this.node.fangorn.preferences.preferences.displayAlignmentCoverage === 'true') {
         if (my_feature.empty()) {
           var text = this.container.append('text').text(pct).attr('class', 'feature alignment-coverage')
           var prev_text = text.select(function(){ return this.previousSibling })

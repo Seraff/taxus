@@ -56,7 +56,11 @@ function Node(fangorn, phylotree_node){
     if (node.is_leaf()){
       node.styler.style_leaf(dom_element)
     } else {
-      node.add_tip_to_branch(node.bootstrap())
+      if (node.fangorn.preferences.preferences.displayBootstrap === 'true'){
+        node.add_tip_to_node(node.bootstrap())
+      } else {
+        node.remove_node_tip()
+      }
     }
   }
 
@@ -94,18 +98,22 @@ function Node(fangorn, phylotree_node){
     }
   }
 
-  node.add_tip_to_branch = function(text){
+  node.add_tip_to_node = function(text){
     if (node.is_leaf() || !text)
       return;
 
 
     d3.select(node.container).html("");
     d3.select(node.container).append("text")
-               .classed("bootstrap", true)
+               .classed("node-tip", true)
                .text(text)
                .attr("dx", ".3em")
                .attr("text-anchor", "start")
                .attr("alignment-baseline", "middle");
+  }
+
+  node.remove_node_tip = function () {
+    d3.select(node.container).select('.node-tip').remove()
   }
 
   node.get_html_element = function(){
