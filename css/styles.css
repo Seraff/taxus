@@ -168,3 +168,7 @@ dialog {
 .tree-scale-bar .tick text {
   fill: #999;
 }
+
+.tree-scale-bar text.caption {
+  fill: #999;
+}

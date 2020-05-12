@@ -100,6 +100,7 @@ end;
 
   phylotree.update = function(transitions, safe=false){
     phylotree.original_update(transitions, safe)
+    phylotree.init_scale_bar()
     phylotree.redraw_scale_bar() // We draw scale bar in different way
   }
 
@@ -107,6 +108,7 @@ end;
 
   phylotree.safe_update = function(transitions){
     phylotree.original_safe_update(transitions)
+    phylotree.init_scale_bar()
     phylotree.redraw_scale_bar() // We draw scale bar in different way
   }
 
@@ -496,14 +498,66 @@ end;
 
   // Scale bar stuff
 
+  function d3_phylotree_svg_translate(x) {
+    if (x && (x[0] !== null || x[1] !== null))
+      return (
+        "translate (" +
+        (x[0] !== null ? x[0] : 0) +
+        "," +
+        (x[1] !== null ? x[1] : 0) +
+        ") "
+      );
+
+    return "";
+  }
+
+  phylotree.init_scale_bar = function () {
+    phylotree.get_svg().selectAll(".tree-scale-bar").remove();
+
+    var scale = d3.scale.linear()
+
+    var tree_width = phylotree.size()[1] - phylotree.get_offsets()[1] - phylotree.options()['left-offset']
+    var width_per_taxa_len = tree_width / phylotree.extents[1][1]
+
+    var bar_width = tree_width / 4
+    var bar_width_in_taxa_len = bar_width / width_per_taxa_len
+
+    scale.domain([0, bar_width_in_taxa_len])
+         .range([0, bar_width])
+
+    var draw_scale_bar = d3.svg
+                           .axis()
+                           .scale(scale)
+                           .orient("top")
+                           .ticks(0)
+                           .tickSize(2)
+
+    phylotree.get_svg()
+             .selectAll(".tree-scale-bar")
+             .data([0])
+             .enter()
+             .append('g')
+             .attr("class", "tree-scale-bar")
+             .call(draw_scale_bar)
+
+    d3.select('.tree-scale-bar')
+      .append('text')
+      .attr('class', 'caption')
+      .attr('x', bar_width/2)
+      .attr('y', 10)
+      .attr('font-size', 8)
+      .style("text-anchor", "middle")
+      .text(bar_width_in_taxa_len.toFixed(2))
+  }
+
   phylotree.redraw_scale_bar = function () {
     var tree_transform = phylotree.get_current_transform();
     var tree_container = d3.select("." + phylotree.get_css_classes()["tree-container"]).node();
 
     var scale = tree_transform.scale[0];
     var translate = [];
-    translate[0] = tree_transform.translate[0];
-    translate[1] = ((tree_container.getBBox().height + 40) * scale) + tree_transform.translate[1];
+    translate[0] = tree_transform.translate[0] + (tree_container.getBBox().width*0.4*scale);
+    translate[1] = ((tree_container.getBBox().height + 20) * scale) + tree_transform.translate[1];
 
     d3.select("." + phylotree.get_css_classes()["tree-scale-bar"])
       .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
@@ -514,6 +568,8 @@ end;
   }
 
   phylotree.pad_height = function () { return 0; }
+
+  // Selection mode
 
   phylotree.set_selection_mode = function (new_mode) {
     if (['taxa', 'branch'].includes(new_mode)) {

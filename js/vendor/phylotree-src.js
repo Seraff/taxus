@@ -240,6 +240,7 @@ const parseString = require('xml2js').parseString;
  *
  * @returns The current ``phylotree``.
  */
+
     phylotree.placenodes = function() {
       var x = 0.0,
         _extents = [[0, 0], [0, 0]],
@@ -703,8 +704,12 @@ const parseString = require('xml2js').parseString;
         draw_scale_bar = null;
       }
 
+      phylotree.extents = _extents;
+
       return phylotree;
     };
+
+    phylotree.extents = null
 
 /**
  * An instance of a phylotree. Sets event listeners, parses tags, and creates links

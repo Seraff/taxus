@@ -120,7 +120,7 @@ function Fangorn () {
         'align-tips': false,
         transitions: false,
         'internal-names': true,
-        'show-scale': true
+        'show-scale': false
       })
 
     function edgeStyler (dom_element, edge_object) {
