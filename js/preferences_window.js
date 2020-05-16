@@ -6,12 +6,13 @@ class PreferencesWindow {
   constructor () {
     this.mainWindow = BrowserWindow.getAllWindows()[0]
 
-    this.window = new BrowserWindow({ width: 300, height: 400,
+    this.window = new BrowserWindow({ width: 300, height: 500,
                                                                modal: false,
                                                                parent: this.mainWindow,
                                                                maximizable: false,
                                                                fullscreen: false,
                                                                minimizable: false,
+                                                               resizable: false,
                                                                webPreferences: { nodeIntegration: true }})
     const htmlPath = path.join(__dirname, '../preferences.html')
     this.window.loadFile(htmlPath)

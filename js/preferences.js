@@ -2,7 +2,12 @@ const DEFAULTS = {
   branchWidth: 2,
   branchColor: '#303030',
   displayAlignmentCoverage: 'true',
-  displayBootstrap: 'true'
+  displayBootstrap: 'true',
+  taxaFontFamily: 'Sans-serif',
+  taxaFontSize: '12',
+  taxaFontBold: 'false',
+  taxaFontItalic: 'true',
+  taxaFontUnderline: 'false'
 }
 
 class Preferences {
@@ -16,7 +21,8 @@ class Preferences {
   }
 
   getPreference (key) {
-    return this.preferences[key]
+    var val = this.preferences[key]
+    return ['true', 'false'].includes(val) ? (val === 'true' ? true : false) : val
   }
 
   resetToDefaults () {

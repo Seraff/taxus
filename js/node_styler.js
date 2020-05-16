@@ -1,6 +1,7 @@
 function NodeStyler(node){
   styler = this
   this.node = node
+  this.preferences = node.fangorn.preferences
   this.drawn_shapes = []
 
   this.style_leaf = function(dom_element){
@@ -25,6 +26,12 @@ function NodeStyler(node){
         pane.unhide_entry_for_node(node)
       }
     }
+
+    this.setFontFamily(this.preferences.getPreference('taxaFontFamily'))
+    this.setFontSize(this.preferences.getPreference('taxaFontSize'))
+    this.setFontWeight(this.preferences.getPreference('taxaFontBold'))
+    this.setFontStyle(this.preferences.getPreference('taxaFontItalic'))
+    this.setFontUnderline(this.preferences.getPreference('taxaFontUnderline'))
   }
 
   this.style = function(){
@@ -35,6 +42,41 @@ function NodeStyler(node){
       var val = this.node.parsed_annotation[prop]
 
       if (prop === 'color') { this.setColor(val) }
+    }
+  }
+
+  this.setFontFamily = function (value) {
+    if (this.node.is_leaf()){
+      var text = this.getLeafTextElement()
+      text.style.fontFamily = value
+    }
+  }
+
+  this.setFontSize = function (value) {
+    if (this.node.is_leaf()){
+      var text = this.getLeafTextElement()
+      text.style.fontSize = value + 'px'
+    }
+  }
+
+  this.setFontWeight = function (is_bold) {
+    if (this.node.is_leaf()){
+      var text = this.getLeafTextElement()
+      text.style.fontWeight = is_bold ? 'bold' : 'normal'
+    }
+  }
+
+  this.setFontStyle = function (is_italic) {
+    if (this.node.is_leaf()){
+      var text = this.getLeafTextElement()
+      text.style.fontStyle = is_italic ? 'italic' : 'normal'
+    }
+  }
+
+  this.setFontUnderline = function (is_underlined) {
+    if (this.node.is_leaf()){
+      var text = this.getLeafTextElement()
+      text.style.textDecoration = is_underlined ? 'underline' : ''
     }
   }
 
@@ -56,6 +98,10 @@ function NodeStyler(node){
 
   this.defaultColor = function() {
     return this.node.fangorn.preferences.getPreference('branchColor')
+  }
+
+  this.getLeafTextElement = function () {
+    return this.node.get_html_element().getElementsByTagName('text')[0]
   }
 }
 
