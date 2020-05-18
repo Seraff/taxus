@@ -1,12 +1,9 @@
-const $ = require('jquery')
 const FastaRepresentation = require('./fasta_representation.js');
 const NodeStyler = require('./node_styler.js');
 const features = require('./node_features')
 
 function Node(fangorn, phylotree_node){
   var node = phylotree_node
-  var fangorn = fangorn
-  var fasta_bar_entry_selector = null
 
   node.fangorn = fangorn
   node.is_fangorn_node = true
@@ -75,13 +72,6 @@ function Node(fangorn, phylotree_node){
     return node.fasta != null;
   }
 
-  node.get_fasta_bar_entry = function(){
-    if (node.fasta_bar_entry_selector != null)
-      return $(node.fasta_bar_entry_selector);
-    else
-      return null
-  }
-
   node.raw_fasta_entry = function(){
     if (!node.fasta_is_loaded())
       return null;
@@ -136,7 +126,7 @@ function Node(fangorn, phylotree_node){
     var bbox = node.getBBox()
     var translated_bbox = bbox
 
-    var current_transform = d3.transform(d3.select("."+fangorn.get_tree().get_css_classes()["tree-container"]).attr("transform"))
+    var current_transform = d3.transform(d3.select("." + node.fangorn.get_tree().get_css_classes()["tree-container"]).attr("transform"))
     var convert = makeAbsoluteContext(d3.select(node.get_html_element()).node())
 
     translated_bbox.x = (convert(bbox.x, bbox.y).x)

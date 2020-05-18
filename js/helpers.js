@@ -1,4 +1,3 @@
-const $ = require('jquery')
 const path = require('path')
 
 function makeAbsoluteContext (element) {

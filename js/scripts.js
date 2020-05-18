@@ -1,3 +1,4 @@
+const $ = require('jquery')
 const app = require('electron')
 const { BrowserWindow, dialog } = require('electron').remote
 const { clipboard } = require('electron')
