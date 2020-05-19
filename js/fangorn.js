@@ -346,10 +346,12 @@ function Fangorn () {
     var new_id = FastaRepresentation.extract_id(title)
     node.name = new_id
     node.fasta.id = new_id
-    node.fasta.title = title
+    node.fasta.header = title
+
 
     fangorn.redraw_fasta_pane()
     fangorn.make_tree_dirty()
+    fangorn.make_fasta_dirty()
   }
 
   fangorn.reroot_to_selected_node = function () {

@@ -294,8 +294,8 @@ function annotate_node_action () {
   if (!fangorn.fasta_is_loaded() || fangorn.get_selection().length != 1) { return false }
 
   var node = fangorn.get_selection()[0]
-  var title = node.fasta.title
-  $('#seq-title-input').val(title)
+  var header = node.fasta.header
+  $('#seq-title-input').val(header)
 
   $('#annotate-dialog')[0].showModal()
 }
