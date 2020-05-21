@@ -79,6 +79,7 @@ TokenTypes.DoubleQuote  = 15;
 TokenTypes.Period     = 16;
 TokenTypes.Backslash  = 17;
 TokenTypes.QuotedString = 18;
+TokenTypes.Comment = 19;
 
 //--------------------------------------------------------------------------------------------------
 function NumberTokens(){}
@@ -172,7 +173,7 @@ Scanner.prototype.GetToken = function(returnspace)
         {
           case '[':
             var comment = this.ParseComment();
-            this.token = TokenTypes.Other;
+            this.token = TokenTypes.Comment;
             break;
           case "'":
             if (this.ParseString())
@@ -258,6 +259,7 @@ Scanner.prototype.GetToken = function(returnspace)
     }
     this.pos++;
   }
+
   return this.token;
 }
 
@@ -439,8 +441,6 @@ NexusReader.prototype.GetBlock = function()
 
   var command = this.GetCommand();
 
-  //console.log('GetBlock: ' + this.buffer + ' ' + command);
-
   if (command.toLowerCase() != 'begin')
   {
     this.error = NexusError.nobegin;
@@ -450,7 +450,6 @@ NexusReader.prototype.GetBlock = function()
     // get block name
     var t = this.GetToken();
 
-    //console.log('GetCommand: ' + this.buffer);
     if (t == TokenTypes.String)
     {
       blockname = this.buffer.toLowerCase();
@@ -477,6 +476,10 @@ NexusReader.prototype.GetCommand = function()
   var t = this.GetToken();
 
   //console.log('GetCommand: ' + this.buffer);
+
+  while (t === TokenTypes.Comment) {
+    t = this.GetToken();
+  }
 
   if (t == TokenTypes.String)
   {
@@ -540,6 +543,7 @@ function parse(str)
   }
 
   var blockname = nx.GetBlock();
+
   var last_error = NexusError.ok;
 
   while(blockname != ""){
