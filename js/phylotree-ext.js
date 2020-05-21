@@ -5,6 +5,27 @@ require('path-data-polyfill')
 const nexus = require('./nexus.js')
 const GeometryHelper = require('./geometry_helper.js')
 
+class NexusError extends Error {
+  constructor(message) {
+    super(message)
+    this.name = "NexusError"
+  }
+}
+
+class NewickError extends Error {
+  constructor(message) {
+    super(message)
+    this.name = "NewickError"
+  }
+}
+
+class PhylotreeError extends Error {
+  constructor(message) {
+    super(message)
+    this.name = "PhylotreeError"
+  }
+}
+
 function apply_extensions(phylotree){
   const basic_nexus_pattern = `#NEXUS
 begin trees;
@@ -342,6 +363,7 @@ end;
   phylotree.read_tree = function(str){
     var newick = null;
     var fangorn_block = null;
+
     phylotree.nexus = null;
     phylotree.original_newick = null;
     phylotree.original_file_template = null;
@@ -350,16 +372,25 @@ end;
 
     // if it looks like newick, make a basic nexus
     if (str[0] == '(' && str[str.length-1] == ';'){
+      phylotree.original_newick = str
       str = basic_nexus_pattern.replace("%NEWICK%", str);
     }
 
-    // try with nexus
+    // str is nexus now, parse it, check it
     var parsed_nexus = nexus.parse(str);
-
     if (parsed_nexus.status === nexus.NexusError.ok){
       // it is nexus
       phylotree.nexus = parsed_nexus;
+
+      if (phylotree.nexus.treesblock === undefined ||
+          phylotree.nexus.treesblock.trees === undefined ||
+          phylotree.nexus.treesblock.trees.length <= 0) {
+        throw new NexusError("No trees found in the file");
+      }
+
       newick = phylotree.nexus.treesblock.trees[0].newick.match(/\(.+\)/)[0];
+
+      phylotree.original_newick = newick;
       phylotree.original_file_template = str.replace(newick, "%NWK%");
 
       fangorn_block = phylotree.original_file_template.match(/begin\s+fangorn\s*;\s.*?end\s*;/si);
@@ -369,13 +400,21 @@ end;
       }
 
     } else {
-      newick = str;
-      throw "Unable to open the tree file";
+      var error = nexus.NexusErrorHumanized(parsed_nexus.status)
+      throw new NexusError("Error in nexus file (" + error + ")");
     }
 
-    phylotree.original_newick = newick;
+    // check newick
+    var newick_test = d3.layout.newick_parser(phylotree.original_newick)
+    if (newick_test.error !== null) {
+      throw new NewickError("Error in newick line (" + newick_test.error + ")")
+    }
 
-    phylotree(newick);
+    try {
+      phylotree(phylotree.original_newick)
+    } catch (err) {
+      throw new PhylotreeError("Phylotree library cannot read the file (" + err + ")")
+    }
 
     if (phylotree.nexus)
       phylotree.translate_nodes(phylotree.get_translations());
@@ -412,7 +451,7 @@ end;
     if (hasOwnProperty(phylotree.nexus, 'fangorn')) {
       Object.assign(result, phylotree.nexus.fangorn)
 
-      if (hasOwnProperty(phylotree.nexus.fangorn, 'removed_seqs')){
+      if (hasOwnProperty(phylotree.nexus.fangorn, 'removed_seqs')) {
         var encoded = phylotree.nexus.fangorn.removed_seqs
         result['removed_seqs'] = pako.inflate(atob(encoded), {to: 'string'})
       }
@@ -455,13 +494,12 @@ end;
     });
 
     if (phylotree.is_nexus()){
-      phylotree.detranslate_nodes(phylotree.get_translations());
-      var newick = phylotree.to_fangorn_newick(true);
+      phylotree.detranslate_nodes(phylotree.get_translations())
+      var newick = phylotree.to_fangorn_newick(true)
 
-      phylotree.translate_nodes(phylotree.get_translations());
+      phylotree.translate_nodes(phylotree.get_translations())
 
-      var content = phylotree.original_file_template.replace("%NWK%", newick);
-
+      var content = phylotree.original_file_template.replace("%NWK%", newick)
       var fangorn_block = phylotree.build_fangorn_block()
 
       if (fangorn_block.length > 0){

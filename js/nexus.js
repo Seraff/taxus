@@ -111,6 +111,31 @@ NexusError.nosemicolon  = 7;
 NexusError.notnexus  = 8;
 
 //--------------------------------------------------------------------------------------------------
+function NexusErrorHumanized(err){
+  switch (err) {
+    case NexusError.ok:
+      return "ok"
+    case NexusError.nobegin:
+      return "problem with begin block"
+    case NexusError.noend:
+      return "problem with end block"
+    case NexusError.syntax:
+      return "syntax error"
+    case NexusError.badcommand:
+      return "bad command"
+    case NexusError.noblockname:
+      return "block name doesn't exist"
+    case NexusError.badblock:
+      return "bad block"
+    case NexusError.nosemicolon:
+      return "no semicolon"
+    case NexusError.notnexus:
+      return "not a nexus file"
+  }
+}
+
+
+//--------------------------------------------------------------------------------------------------
 function Scanner(str)
 {
   this.error = 0;
@@ -797,3 +822,4 @@ function parse(str)
 
 module.exports.parse = parse;
 module.exports.NexusError = NexusError;
+module.exports.NexusErrorHumanized = NexusErrorHumanized;

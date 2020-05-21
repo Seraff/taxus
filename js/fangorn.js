@@ -139,11 +139,14 @@ function Fangorn () {
     _tree.style_nodes(nodeStyler)
 
     try {
-      _tree.read_tree(str).layout() // renders the tree
+      _tree.read_tree(str)
     } catch (err) {
-      console.log(err)
-      show_alert('Error', 'Unable to open tree')
+      console.error(err)
+      show_alert('Error', 'Unable to open tree: ' + err.message)
+      return false
     }
+
+    _tree.layout() // renders the tree
 
     d3.select('.phylotree-container').attr('align', 'center')
 
@@ -158,6 +161,8 @@ function Fangorn () {
 
     fangorn.fasta = null
     fangorn.dispatch_state_update()
+
+    return true
   }
 
   fangorn.load_tree_file = function (path) {
@@ -174,15 +179,17 @@ function Fangorn () {
 
   fangorn.load_tree_string = function (content) {
     fangorn.close_fasta()
-    fangorn.init_phylotree(content)
-    fangorn.preferences = new Preferences()
-    fangorn.reinit_nodes()
 
-    fangorn.apply_metadata_from_nexus()
-    fangorn.apply_taxa_colors_from_figtree()
-    fangorn.redraw_features()
+    if (fangorn.init_phylotree(content)) {
+      fangorn.preferences = new Preferences()
+      fangorn.reinit_nodes()
 
-    fangorn.get_tree().update() // for initial node styling.
+      fangorn.apply_metadata_from_nexus()
+      fangorn.apply_taxa_colors_from_figtree()
+      fangorn.redraw_features()
+
+      fangorn.get_tree().update() // for initial node styling.
+    }
   }
 
   fangorn.save_tree = function (path = null) {
