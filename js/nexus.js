@@ -234,12 +234,13 @@ Scanner.prototype.GetToken = function(returnspace)
         {
           if (isNumber(this.str.charAt(this.pos)))
           {
-            if (this.ParseNumber())
-            {
-              this.token = TokenTypes.Number;
-            }
-            else
-            {
+            if (this.ParseToken()) {
+              if (/^([-+]?\d*\.?\d+)(?:[eE]([-+]?\d+))?$/.test(this.buffer)) {
+                this.token = TokenTypes.Number;
+              } else {
+                this.token = TokenTypes.String;
+              }
+            } else {
               this.token = TokenTypes.Bad;
             }
           }
@@ -279,6 +280,7 @@ Scanner.prototype.ParseComment = function()
 }
 
 //----------------------------------------------------------------------------------------------
+// we don't use it in Fangorn, parsing as string instead
 Scanner.prototype.ParseNumber = function()
 {
   this.buffer = '';
@@ -348,8 +350,6 @@ Scanner.prototype.ParseNumber = function()
   }
   this.pos--;
 
-  //console.log(this.buffer);
-
   return true;
 }
 
@@ -397,7 +397,6 @@ Scanner.prototype.ParseString = function()
   }
   this.pos--;
 
-  //console.log(this.buffer);
   return (state == StringTokens.done) ? true : false;
 }
 
@@ -416,8 +415,6 @@ Scanner.prototype.ParseToken = function()
       this.pos++;
     }
   this.pos--;
-
-  //console.log(this.buffer);
 
   return true;
 }
@@ -474,8 +471,6 @@ NexusReader.prototype.GetCommand = function()
   var command = '';
 
   var t = this.GetToken();
-
-  //console.log('GetCommand: ' + this.buffer);
 
   while (t === TokenTypes.Comment) {
     t = this.GetToken();
@@ -613,11 +608,14 @@ function parse(str)
             var done = false;
             while (!done && (nx.error == NexusError.ok))
             {
+              // get index of taxa
               var t = nx.GetToken();
 
               if ([TokenTypes.Number, TokenTypes.String, TokenTypes.QuotedString].indexOf(t) != -1)
               {
                 var otu = nx.buffer;
+
+                // get taxa name
                 t = nx.GetToken();
 
                 if ([TokenTypes.Number, TokenTypes.String, TokenTypes.QuotedString].indexOf(t) != -1)
