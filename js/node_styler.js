@@ -41,7 +41,7 @@ function NodeStyler(node){
     for (var prop in this.node.parsed_annotation){
       var val = this.node.parsed_annotation[prop]
 
-      if (prop === 'color') { this.setColor(val) }
+      if (prop === '!color') { this.setColor(val) }
     }
   }
 

@@ -32,19 +32,19 @@ function Node(fangorn, phylotree_node){
   }
 
   node.mark = function(){
-    node.add_annotation({ fangorn_marked: true })
+    node.add_annotation({ '!fangorn_marked': true })
     node.fangorn.make_tree_dirty()
     node.fangorn.make_fasta_dirty()
   }
 
   node.unmark = function(){
-    node.remove_annotation("fangorn_marked")
+    node.remove_annotation("!fangorn_marked")
     node.fangorn.make_tree_dirty()
     node.fangorn.make_fasta_dirty()
   }
 
   node.is_marked = function(){
-    return node.parsed_annotation['fangorn_marked'] && node.parsed_annotation['fangorn_marked'] == true
+    return node.parsed_annotation['!fangorn_marked'] && node.parsed_annotation['!fangorn_marked'] == true
   }
 
   node.style = function(dom_element){
@@ -145,7 +145,7 @@ function Node(fangorn, phylotree_node){
       return
     }
 
-    var values = node.annotation.replace(/^&!/g, '').split(/,!/)
+    var values = node.annotation.replace(/&/g, '').split(',')
 
     values.forEach(function(e){
       var splitted = e.split('=')
@@ -165,7 +165,7 @@ function Node(fangorn, phylotree_node){
   node.build_annotation = function(){
     var annotations = []
     Object.keys(node.parsed_annotation).forEach(function(k){
-      annotations.push("!" + k + "=" + node.parsed_annotation[k])
+      annotations.push(k + "=" + node.parsed_annotation[k])
     })
 
     node.annotation = (annotations.length > 0) ? ("&" + annotations.join(',')) : ""

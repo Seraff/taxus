@@ -323,7 +323,7 @@ function export_to_svg_action () {
 }
 
 function remove_branch_color_action () {
-  fangorn.set_selected_nodes_annotation({ color: undefined })
+  fangorn.set_selected_nodes_annotation({ '!color': undefined })
   fangorn.get_tree().dispatch_selection_modified_event() // for picker to reset color
 }
 
@@ -461,14 +461,14 @@ $(document).ready(function () {
 
   var picker = new ColorPicker('#branch-color-picker', '#change-branch-color-action', ['#change-branch-color-box'])
   picker.add_color_change_callback(function (color) {
-    fangorn.set_selected_nodes_annotation({ color: color })
+    fangorn.set_selected_nodes_annotation({ "!color": color })
   })
 
   document.addEventListener('selection_modified', function (e) {
     var selection = fangorn.get_selection()
 
     if (selection.length === 1) {
-      var color = selection[0].parsed_annotation.color
+      var color = selection[0].parsed_annotation['!color']
 
       if (color) {
         picker.set_color(color)

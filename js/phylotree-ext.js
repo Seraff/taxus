@@ -388,7 +388,7 @@ end;
         throw new NexusError("No trees found in the file");
       }
 
-      newick = phylotree.nexus.treesblock.trees[0].newick.match(/\(.+\)/)[0];
+      newick = phylotree.nexus.treesblock.trees[0].newick.match(/^(\[.+?\])?(.+)\;?$/)[2]
 
       phylotree.original_newick = newick;
       phylotree.original_file_template = str.replace(newick, "%NWK%");
@@ -630,8 +630,6 @@ end;
     node.children = new_children
 
     phylotree.update_layout(fangorn.get_tree().get_root(), true)
-
-
   }
 }
 
