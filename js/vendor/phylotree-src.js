@@ -2999,6 +2999,7 @@ const parseString = require('xml2js').parseString;
       current_node_name = "";
       current_node_attribute = "";
       current_node_annotation = "";
+      ignore_further_annotation = false;
     }
 
     function generate_error(location) {
@@ -3019,6 +3020,7 @@ const parseString = require('xml2js').parseString;
     var current_node_name = "";
     var current_node_attribute = "";
     var current_node_annotation = "";
+    var ignore_further_annotation = false;
     var quote_delimiter = null;
     var name_quotes = {
       "'": 1,
@@ -3079,11 +3081,7 @@ const parseString = require('xml2js').parseString;
               return generate_error(char_index);
             } else {
               if (current_char == "[") {
-                if (current_node_annotation.length) {
-                  return generate_error(char_index);
-                } else {
-                  automaton_state = 4;
-                }
+                automaton_state = 4;
               } else {
                 if (automaton_state == 3) {
                   current_node_attribute += current_char;
@@ -3121,12 +3119,15 @@ const parseString = require('xml2js').parseString;
           }
           case 4: { // inside a comment / attribute
             if (current_char == "]") {
+              ignore_further_annotation = true;
               automaton_state = 3;
             } else {
               if (current_char == "[") {
                 return generate_error(char_index);
               }
-              current_node_annotation += current_char;
+              if (!ignore_further_annotation) {
+                current_node_annotation += current_char;
+              }
             }
             break;
           }
