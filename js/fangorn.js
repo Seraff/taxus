@@ -98,6 +98,10 @@ function Fangorn () {
     fangorn.get_tree().modify_selection(function (n) { return all.includes(n.target) })
   }
 
+  fangorn.select_specific = function (nodes) {
+    fangorn.get_tree().modify_selection(function (n) { return nodes.includes(n.target) })
+  }
+
   fangorn.select_descendants_of_selected = function () {
     if (fangorn.is_one_internal_selected()){
       var node = fangorn.get_selection()[0]
@@ -189,6 +193,7 @@ function Fangorn () {
       fangorn.redraw_features()
 
       fangorn.get_tree().update() // for initial node styling.
+      dispatchDocumentEvent('new_tree_is_loaded')
     }
   }
 
@@ -370,7 +375,6 @@ function Fangorn () {
 
     fangorn.get_tree().reroot(node)
     fangorn.get_tree().safe_update()
-    fangorn.reinit_nodes()
     fangorn.make_tree_dirty()
   }
 
@@ -384,7 +388,6 @@ function Fangorn () {
 
     fangorn.get_tree().rotate_branch(node)
     fangorn.get_tree().safe_update()
-    fangorn.reinit_nodes()
     fangorn.make_tree_dirty()
   }
 

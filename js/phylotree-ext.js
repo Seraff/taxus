@@ -38,17 +38,25 @@ end;
   var shift_mode = false;
   var selection_mode = 'taxa'
 
-  $(window).unbind("keydown")
+  $(window).unbind("keydown", onkeydown)
   $(window).unbind("keyup")
   $(window).unbind("wheel")
   $(window).unbind("focus")
 
-  $(window).on("keydown", function(e) {
+  $(window).on("keydown", onkeydown)
+
+  function onkeydown (e) {
+    if (e.target.tagName !== 'BODY') {
+      return true
+    }
+
     if (e.ctrlKey){
       phylotree.enter_zoom_mode()
     } else if (e.shiftKey) {
       phylotree.enter_shift_mode()
-    } else {
+    }
+
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
       var delta = e.shiftKey ? 15 : 5
 
       switch(e.code){
@@ -66,7 +74,7 @@ end;
           break
       }
     }
-  });
+  }
 
   $(window).on('focus', function(e) {
     phylotree.exit_zoom_mode()

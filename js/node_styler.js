@@ -1,10 +1,14 @@
-function NodeStyler(node){
-  styler = this
-  this.node = node
-  this.preferences = node.fangorn.preferences
-  this.drawn_shapes = []
+class NodeStyler {
+  constructor (node) {
+    this.node = node
+    this.preferences = node.fangorn.preferences
+    this.drawn_shapes = []
 
-  this.style_leaf = function(dom_element){
+    this.highlight_rect = null
+    this.initHighlight()
+  }
+
+  style_leaf (dom_element) {
     if (this.node.is_marked() == true){
       var klass = dom_element.attr('class')
       klass += " node-fangorn-marked"
@@ -12,18 +16,18 @@ function NodeStyler(node){
     }
 
     if (this.node.fasta_is_loaded()){
-      var pane = styler.node.fangorn.fasta_pane
+      var pane = this.node.fangorn.fasta_pane
 
       if (this.node.selected == true){
-        pane.highlight_entry_for_node(node)
+        pane.highlight_entry_for_node(this.node)
       } else {
-        pane.unhighlight_entry_for_node(node)
+        pane.unhighlight_entry_for_node(this.node)
       }
 
       if (this.node.is_marked() == true){
-        pane.hide_entry_for_node(node)
+        pane.hide_entry_for_node(this.node)
       } else {
-        pane.unhide_entry_for_node(node)
+        pane.unhide_entry_for_node(this.node)
       }
     }
 
@@ -34,7 +38,7 @@ function NodeStyler(node){
     this.setFontUnderline(this.preferences.getPreference('taxaFontUnderline'))
   }
 
-  this.style = function(){
+  style () {
     this.setColor(this.defaultColor())
     this.setWidth()
 
@@ -45,64 +49,102 @@ function NodeStyler(node){
     }
   }
 
-  this.setFontFamily = function (value) {
+  setFontFamily (value) {
     if (this.node.is_leaf()){
       var text = this.getLeafTextElement()
       text.style.fontFamily = value
     }
   }
 
-  this.setFontSize = function (value) {
+  setFontSize (value) {
     if (this.node.is_leaf()){
       var text = this.getLeafTextElement()
       text.style.fontSize = value + 'px'
     }
   }
 
-  this.setFontWeight = function (is_bold) {
+  setFontWeight (is_bold) {
     if (this.node.is_leaf()){
       var text = this.getLeafTextElement()
       text.style.fontWeight = is_bold ? 'bold' : 'normal'
     }
   }
 
-  this.setFontStyle = function (is_italic) {
+  setFontStyle (is_italic) {
     if (this.node.is_leaf()){
       var text = this.getLeafTextElement()
       text.style.fontStyle = is_italic ? 'italic' : 'normal'
     }
   }
 
-  this.setFontUnderline = function (is_underlined) {
+  setFontUnderline (is_underlined) {
     if (this.node.is_leaf()){
       var text = this.getLeafTextElement()
       text.style.textDecoration = is_underlined ? 'underline' : ''
     }
   }
 
-  this.setColor = function(value){
+  setColor (value){
     if (this.node.prev_branch){
       $(this.node.prev_branch.get_element()[0]).css('stroke', value)
+
       if (this.node.is_leaf()){
         $(this.node.get_html_element()).css('fill', value)
       }
     }
   }
 
-  this.setWidth = function(){
+  setWidth () {
     if (this.node.prev_branch) {
       var value = this.node.fangorn.preferences.getPreference('branchWidth')
       $(this.node.prev_branch.get_element()[0]).css('stroke-width', value + 'px')
     }
   }
 
-  this.defaultColor = function() {
+  highlight () {
+    if (this.highlight_rect) {
+      this.highlight_rect.style('display', 'block')
+    }
+  }
+
+  unhighlight () {
+    if (this.highlight_rect) {
+      this.highlight_rect.style('display', 'none')
+    }
+  }
+
+  setHighlightColor (color) {
+    if (this.highlight_rect) {
+      this.highlight_rect.style('fill', color)
+    }
+  }
+
+  defaultColor () {
     return this.node.fangorn.preferences.getPreference('branchColor')
   }
 
-  this.getLeafTextElement = function () {
+  getLeafTextElement () {
     return this.node.get_html_element().getElementsByTagName('text')[0]
   }
+
+  initHighlight () {
+    if (this.node.is_leaf()) {
+      var container = this.node.container
+      var bbox = this.node.container.getBBox()
+
+      this.highlight_rect = d3.select(container)
+                              .insert('rect', ':first-child')
+                              .attr('x', bbox.x)
+                              .attr('y', bbox.y)
+                              .attr('width', bbox.width)
+                              .attr('height', bbox.height)
+                              .style('fill', NodeStyler.HIGHLIGHT_COLOR)
+                              .style('stroke', 'none')
+                              .style('display', 'none')
+    }
+  }
 }
+
+NodeStyler.HIGHLIGHT_COLOR = '#fff308'
 
 module.exports = NodeStyler;

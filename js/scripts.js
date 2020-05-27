@@ -7,13 +7,13 @@ const ipcRenderer = require('electron').ipcRenderer
 const fs = require('fs')
 const cp = require('child_process')
 const fileDialog = require('file-dialog')
-const FindInPage = require('electron-find').FindInPage
 const AColorPicker = require('a-color-picker')
 const Fangorn = require('./js/fangorn.js')
 const ColorPicker = require('./js/color_picker.js')
 const svgToPng = require('save-svg-as-png')
 const Split = require('split.js')
-const BtnGroupRadio = require('./js/btn-group-radio.js')
+const BtnGroupRadio = require('./js/btn_group_radio.js')
+const SearchPanel = require('./js/frontend/search_panel.js')
 
 const unhandled = require('electron-unhandled');
 
@@ -21,7 +21,6 @@ const TREE_EXT = ['tre', 'tree', 'nexus', 'nex', 'nxs', 'newick', 'txt']
 const FASTA_EXT = ['fa', 'fas', 'fasta', 'fna', 'faa', 'ffn', 'frn']
 
 var fangorn = null
-var findInPage = null
 var modeSelector = null
 
 function update_controls (fangorn) {
@@ -209,10 +208,6 @@ function copy_action () {
   if (fasta) { clipboard.writeText(fasta) }
 }
 
-function find_action () {
-  findInPage.openFindWindow()
-}
-
 function toggle_selection_mode_action () {
   if ($('#set-mode-to-taxa-action').hasClass('active')) {
     $('#set-mode-to-branch-action').click()
@@ -390,23 +385,12 @@ $(document).ready(function () {
     }
   })
 
-  menu.setCallbackOnItem('find', find_action)
   menu.setCallbackOnItem('toggle-selection-mode', toggle_selection_mode_action)
   menu.setCallbackOnItem('remove-selected', remove_selected_action)
   menu.setCallbackOnItem('remove-unselected', remove_unselected_action)
   menu.setCallbackOnItem('restore-selected', restore_selected_action)
   menu.setCallbackOnItem('select-all', selectAllAction)
 
-
-  findInPage = new FindInPage(app.remote.getCurrentWebContents(), {
-    parentElement: document.querySelector("#main-tree-container"),
-    offsetTop: 65,
-    duration: 150
-  })
-
-  $('#find-action').on('click', function () {
-    findInPage.openFindWindow()
-  })
 
   $('#remove-selected-action').on('click', remove_selected_action)
   $('#remove-unselected-action').on('click', remove_unselected_action)
@@ -519,6 +503,7 @@ $(document).ready(function () {
   // Selection modes logic
 
   modeSelector = new BtnGroupRadio($('#mode-select-btn-group'))
+
   modeSelector.on_change = (new_button) => {
     var mode = $(new_button).data('mode')
     if (!fangorn.tree_is_loaded()) { return false }
@@ -528,6 +513,20 @@ $(document).ready(function () {
   }
 
   resetSelectionMode()
+
+  // Search panel
+
+  search_panel = new SearchPanel($('#search-panel'), fangorn)
+
+  menu.setCallbackOnItem('find', function () {
+    search_panel.toggle()
+  })
+
+  // Footer text
+
+  document.addEventListener('new_tree_is_loaded', () => {
+    $("#footer-text").show()
+  })
 
   // Header update logic
 

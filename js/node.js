@@ -2,6 +2,8 @@ const FastaRepresentation = require('./fasta_representation.js');
 const NodeStyler = require('./node_styler.js');
 const features = require('./node_features')
 
+// Our phylotreejs node wrapper
+
 function Node(fangorn, phylotree_node){
   var node = phylotree_node
 
@@ -11,7 +13,6 @@ function Node(fangorn, phylotree_node){
 
   node.prev_branch = null
   node.next_branch = null
-  node.styler = new NodeStyler(node)
 
   node.features = []
 
@@ -204,6 +205,9 @@ function Node(fangorn, phylotree_node){
 
   node.init_features()
   node.parse_annotation()
+
+  node.styler = new NodeStyler(node)
+
   return node
 }
 

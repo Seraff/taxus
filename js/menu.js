@@ -85,8 +85,13 @@ const template = [
       },
       {
         label: "Select All",
-        id: 'select-all',
+        role: 'selectAll',
         accelerator: "CmdOrCtrl+A"
+      },
+      {
+        label: "Select All in Tree",
+        id: 'select-all',
+        accelerator: "CmdOrCtrl+Shift+A"
       },
       {
         id: 'select-descendants',

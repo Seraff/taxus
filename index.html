@@ -96,6 +96,23 @@
           <span class="icon icon-search"></span>
         </button>
       </div>
+
+      <div id="search-panel" style="display: none" class="toolbar-actions">
+        <div id="search-mode-btn-group" class="btn-group btn-group-radio">
+          <button id="set-search-mode-to-tree" class="btn btn-default active" data-mode="tree" title="Search in tree">
+            Tree
+          </button>
+          <button id="set-search-mode-to-fasta" class="btn btn-default" data-mode="fasta" title="Search in fasta">
+            Fasta
+          </button>
+        </div>
+
+        <input id="search-input" type="text" class="form-control" style="width: 30%" placeholder="Search">
+
+        <button id="search-select-all" class="btn btn-default" disabled="disabled" title="Select all found items">
+          Select All
+        </button>
+      </div>
     </header>
 
     <div class="window-content">
@@ -112,6 +129,11 @@
     </div>
 
     <footer class="toolbar toolbar-footer">
+      <div class="footer" id="footer-text" style="display: none;">
+        Press and hold Ctrl to enter zoom/pan mode
+      </div>
+      <div class="footer" id="footer-meta">
+      </div>
     </footer>
   </div>
 
