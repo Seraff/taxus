@@ -196,3 +196,7 @@ dialog {
   float: right;
   width: 100px;
 }
+
+#search-panel input{
+  -webkit-app-region: no-drag;
+}
