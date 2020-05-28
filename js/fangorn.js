@@ -1,6 +1,5 @@
 const fs = require('fs')
 const Node = require('./node.js')
-const FastaPane = require('./fasta_pane.js')
 const FastaRepresentation = require('./fasta_representation.js')
 const Preferences = require('./preferences.js')
 const apply_extensions = require('./phylotree-ext.js')
@@ -15,7 +14,6 @@ function Fangorn () {
   fangorn.fasta_is_dirty = false
 
   fangorn.fasta = null
-  fangorn.fasta_pane = new FastaPane(fangorn)
 
   fangorn.preferences = null
 
@@ -282,7 +280,7 @@ function Fangorn () {
         show_alert('Warning', 'Sequences for restoring removed taxa will be taken from Nexus file')
       }
 
-      fangorn.redraw_fasta_pane()
+      dispatchDocumentEvent('new_fasta_applied')
       fangorn.dispatch_state_update()
       fangorn.get_tree().refresh()
     }
@@ -301,7 +299,7 @@ function Fangorn () {
 
   fangorn.close_fasta = function () {
     fangorn.fasta = null
-    fangorn.fasta_pane.show_no_fasta()
+    dispatchDocumentEvent('fasta_closed')
   }
 
   // wrap phylotree nodes with fangorn nodes
@@ -322,11 +320,6 @@ function Fangorn () {
 
   fangorn.fasta_is_loaded = function () {
     return fangorn.fasta != null
-  }
-
-  fangorn.redraw_fasta_pane = function () {
-    fangorn.fasta_pane.set_title_from_path(fangorn.fasta.path)
-    fangorn.fasta_pane.draw_fasta(fangorn.get_leaves())
   }
 
   fangorn.get_selected_leaves_fasta = function () {
@@ -360,8 +353,7 @@ function Fangorn () {
     node.fasta.id = new_id
     node.fasta.header = title
 
-
-    fangorn.redraw_fasta_pane()
+    dispatchDocumentEvent('node_titles_changed')
     fangorn.make_tree_dirty()
     fangorn.make_fasta_dirty()
   }
@@ -477,12 +469,12 @@ function Fangorn () {
 
   fangorn.make_fasta_dirty = function () {
     fangorn.fasta_is_dirty = true
-    dispatchDocumentEvent('fangorn_fasta_header_update')
+    dispatchDocumentEvent('fasta_clean_status_changed')
   }
 
   fangorn.make_fasta_clean = function () {
     fangorn.fasta_is_dirty = false
-    dispatchDocumentEvent('fangorn_fasta_header_update')
+    dispatchDocumentEvent('fasta_clean_status_changed')
   }
 
   fangorn.has_dirty_files = function () {

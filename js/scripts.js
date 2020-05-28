@@ -8,12 +8,14 @@ const fs = require('fs')
 const cp = require('child_process')
 const fileDialog = require('file-dialog')
 const AColorPicker = require('a-color-picker')
-const Fangorn = require('./js/fangorn.js')
-const ColorPicker = require('./js/color_picker.js')
 const svgToPng = require('save-svg-as-png')
 const Split = require('split.js')
-const BtnGroupRadio = require('./js/btn_group_radio.js')
+
+const Fangorn = require('./js/fangorn.js')
+const FastaPane = require('./js/fasta_pane.js')
 const SearchPanel = require('./js/frontend/search_panel.js')
+const ColorPicker = require('./js/color_picker.js')
+const BtnGroupRadio = require('./js/btn_group_radio.js')
 
 const unhandled = require('electron-unhandled');
 
@@ -361,6 +363,8 @@ $(document).ready(function () {
   fangorn = Fangorn()
   fangorn.dispatch_state_update()
 
+  fangorn.fasta_pane = new FastaPane(fangorn)
+
   // *** Menu actions *** //
 
   // File
@@ -433,12 +437,6 @@ $(document).ready(function () {
     var which_function = $(this).data('direction') == 'vertical' ? fangorn.get_tree().spacing_x : fangorn.get_tree().spacing_y
     which_function(which_function() + (+$(this).data('amount'))).safe_update()
     fangorn.get_tree().redraw_scale_bar()
-  })
-
-  $(document).on('click', '.fasta-pane-entry', function (e) {
-    var id = $(e.target).parent('.fasta-pane-entry').attr('id')
-    var node = fangorn.fasta_pane.node_by_id(id)
-    fangorn.get_tree().modify_selection(function (n) { return node == n.target })
   })
 
   // Picker logic

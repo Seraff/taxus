@@ -8,8 +8,11 @@ class SearchPanel {
     this.$search_field = $('#search-input')
     this.$select_all_button = $('#search-select-all')
     this.$meta_info = $("#footer-meta")
+    this.$tree_mode_button = $('#set-search-mode-to-tree')
+    this.$fasta_mode_button = $('#set-search-mode-to-fasta')
 
     this.fangorn = fangorn
+    this.search_mode = 'tree'
     this.search_mode_radio = new BtnGroupRadio(this.$search_mode_buttons)
     this.found_items = []
 
@@ -41,6 +44,12 @@ class SearchPanel {
     this.$select_all_button.on('click', () => {
       this.selectFoundItems()
     })
+
+    this.search_mode_radio.on_change = () => {
+      this.clean()
+      this.search_mode = this.search_mode_radio.active_button.data('mode')
+      this.searchCurrent()
+    }
   }
 
   hide () {
@@ -69,12 +78,8 @@ class SearchPanel {
     return this.$panel.is(":hidden")
   }
 
-  searchMode () {
-    return this.search_mode_radio.active_button.data('mode')
-  }
-
   isTreeMode () {
-    return this.searchMode() == 'tree'
+    return this.search_mode === 'tree'
   }
 
   enableSelectAll () {
@@ -106,6 +111,7 @@ class SearchPanel {
             e.styler.highlight()
           }
         })
+      } else {
       }
     }
 
