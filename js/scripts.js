@@ -222,6 +222,7 @@ function remove_selected_action () {
   fangorn.get_selection().forEach(function (n) { n.mark() })
   fangorn.get_tree().refresh()
   fangorn.select_none()
+  dispatchDocumentEvent('node_mark_status_changed')
 }
 
 function remove_unselected_action () {
@@ -233,12 +234,14 @@ function remove_unselected_action () {
 
   fangorn.get_tree().refresh()
   fangorn.select_none()
+  dispatchDocumentEvent('node_mark_status_changed')
 }
 
 function restore_selected_action () {
   fangorn.get_selection().forEach(function (n) { n.unmark() })
   fangorn.get_tree().refresh()
   fangorn.select_none()
+  dispatchDocumentEvent('node_mark_status_changed')
 }
 
 function save_fasta_action () {
@@ -363,7 +366,7 @@ $(document).ready(function () {
   fangorn = Fangorn()
   fangorn.dispatch_state_update()
 
-  fangorn.fasta_pane = new FastaPane(fangorn)
+  var fasta_pane = new FastaPane(fangorn)
 
   // *** Menu actions *** //
 
@@ -514,7 +517,7 @@ $(document).ready(function () {
 
   // Search panel
 
-  search_panel = new SearchPanel($('#search-panel'), fangorn)
+  var search_panel = new SearchPanel($('#search-panel'), fangorn)
 
   menu.setCallbackOnItem('find', function () {
     search_panel.toggle()

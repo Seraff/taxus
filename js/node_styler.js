@@ -15,22 +15,6 @@ class NodeStyler {
       dom_element.attr('class', klass)
     }
 
-    if (this.node.fasta_is_loaded()){
-      var pane = this.node.fangorn.fasta_pane
-
-      if (this.node.selected == true){
-        pane.highlight_entry_for_node(this.node)
-      } else {
-        pane.unhighlight_entry_for_node(this.node)
-      }
-
-      if (this.node.is_marked() == true){
-        pane.hide_entry_for_node(this.node)
-      } else {
-        pane.unhide_entry_for_node(this.node)
-      }
-    }
-
     this.setFontFamily(this.preferences.getPreference('taxaFontFamily'))
     this.setFontSize(this.preferences.getPreference('taxaFontSize'))
     this.setFontWeight(this.preferences.getPreference('taxaFontBold'))

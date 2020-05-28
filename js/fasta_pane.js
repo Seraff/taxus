@@ -34,6 +34,14 @@ class FastaPane {
     document.addEventListener('fasta_closed', () => {
       this.show_no_fasta()
     })
+
+    document.addEventListener('selection_modified', () => {
+      this.redraw_entries()
+    })
+
+    document.addEventListener('node_mark_status_changed', () => {
+      this.redraw_entries()
+    })
   }
 
   redraw () {
@@ -96,6 +104,26 @@ class FastaPane {
 
   show_no_fasta () {
     this.$fasta_panel.html('<b class="ui-text">Fasta is not loaded...</b>')
+  }
+
+  redraw_entries () {
+    fangorn.get_leaves().forEach((node) => {
+      this.redraw_entry_for_node(node)
+    })
+  }
+
+  redraw_entry_for_node (node) {
+    if (node.selected == true){
+      this.highlight_entry_for_node(node)
+    } else {
+      this.unhighlight_entry_for_node(node)
+    }
+
+    if (node.is_marked() == true){
+      this.hide_entry_for_node(node)
+    } else {
+      this.unhide_entry_for_node(node)
+    }
   }
 
   select_entry_by_node (node) {
