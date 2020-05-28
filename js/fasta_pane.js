@@ -3,13 +3,15 @@ const Path = require('path')
 
 class FastaPane {
   constructor (fangorn) {
-    this.$fasta_panel = $('#fasta-panel')
+    this.$fasta_pane = $('#fasta-panel')
 
     this.fangorn = fangorn
     this.fasta_is_loaded = false
     this.title = null
-    this.entries = {}
-    this.nodes = {}
+
+    this.entries = []
+    this.entries_by_name = {}
+    this.entries_by_alias = {}
 
     this.show_no_fasta()
 
@@ -17,18 +19,12 @@ class FastaPane {
       this.update_title()
     })
 
-    $(document).on('click', '.fasta-pane-entry', (e) => {
-      var id = $(e.target).parent('.fasta-pane-entry').attr('id')
-      var node = this.node_by_id(id)
-      fangorn.select_specific([node])
-    })
-
     document.addEventListener('new_fasta_applied', () => {
-      this.redraw()
+      this.render()
     })
 
     document.addEventListener('node_titles_changed', () => {
-      this.redraw()
+      this.render()
     })
 
     document.addEventListener('fasta_closed', () => {
@@ -42,25 +38,25 @@ class FastaPane {
     document.addEventListener('node_mark_status_changed', () => {
       this.redraw_entries()
     })
-  }
 
-  redraw () {
-    this.set_title_from_path(this.fangorn.fasta.path)
-    this.render()
-  }
-
-  set_title_from_path (path) {
-    this.title = Path.basename(path)
+    $(document).on('click', '.fasta-pane-entry', (e) => {
+      var alias = $(e.target).parent('.fasta-pane-entry').attr('id')
+      var node = this.entries_by_alias[alias].node
+      fangorn.select_specific([node])
+    })
   }
 
   render () {
     var nodes = fangorn.get_leaves()
 
-    this.entries = {}
-    this.$fasta_panel.html('')
-    this.$fasta_panel.append('<b class="ui-text" id="fasta-title">' + this.title + '</b></br>')
+    this.title = Path.basename(this.fangorn.fasta.path)
 
-    var content = ''
+    this.entries = []
+    this.entries_by_name = {}
+    this.entries_by_alias = {}
+
+    this.$fasta_pane.html('')
+    this.$fasta_pane.append('<b class="ui-text" id="fasta-title">' + this.title + '</b></br>')
 
     if (nodes.length === 0){
       this.show_no_fasta()
@@ -73,81 +69,25 @@ class FastaPane {
         this.show_no_fasta()
         return true
       }
-      var alias = Math.random().toString(36).substring(2)
-      var current_content = this.contentForNode(node, alias)
+      var entry = new FastaPaneEntry(this.$fasta_pane, node)
+      entry.render()
 
-      this.$fasta_panel.append(current_content)
-
-      var entry = { element: $("span#"+alias), node: node }
-
-      this.entries[node.fasta.id] = entry
-      this.nodes[alias] = entry
+      this.entries.push(entry)
+      this.entries_by_name[entry.id] = entry
+      this.entries_by_alias[entry.alias] = entry
     })
 
     this.fasta_is_loaded = true
   }
 
-  contentForNode (node, alias) {
-    if (!node.fasta_is_loaded())
-      return '';
-
-    var klass = node.selected == true ? 'selected' : ''
-    var hidden = node.is_marked() ? 'hidden' : ''
-
-    var content = '<span id="' + alias + '" ' + hidden + ' class="fasta-pane-entry ' + klass + '">'
-    content += "<span class='fasta-pane-entry-header'>>" + node.fasta.header + "</span><br>"
-    content += "<span class='fasta-pane-entry-sequence'>" + node.fasta.sequence + "</span><br>"
-    content += "</span>"
-
-    return content;
-  }
-
   show_no_fasta () {
-    this.$fasta_panel.html('<b class="ui-text">Fasta is not loaded...</b>')
+    this.$fasta_pane.html('<b class="ui-text">Fasta is not loaded...</b>')
   }
 
   redraw_entries () {
-    fangorn.get_leaves().forEach((node) => {
-      this.redraw_entry_for_node(node)
+    this.entries.forEach((entry) => {
+      entry.redraw()
     })
-  }
-
-  redraw_entry_for_node (node) {
-    if (node.selected == true){
-      this.highlight_entry_for_node(node)
-    } else {
-      this.unhighlight_entry_for_node(node)
-    }
-
-    if (node.is_marked() == true){
-      this.hide_entry_for_node(node)
-    } else {
-      this.unhide_entry_for_node(node)
-    }
-  }
-
-  select_entry_by_node (node) {
-    return this.entries[node.fasta.id].element
-  }
-
-  highlight_entry_for_node (node) {
-    this.entries[node.fasta.id].element.addClass('selected')
-  }
-
-  unhighlight_entry_for_node (node) {
-    this.entries[node.fasta.id].element.removeClass('selected')
-  }
-
-  hide_entry_for_node (node) {
-    this.entries[node.fasta.id].element.hide()
-  }
-
-  unhide_entry_for_node (node) {
-    this.entries[node.fasta.id].element.show()
-  }
-
-  node_by_id (id) {
-    return this.nodes[id].node
   }
 
   update_title () {
@@ -157,6 +97,63 @@ class FastaPane {
       if (this.fangorn.fasta_is_dirty) { title_el.innerHTML += "*" }
     }
 
+  }
+}
+
+class FastaPaneEntry {
+  constructor (pane_el, node) {
+    this.$element = null
+    this.$fasta_pane = pane_el
+
+    this.node = node
+    this.id = node.fasta.id
+    this.alias = Math.random().toString(36).substring(2)
+  }
+
+  render () {
+    if (!this.node.fasta_is_loaded())
+      return '';
+
+    var klass = this.node.selected == true ? 'selected' : ''
+    var hidden = this.node.is_marked() ? 'hidden' : ''
+
+    var content = '<span id="' + this.alias + '" ' + hidden + ' class="fasta-pane-entry ' + klass + '">'
+    content += "<span class='fasta-pane-entry-header'>>" + this.node.fasta.header + "</span><br>"
+    content += "<span class='fasta-pane-entry-sequence'>" + this.node.fasta.sequence + "</span><br>"
+    content += "</span>"
+
+    this.$fasta_pane.append(content)
+    this.$element = $("span#"+this.alias)
+  }
+
+  redraw () {
+    if (this.node.selected == true){
+      this.select()
+    } else {
+      this.unselect()
+    }
+
+    if (this.node.is_marked() == true){
+      this.hide()
+    } else {
+      this.unhide()
+    }
+  }
+
+  select () {
+    this.$element.addClass('selected')
+  }
+
+  unselect () {
+    this.$element.removeClass('selected')
+  }
+
+  hide () {
+    this.$element.hide()
+  }
+
+  unhide () {
+    this.$element.show()
   }
 }
 

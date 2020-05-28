@@ -105,14 +105,17 @@ class SearchPanel {
         this.found_items = this.fangorn.get_leaves().filter((e) => {
           return e.name.toLocaleLowerCase().includes(query)
         })
-
-        this.found_items.forEach((e) => {
-          if (this.isTreeMode()) {
-            e.styler.highlight()
-          }
-        })
       } else {
+
       }
+
+      this.found_items.forEach((e) => {
+        if (this.isTreeMode()) {
+          e.styler.highlight()
+        } else {
+
+        }
+      })
     }
 
     this.refreshSelectFoundButton()
@@ -123,6 +126,8 @@ class SearchPanel {
     this.found_items.forEach((e) => {
       if (this.isTreeMode()) {
         e.styler.unhighlight()
+      } else {
+
       }
     })
 
@@ -140,6 +145,8 @@ class SearchPanel {
 
     if (this.isTreeMode()){
       this.fangorn.select_specific(this.found_items)
+    } else {
+      this.fangorn.select_specific(this.found_items.map((i) => { return i.node }))
     }
   }
 
