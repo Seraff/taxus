@@ -155,6 +155,17 @@ class FastaPaneEntry {
   unhide () {
     this.$element.show()
   }
+
+  highlight () {
+    this.$element.css('background-color', FastaPaneEntry.HIGHLIGHT_COLOR)
+  }
+
+  unhighlight () {
+    this.$element.css('background-color', '')
+
+  }
 }
+
+FastaPaneEntry.HIGHLIGHT_COLOR = '#fff308'
 
 module.exports = FastaPane;

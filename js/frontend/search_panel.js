@@ -1,7 +1,7 @@
 const BtnGroupRadio = require('../btn_group_radio.js')
 
 class SearchPanel {
-  constructor (panel, fangorn) {
+  constructor (panel, fangorn, fasta_pane) {
     this.$panel = panel
     this.$search_action_button = $('#find-action')
     this.$search_mode_buttons = $('#search-mode-btn-group')
@@ -12,12 +12,13 @@ class SearchPanel {
     this.$fasta_mode_button = $('#set-search-mode-to-fasta')
 
     this.fangorn = fangorn
+    this.fasta_pane = fasta_pane
     this.search_mode = 'tree'
     this.search_mode_radio = new BtnGroupRadio(this.$search_mode_buttons)
     this.found_items = []
 
-    this.$search_action_button.on('click', function () {
-      search_panel.toggle()
+    this.$search_action_button.on('click', () => {
+      this.toggle()
     })
 
     $(window).on("keydown", (e) => {
@@ -41,8 +42,15 @@ class SearchPanel {
       }
     })
 
+    document.addEventListener('node_titles_changed', () => {
+      if (!this.isHidden()) {
+        this.searchCurrent()
+      }
+    })
+
     this.$select_all_button.on('click', () => {
       this.selectFoundItems()
+      this.$select_all_button.blur()
     })
 
     this.search_mode_radio.on_change = () => {
@@ -106,14 +114,16 @@ class SearchPanel {
           return e.name.toLocaleLowerCase().includes(query)
         })
       } else {
-
+        this.found_items = this.fasta_pane.entries.filter((e) => {
+          return e.id.toLocaleLowerCase().includes(query)
+        })
       }
 
       this.found_items.forEach((e) => {
         if (this.isTreeMode()) {
           e.styler.highlight()
         } else {
-
+          e.highlight()
         }
       })
     }
@@ -127,7 +137,7 @@ class SearchPanel {
       if (this.isTreeMode()) {
         e.styler.unhighlight()
       } else {
-
+        e.unhighlight()
       }
     })
 
@@ -172,6 +182,6 @@ class SearchPanel {
   }
 }
 
-SearchPanel.QUERY_MIN_LEN = 3
+SearchPanel.QUERY_MIN_LEN = 2
 
 module.exports = SearchPanel

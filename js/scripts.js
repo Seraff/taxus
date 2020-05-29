@@ -47,6 +47,7 @@ function update_controls (fangorn) {
   $('#set-mode-to-branch-action').attr('disabled', 'disabled')
   $('#set-mode-to-taxa-action').attr('disabled', 'disabled')
   $('#find-action').attr('disabled', 'disabled')
+  $('#find-action').removeAttr('disabled')
 
   if (fangorn.tree_is_loaded()) {
     $('#set-mode-to-branch-action').removeAttr('disabled')
@@ -517,7 +518,7 @@ $(document).ready(function () {
 
   // Search panel
 
-  var search_panel = new SearchPanel($('#search-panel'), fangorn)
+  var search_panel = new SearchPanel($('#search-panel'), fangorn, fasta_pane)
 
   menu.setCallbackOnItem('find', function () {
     search_panel.toggle()
