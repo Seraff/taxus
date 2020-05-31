@@ -2,6 +2,7 @@ const $ = require('jquery')
 const pako = require('pako')
 require('path-data-polyfill')
 
+PhylotreeNavigator = require('./phylotree_navigator.js')
 const nexus = require('./nexus.js')
 const GeometryHelper = require('./geometry_helper.js')
 
@@ -33,17 +34,21 @@ begin trees;
 end;
 `
 
-  var svg = phylotree.get_svg();
-  var zoom_mode = false;
-  var shift_mode = false;
+  var $svg = $('svg#tree_display')
+  var $window = $(window)
+  var $tree_display = $("#tree_display")
+
+  var svg = phylotree.get_svg()
+  var zoom_mode = false
+  var shift_mode = false
   var selection_mode = 'taxa'
 
-  $(window).unbind("keydown", onkeydown)
-  $(window).unbind("keyup")
-  $(window).unbind("wheel")
-  $(window).unbind("focus")
+  $window.unbind("keydown", onkeydown)
+  $window.unbind("keyup")
+  $window.unbind("wheel")
+  $window.unbind("focus")
 
-  $(window).on("keydown", onkeydown)
+  $window.on("keydown", onkeydown)
 
   function onkeydown (e) {
     if (e.target.tagName !== 'BODY') {
@@ -76,20 +81,20 @@ end;
     }
   }
 
-  $(window).on('focus', function(e) {
+  $window.on('focus', function(e) {
     phylotree.exit_zoom_mode()
     phylotree.exit_shift_mode()
   })
 
-  $(window).on("keyup", function(e) {
+  $window.on("keyup", function(e) {
     if (e.key == 'Control'){
       phylotree.exit_zoom_mode()
     } else if (e.key == 'Shift') {
       phylotree.exit_shift_mode()
     }
-  });
+  })
 
-  $(window).on("wheel", function(e) {
+  $window.on("wheel", function(e) {
     var cursor_above_tree = ($("#tree-pane:hover").length != 0)
 
     if (!zoom_mode && cursor_above_tree){
@@ -106,26 +111,26 @@ end;
   })
 
   phylotree.enter_zoom_mode = function(){
-    svg.call(zoom);
-    zoom_mode = true;
-    $("#tree_display").css('cursor', 'grab');
+    svg.call(zoom)
+    zoom_mode = true
+    $tree_display.css('cursor', 'grab')
   }
 
   phylotree.exit_zoom_mode = function(){
-    svg.on(".zoom", null);
-    zoom_mode = false;
-    $("#tree_display").css('cursor', '');
+    svg.on(".zoom", null)
+    zoom_mode = false
+    $tree_display.css('cursor', '')
   }
 
   phylotree.enter_shift_mode = function(){
-    shift_mode = true;
+    shift_mode = true
   }
 
   phylotree.exit_shift_mode = function(){
-    shift_mode = false;
+    shift_mode = false
   }
 
-  phylotree.original_update = phylotree.update;
+  phylotree.original_update = phylotree.update
 
   phylotree.update = function(transitions, safe=false){
     phylotree.original_update(transitions, safe)
@@ -133,7 +138,7 @@ end;
     phylotree.redraw_scale_bar() // We draw scale bar in different way
   }
 
-  phylotree.original_safe_update = phylotree.safe_update;
+  phylotree.original_safe_update = phylotree.safe_update
 
   phylotree.safe_update = function(transitions){
     phylotree.original_safe_update(transitions)
@@ -142,36 +147,36 @@ end;
   }
 
   phylotree.update_zoom_transform = function(){
-    var translate = phylotree.current_translate;
-    var scale = phylotree.current_zoom;
+    var translate = phylotree.current_translate
+    var scale = phylotree.current_zoom
 
     d3.select("."+phylotree.get_css_classes()["tree-container"])
-      .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
+      .attr("transform", "translate(" + translate + ")scale(" + scale + ")")
   }
 
-  phylotree.current_translate = [0, 0];
-  phylotree.current_zoom = 1;
+  phylotree.current_translate = [0, 0]
+  phylotree.current_zoom = 1
 
   // Zoom and Pan event
   var zoom = d3.behavior.zoom()
     .scaleExtent([.1, 10])
     .on("zoom", function(){
-      phylotree.current_translate = d3.event.translate;
-      phylotree.current_zoom = d3.event.scale;
+      phylotree.current_translate = d3.event.translate
+      phylotree.current_zoom = d3.event.scale
 
-      var translate = d3.event.translate;
+      var translate = d3.event.translate
 
-      translate[0] += phylotree.get_offsets()[1] + phylotree.get_options()["left-offset"];
-      translate[1] += phylotree.pad_height();
+      translate[0] += phylotree.get_offsets()[1] + phylotree.get_options()["left-offset"]
+      translate[1] += phylotree.pad_height()
 
       d3.select("." + phylotree.get_css_classes()["tree-container"])
-        .attr("transform", "translate(" + translate + ")scale(" + d3.event.scale + ")");
+        .attr("transform", "translate(" + translate + ")scale(" + d3.event.scale + ")")
 
       // Scale bar stuff
 
       phylotree.redraw_scale_bar()
 
-    });
+    })
 
   phylotree.move = function(direction, delta = 5) {
     var transform = phylotree.get_current_transform()
@@ -194,7 +199,7 @@ end;
     phylotree.current_translate = transform.translate
 
     d3.select("." + phylotree.get_css_classes()["tree-container"])
-        .attr("transform", "translate(" + transform.translate + ")scale(" + transform.scale + ")");
+        .attr("transform", "translate(" + transform.translate + ")scale(" + transform.scale + ")")
 
     zoom.translate(transform.translate)
 
@@ -202,17 +207,18 @@ end;
   }
 
   /* Add link to SVG object to node */
-  var _draw_node = phylotree.draw_node;
+  var _draw_node = phylotree.draw_node
 
   phylotree.draw_node = function(container, node, transitions) {
-    node.container = container;
-    _draw_node(container, node, transitions);
+    node.container = container
+    _draw_node(container, node, transitions)
   }
 
   function get_current_transform () {
     return d3.transform(d3.select("."+phylotree.get_css_classes()["tree-container"]).attr("transform"))
   }
 
+  // Returns absolute coordinates of the element after all the pan/zoom transformations
   function get_leaf_geometry (node) {
     var current_transform = get_current_transform()
     var bbox = d3.select(node.container).node().getBBox()
@@ -269,36 +275,36 @@ end;
 
   var selection = svg.append("path")
     .attr("class", "selection")
-    .attr("visibility", "hidden");
+    .attr("visibility", "hidden")
 
   svg.on("mousedown", function() {
-    if (zoom_mode) return false;
+    if (zoom_mode) return false
 
-    var _svg = svg[0][0];
+    var _svg = svg[0][0]
     var subject = d3.select(window)
-    var start = d3.mouse(this);
+    var start = d3.mouse(this)
 
     selection.attr("d", GeometryHelper.rect(start[0], start[0], 0, 0))
-        .attr("visibility", "visible");
+        .attr("visibility", "visible")
 
     nodes = phylotree.get_nodes().filter(function(n){ return selection_mode == 'taxa' ? phylotree.is_leafnode(n) : true })
 
     nodes.forEach(function(n){
       n.geometry = (selection_mode == 'taxa') ? get_leaf_geometry(n) : get_branch_geometry(n)
-    });
+    })
 
     subject
       .on("mousemove.selection", function() {
-        var current = d3.mouse(_svg);
-        selection.attr("d", GeometryHelper.rect(start[0], start[1], current[0]-start[0], current[1]-start[1]));
+        var current = d3.mouse(_svg)
+        selection.attr("d", GeometryHelper.rect(start[0], start[1], current[0]-start[0], current[1]-start[1]))
       }).on("mouseup.selection", function() {
-        var finish = d3.mouse(_svg);
+        var finish = d3.mouse(_svg)
         var selection_rect = { x: Math.min(start[0], finish[0]),
                                y: Math.min(start[1], finish[1]),
                                width: Math.abs(start[0] - finish[0]),
                                height: Math.abs(start[1] - finish[1]) }
 
-        var to_select = nodes.filter(function(n){ return rect_overlaps_geometry(selection_rect, n.geometry) });
+        var to_select = nodes.filter(function(n){ return rect_overlaps_geometry(selection_rect, n.geometry) })
 
         if (shift_mode) {
           to_select = to_select.concat(phylotree.get_selection())
@@ -306,10 +312,10 @@ end;
 
         phylotree.modify_selection(function(n){ return to_select.includes(n.target) })
 
-        selection.attr("visibility", "hidden");
+        selection.attr("visibility", "hidden")
         subject.on("mousemove.selection", null).on("mouseup.selection", null)
-      });
-  });
+      })
+  })
 
   // Branches and taxa selection-by-click logic
   document.addEventListener('d3.layout.phylotree.event', function(e) {
@@ -354,62 +360,62 @@ end;
 
     phylotree.get_nodes().forEach(function(n){
       if (Object.keys(table).includes(n.name))
-        n.name = table[n.name];
-    });
+        n.name = table[n.name]
+    })
   }
 
   phylotree.detranslate_nodes = function(){
     var table = phylotree.get_translations()
 
     phylotree.get_nodes().forEach(function(n){
-      var key = Object.keys(table).find(function(key){ return table[key] === n.name });
+      var key = Object.keys(table).find(function(key){ return table[key] === n.name })
       if (key)
-        n.name = key;
-    });
+        n.name = key
+    })
   }
 
   phylotree.read_tree = function(str){
-    var newick = null;
-    var fangorn_block = null;
+    var newick = null
+    var fangorn_block = null
 
-    phylotree.nexus = null;
-    phylotree.original_newick = null;
-    phylotree.original_file_template = null;
+    phylotree.nexus = null
+    phylotree.original_newick = null
+    phylotree.original_file_template = null
 
-    str = $.trim(str);
+    str = $.trim(str)
 
     // if it looks like newick, make a basic nexus
     if (str[0] == '(' && str[str.length-1] == ';'){
       phylotree.original_newick = str
-      str = basic_nexus_pattern.replace("%NEWICK%", str);
+      str = basic_nexus_pattern.replace("%NEWICK%", str)
     }
 
     // str is nexus now, parse it, check it
-    var parsed_nexus = nexus.parse(str);
+    var parsed_nexus = nexus.parse(str)
     if (parsed_nexus.status === nexus.NexusError.ok){
       // it is nexus
-      phylotree.nexus = parsed_nexus;
+      phylotree.nexus = parsed_nexus
 
       if (phylotree.nexus.treesblock === undefined ||
           phylotree.nexus.treesblock.trees === undefined ||
           phylotree.nexus.treesblock.trees.length <= 0) {
-        throw new NexusError("No trees found in the file");
+        throw new NexusError("No trees found in the file")
       }
 
       newick = phylotree.nexus.treesblock.trees[0].newick.match(/^(\[.+?\])?(.+)\;?$/)[2]
 
-      phylotree.original_newick = newick;
-      phylotree.original_file_template = str.replace(newick, "%NWK%");
+      phylotree.original_newick = newick
+      phylotree.original_file_template = str.replace(newick, "%NWK%")
 
-      fangorn_block = phylotree.original_file_template.match(/begin\s+fangorn\s*;\s.*?end\s*;/si);
+      fangorn_block = phylotree.original_file_template.match(/begin\s+fangorn\s*;\s.*?end\s*;/si)
       if (fangorn_block){
-        fangorn_block = fangorn_block[0];
-        phylotree.original_file_template = phylotree.original_file_template.replace(fangorn_block, "%FG_BLK%");
+        fangorn_block = fangorn_block[0]
+        phylotree.original_file_template = phylotree.original_file_template.replace(fangorn_block, "%FG_BLK%")
       }
 
     } else {
       var error = nexus.NexusErrorHumanized(parsed_nexus.status)
-      throw new NexusError("Error in nexus file (" + error + ")");
+      throw new NexusError("Error in nexus file (" + error + ")")
     }
 
     // check newick
@@ -425,20 +431,20 @@ end;
     }
 
     if (phylotree.nexus)
-      phylotree.translate_nodes(phylotree.get_translations());
+      phylotree.translate_nodes(phylotree.get_translations())
 
-    return phylotree;
+    return phylotree
   }
 
   phylotree.get_translations = function(){
     if (!phylotree.is_nexus())
-      return {};
+      return {}
 
-    return phylotree.nexus.treesblock.translate || {};
+    return phylotree.nexus.treesblock.translate || {}
   }
 
   phylotree.is_nexus = function(){
-    return phylotree.nexus != null;
+    return phylotree.nexus != null
   }
 
   // Metadata comes from Fangorn in it's format (when saving)
@@ -498,8 +504,8 @@ end;
 
   phylotree.output_tree = function(metadata_json){
     phylotree.get_nodes().forEach(function(n){
-      n.build_annotation();
-    });
+      n.build_annotation()
+    })
 
     if (phylotree.is_nexus()){
       phylotree.detranslate_nodes(phylotree.get_translations())
@@ -519,7 +525,7 @@ end;
 
       return content
     } else
-      return phylotree.to_fangorn_newick(true);
+      return phylotree.to_fangorn_newick(true)
   }
 
   phylotree.build_fangorn_block = function(){
@@ -538,8 +544,8 @@ end;
 
   phylotree.dispatch_selection_modified_event = function () {
     // Fangorn stuff
-    var event = new Event('selection_modified');
-    document.dispatchEvent(event);
+    var event = new Event('selection_modified')
+    document.dispatchEvent(event)
   }
 
   // Scale bar stuff
@@ -552,13 +558,13 @@ end;
         "," +
         (x[1] !== null ? x[1] : 0) +
         ") "
-      );
+      )
 
-    return "";
+    return ""
   }
 
   phylotree.init_scale_bar = function () {
-    phylotree.get_svg().selectAll(".tree-scale-bar").remove();
+    phylotree.get_svg().selectAll(".tree-scale-bar").remove()
 
     var scale = d3.scale.linear()
 
@@ -597,20 +603,20 @@ end;
   }
 
   phylotree.redraw_scale_bar = function () {
-    var tree_transform = phylotree.get_current_transform();
-    var tree_container = d3.select("." + phylotree.get_css_classes()["tree-container"]).node();
+    var tree_transform = phylotree.get_current_transform()
+    var tree_container = d3.select("." + phylotree.get_css_classes()["tree-container"]).node()
 
-    var scale = tree_transform.scale[0];
-    var translate = [];
-    translate[0] = tree_transform.translate[0] + (tree_container.getBBox().width*0.4*scale);
-    translate[1] = ((tree_container.getBBox().height + 20) * scale) + tree_transform.translate[1];
+    var scale = tree_transform.scale[0]
+    var translate = []
+    translate[0] = tree_transform.translate[0] + (tree_container.getBBox().width*0.4*scale)
+    translate[1] = ((tree_container.getBBox().height + 20) * scale) + tree_transform.translate[1]
 
     d3.select("." + phylotree.get_css_classes()["tree-scale-bar"])
-      .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
+      .attr("transform", "translate(" + translate + ")scale(" + scale + ")")
   }
 
   phylotree.get_current_transform = function () {
-    return d3.transform(d3.select("." + phylotree.get_css_classes()["tree-container"]).attr('transform'));
+    return d3.transform(d3.select("." + phylotree.get_css_classes()["tree-container"]).attr('transform'))
   }
 
   phylotree.pad_height = function () { return 0; }
@@ -623,7 +629,7 @@ end;
     }
   }
 
-  // rotate branch feature
+  // Rotate branch feature
 
   phylotree.get_root = function () {
     return phylotree.get_nodes().find(function (n) { return n.is_root() })
@@ -639,6 +645,10 @@ end;
 
     phylotree.update_layout(fangorn.get_tree().get_root(), true)
   }
+
+  // Navigator
+
+  phylotree.navigator = new PhylotreeNavigator(phylotree, zoom)
 }
 
-module.exports = apply_extensions;
+module.exports = apply_extensions
