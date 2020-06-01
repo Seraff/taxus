@@ -506,11 +506,15 @@ $(document).ready(function () {
   modeSelector = new BtnGroupRadio($('#mode-select-btn-group'))
 
   modeSelector.on_change = (new_button) => {
-    var mode = $(new_button).data('mode')
-    if (!fangorn.tree_is_loaded()) { return false }
+    if (!fangorn.tree_is_loaded()) {
+      return false
+    }
 
-    fangorn.select_none()
+    var $btn = $(new_button)
+    var mode = $btn.data('mode')
+
     fangorn.get_tree().set_selection_mode(mode)
+    $btn.blur()
   }
 
   resetSelectionMode()
