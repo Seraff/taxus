@@ -305,9 +305,14 @@ end;
                                height: Math.abs(start[1] - finish[1]) }
 
         var to_select = nodes.filter(function(n){ return rect_overlaps_geometry(selection_rect, n.geometry) })
+        var selected = phylotree.get_selection()
 
         if (shift_mode) {
-          to_select = to_select.concat(phylotree.get_selection())
+          if (to_select.length === 1 && selected.includes(to_select[0])) {
+            to_select = selected.filter((n) => { return to_select[0] != n })
+          } else {
+            to_select = to_select.concat(selected)
+          }
         }
 
         phylotree.modify_selection(function(n){ return to_select.includes(n.target) })
@@ -331,9 +336,14 @@ end;
       d3.selectAll('path.branch').on('mouseup', function(e){
         if (selection_mode === 'branch') {
           var to_select = [e.target]
+          var selected = phylotree.get_selection()
 
           if (shift_mode) {
-            to_select = to_select.concat(phylotree.get_selection())
+            if (selected.includes(to_select[0])){
+              to_select = selected.filter((n) => { return to_select[0] != n })
+            } else {
+              to_select = to_select.concat(selected)
+            }
           }
 
           phylotree.modify_selection(function(n){ return to_select.includes(n.target) })
