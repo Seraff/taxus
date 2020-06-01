@@ -430,7 +430,6 @@ $(document).ready(function () {
     fangorn.update_node_title(node, $('#seq-title-input').val())
     $('#seq-title-input').val('')
     $('#annotate-dialog')[0].close(false)
-    fangorn.get_tree().safe_update()
   })
 
   $('#universal-dialog-close').on('click', function () {

@@ -353,9 +353,12 @@ function Fangorn () {
     node.fasta.id = new_id
     node.fasta.header = title
 
-    dispatchDocumentEvent('node_titles_changed')
+    fangorn.get_tree().safe_update()
+
     fangorn.make_tree_dirty()
     fangorn.make_fasta_dirty()
+
+    dispatchDocumentEvent('node_titles_changed')
   }
 
   fangorn.reroot_to_selected_node = function () {

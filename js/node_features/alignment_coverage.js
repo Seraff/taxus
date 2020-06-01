@@ -2,36 +2,54 @@ class AlignmentCoverage {
   constructor (node) {
     this.node = node
     this.container = d3.select(this.node.container)
+
+    $(document).on('node_titles_changed', () => {
+      console.log('node_titles_changed')
+      this.redraw()
+    })
   }
 
   redraw () {
-    if (!this.node.is_leaf()) { return false }
+    this.remove()
 
-
-    if (this.node.fasta) {
-      var pct = this.getPct()
-
-      var container = d3.select(this.node.container)
-      var my_feature = this.container.selectAll('.alignment-coverage')
-
-      if (this.node.fangorn.preferences.preferences.displayAlignmentCoverage === 'true') {
-        if (my_feature.empty()) {
-          var text = this.container.append('text').text(pct).attr('class', 'feature alignment-coverage')
-          var prev_text = text.select(function(){ return this.previousSibling })
-          var prev_text_box = prev_text.node().getBBox()
-          var x = prev_text_box.width + 10
-
-          text.attr('dx', x)
-          text.attr('dy', prev_text.attr('dy'))
-
-        } else {
-          my_feature.text(pct)
-        }
-
-      } else {
-        if (!my_feature.empty()) { my_feature.remove() }
-      }
+    if (this.isEnabled()) {
+      this.render()
     }
+  }
+
+  render () {
+    if (!this.node.is_leaf() || !this.node.fasta_is_loaded()) {
+      return false
+    }
+
+    var pct = this.getPct()
+    var my_feature = this.getSelector()
+
+    var text = this.container.append('text').text(pct).attr('class', 'feature alignment-coverage')
+    var prev_text = text.select(function(){ return this.previousSibling })
+    var prev_text_box = prev_text.node().getBBox()
+    var x = prev_text_box.width + 10
+
+    text.attr('dx', x)
+    text.attr('dy', prev_text.attr('dy'))
+  }
+
+  remove () {
+    if (this.isDrawn()) {
+      this.getSelector().remove()
+    }
+  }
+
+  isDrawn () {
+    return !this.getSelector().empty()
+  }
+
+  getSelector () {
+    return this.container.selectAll('.alignment-coverage')
+  }
+
+  isEnabled () {
+    return this.node.fangorn.preferences.getPreference('displayAlignmentCoverage') === true
   }
 
   getPct () {
