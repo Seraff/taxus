@@ -101,11 +101,11 @@
 
       <footer class="toolbar toolbar-footer">
         <div class="toolbar-actions">
-          <button id="cancel-button" class="btn btn-default">
+          <button id="cancel-button" type="button" class="btn btn-default">
             Cancel
           </button>
 
-          <button id ="save-button" class="btn btn-primary pull-right">
+          <button id="save-button" type="button" class="btn btn-primary pull-right">
             Save
           </button>
         </div>
@@ -213,6 +213,11 @@
         }
       })
 
+      function submit () {
+        var prefs = collectPreferences()
+        ipcRenderer.send('take_new_prefs', prefs)
+      }
+
       ipcRenderer.send('give_current_prefs')
 
       $('#cancel-button').on('click', () => {
@@ -222,8 +227,13 @@
       })
 
       $('#save-button').on('click', () => {
-        var prefs = collectPreferences()
-        ipcRenderer.send('take_new_prefs', prefs)
+        submit()
+      })
+
+      $(window).on("keydown", (e) => {
+        if (e.keyCode === 13){
+          submit()
+        }
       })
 
       ipcRenderer.on('new_preferences_taken', (event, message) => {

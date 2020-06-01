@@ -532,8 +532,18 @@ $(document).ready(function () {
 
   // Header update logic
 
-  document.addEventListener('fangorn_tree_header_update', function (e) {
+  document.addEventListener('fangorn_tree_header_update', (e) => {
     set_window_header(fangorn.tree_title())
+  })
+
+  // Key bindings
+
+  document.addEventListener('keydown', (e) => {
+    if (e.keyCode === 13) {
+      $('dialog.modal-dialog:visible').each((i, el) => {
+        $(el).find('.enter-action').click()
+      })
+    }
   })
 
   ipcRenderer.send('scripts_loaded')

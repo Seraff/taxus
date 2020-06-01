@@ -137,13 +137,13 @@
     </footer>
   </div>
 
-  <dialog id="annotate-dialog">
+  <dialog id="annotate-dialog" class="modal-dialog">
       <header class="toolbar toolbar-header">
           <h1 class="title">Edit the node title</h1>
       </header>
 
       <div class="padded-more">
-          <form>
+          <form action="#">
             <div class="form-group">
               <input id="seq-title-input" type="text" class="form-control" placeholder="Title">
             </div>
@@ -152,13 +152,13 @@
 
       <footer class="toolbar toolbar-footer">
           <div class="toolbar-actions">
-              <button id="annotation-dialog-save" class="btn btn-primary pull-right">Save</button>
-              <button id="annotation-dialog-cancel" class="btn btn-default pull-right">Cancel</button>
+              <button id="annotation-dialog-save" type="button" class="btn btn-primary pull-right enter-action">Save</button>
+              <button id="annotation-dialog-cancel" type="button" class="btn btn-default pull-right">Cancel</button>
           </div>
       </footer>
   </dialog>
 
-  <dialog id="universal-dialog">
+  <dialog id="universal-dialog" class="modal-dialog">
       <header class="toolbar toolbar-header">
           <h1 class="title"></h1>
       </header>
@@ -168,7 +168,7 @@
 
       <footer class="toolbar toolbar-footer">
           <div class="toolbar-actions">
-              <button id="universal-dialog-close" class="btn btn-primary pull-right">Ok</button>
+              <button id="universal-dialog-close" type="button" class="btn btn-primary pull-right enter-action">Ok</button>
           </div>
       </footer>
   </dialog>
