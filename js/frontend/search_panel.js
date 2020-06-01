@@ -48,6 +48,13 @@ class SearchPanel {
       }
     })
 
+    document.addEventListener('tree_topology_changed', () => {
+      if (!this.isHidden()) {
+        this.clean()
+        this.searchCurrent()
+      }
+    })
+
     this.$select_all_button.on('click', () => {
       this.selectFoundItems()
       this.$select_all_button.blur()

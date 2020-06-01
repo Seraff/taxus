@@ -92,8 +92,7 @@ function Fangorn () {
   }
 
   fangorn.select_all = function () {
-    var all = fangorn.get_nodes()
-    fangorn.get_tree().modify_selection(function (n) { return all.includes(n.target) })
+    fangorn.get_tree().modify_selection(function (n) { return _nodes.includes(n.target) })
   }
 
   fangorn.select_specific = function (nodes) {
@@ -310,6 +309,7 @@ function Fangorn () {
 
       _branches = []
       this.get_tree().get_svg().selectAll('.branch').each(function (b) { _branches.push(b) })
+
       _branches.forEach(function (b) {
         b.source.next_branch = b
         b.target.prev_branch = b
@@ -368,6 +368,8 @@ function Fangorn () {
     fangorn.get_tree().reroot(node)
     fangorn.get_tree().safe_update()
     fangorn.make_tree_dirty()
+    fangorn.reinit_nodes()
+    dispatchDocumentEvent('tree_topology_changed')
   }
 
   fangorn.rotate_selected_branch = function () {
@@ -381,6 +383,8 @@ function Fangorn () {
     fangorn.get_tree().rotate_branch(node)
     fangorn.get_tree().safe_update()
     fangorn.make_tree_dirty()
+    fangorn.reinit_nodes()
+    dispatchDocumentEvent('tree_topology_changed')
   }
 
   fangorn.set_selected_nodes_annotation = function (annotation) {

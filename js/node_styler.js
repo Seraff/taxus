@@ -112,12 +112,19 @@ class NodeStyler {
   }
 
   initHighlight () {
-    if (this.node.is_leaf()) {
-      var container = this.node.container
+    if (!this.node.is_leaf()) {
+      return false
+    }
+
+    var container = this.node.container
+    this.highlight_rect = d3.select(container).select('rect.highlight-rect')
+
+    if (this.highlight_rect.empty()){
       var bbox = this.node.container.getBBox()
 
       this.highlight_rect = d3.select(container)
                               .insert('rect', ':first-child')
+                              .attr('class', 'highlight-rect')
                               .attr('x', bbox.x)
                               .attr('y', bbox.y)
                               .attr('width', bbox.width)
