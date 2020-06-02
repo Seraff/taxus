@@ -42,6 +42,7 @@ end;
   var zoom_mode = false
   var shift_mode = false
   var selection_mode = 'taxa'
+  var scale_bar = true
 
   $window.unbind("keydown", onkeydown)
   $window.unbind("keyup")
@@ -613,6 +614,15 @@ end;
   }
 
   phylotree.redraw_scale_bar = function () {
+    var bar = d3.select("." + phylotree.get_css_classes()["tree-scale-bar"])
+
+    if (!scale_bar) {
+      bar.style('visibility', 'hidden')
+      return true
+    }
+
+    bar.style('visibility', 'visible')
+
     var tree_transform = phylotree.get_current_transform()
     var tree_container = d3.select("." + phylotree.get_css_classes()["tree-container"]).node()
 
@@ -621,8 +631,7 @@ end;
     translate[0] = tree_transform.translate[0] + (tree_container.getBBox().width*0.4*scale)
     translate[1] = ((tree_container.getBBox().height + 20) * scale) + tree_transform.translate[1]
 
-    d3.select("." + phylotree.get_css_classes()["tree-scale-bar"])
-      .attr("transform", "translate(" + translate + ")scale(" + scale + ")")
+    bar.attr("transform", "translate(" + translate + ")scale(" + scale + ")")
   }
 
   phylotree.get_current_transform = function () {
@@ -653,12 +662,25 @@ end;
     var new_children = [node.children[node.children.length-1], node.children[0]]
     node.children = new_children
 
-    phylotree.update_layout(fangorn.get_tree().get_root(), true)
+    phylotree.update_layout(phylotree.get_root(), true)
   }
 
   // Navigator
 
   phylotree.navigator = new PhylotreeNavigator(phylotree, zoom)
+
+  // Cladogram
+  phylotree.setCladogramView = function (is_cladogram) {
+    phylotree.cladogram = is_cladogram
+    if (is_cladogram) {
+      scale_bar = false
+    } else {
+      scale_bar = true
+    }
+    phylotree.update_layout(phylotree.get_root(), true)
+    phylotree.redraw_scale_bar()
+  }
+
 }
 
 module.exports = apply_extensions

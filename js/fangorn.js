@@ -510,8 +510,32 @@ function Fangorn () {
     fangorn.make_tree_dirty()
   }
 
+  // Features
+
   fangorn.redraw_features = function (argument) {
     fangorn.get_leaves().forEach((n) => { n.redraw_features() })
+  }
+
+  // Cladogram mode
+
+  fangorn.isCladogramView = function () {
+    return fangorn.get_tree().cladogram
+  }
+
+  fangorn.setCladogramView = function (is_cladogram) {
+    if (typeof(is_cladogram) !== 'boolean') {
+      return false
+    }
+
+    fangorn.get_tree().setCladogramView(is_cladogram)
+    fangorn.get_tree().safe_update()
+    fangorn.reinit_nodes()
+    dispatchDocumentEvent('tree_topology_changed')
+  }
+
+  fangorn.toggleCladogramView = function () {
+    var new_mode = fangorn.get_tree().cladogram ? false : true
+    fangorn.setCladogramView(new_mode)
   }
 
   return this

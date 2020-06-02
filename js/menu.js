@@ -144,6 +144,14 @@ const template = [
     label: 'View',
     submenu: [
       {
+        id: "toggle-cladogram-view",
+        label: 'Toggle cladogram view',
+        accelerator: 'CmdOrCtrl+Shift+C'
+      },
+      {
+        type: 'separator'
+      },
+      {
         label: 'Reload',
         accelerator: 'CmdOrCtrl+Alt+R',
         click: function(item, focusedWindow) {

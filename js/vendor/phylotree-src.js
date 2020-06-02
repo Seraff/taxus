@@ -1704,7 +1704,8 @@ const parseString = require('xml2js').parseString;
           n.__mapped_bl = branch_length_accessor(n);
         });
         phylotree.branch_length(function(n) {
-          return n.__mapped_bl;
+          // FANGORN modified
+          return phylotree.cladogram ? undefined : n.__mapped_bl
         });
 
         // rerooted and inited branch lengths
@@ -2848,6 +2849,29 @@ const parseString = require('xml2js').parseString;
     phylotree.get_options = function(){ return options }
     phylotree.get_css_classes = function(){ return css_classes }
 
+    // FANGORN: cladogram mode
+    phylotree.cladogram = false
+
+    branch_length_accessor = function(_node) {
+      if (phylotree.cladogram) {
+        return undefined
+      } else {
+        if (
+          "attribute" in _node &&
+          _node["attribute"] &&
+          _node["attribute"].length
+        ) {
+          var bl = parseFloat(_node["attribute"]);
+          if (!isNaN(bl)) {
+            return Math.max(0, bl);
+          }
+        }
+      }
+
+      return undefined;
+    }
+
+    phylotree.branch_length_accessor = branch_length_accessor
 
     return phylotree;
   };

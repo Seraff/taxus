@@ -30,7 +30,8 @@ function update_controls (fangorn) {
 
   var disabled_menu_items = ['open-fasta', 'save-fasta', 'save-fasta-as', 'save-selection-as-fasta',
                              'reroot', 'rotate-branch', 'select-all', 'select-descendants',
-                             'remove-selected', 'remove-unselected', 'restore-selected', 'find', 'toggle-selection-mode']
+                             'remove-selected', 'remove-unselected', 'restore-selected', 'find',
+                             'toggle-selection-mode', 'toggle-cladogram-view']
 
   disabled_menu_items.forEach(function (item) {
     menu.disableItemById(item)
@@ -60,6 +61,7 @@ function update_controls (fangorn) {
     menu.enableItemById('select-all')
     menu.enableItemById('find')
     menu.enableItemById('toggle-selection-mode')
+    menu.enableItemById('toggle-cladogram-view')
 
     if (fangorn.fasta_is_loaded() && fangorn.is_one_leaf_selected()) { $('#annotate-node-action').removeAttr('disabled') }
 
@@ -340,6 +342,10 @@ function selectAllAction () {
   }
 }
 
+function toggleCladogramViewAction () {
+  fangorn.toggleCladogramView()
+}
+
 function applyPreferences () {
   fangorn.get_tree().safe_update()
   fangorn.redraw_features()
@@ -402,6 +408,9 @@ $(document).ready(function () {
   menu.setCallbackOnItem('restore-selected', restore_selected_action)
   menu.setCallbackOnItem('select-all', selectAllAction)
 
+  // View
+
+  menu.setCallbackOnItem('toggle-cladogram-view', toggleCladogramViewAction)
 
   $('#remove-selected-action').on('click', remove_selected_action)
   $('#remove-unselected-action').on('click', remove_unselected_action)
