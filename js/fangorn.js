@@ -78,6 +78,10 @@ function Fangorn () {
     return fangorn.get_selected_internals().length === 1
   }
 
+  fangorn.is_any_interlal_selected = function () {
+    return fangorn.get_selected_internals().length > 0
+  }
+
   fangorn.is_one_selected = function () {
     return fangorn.is_one_internal_selected() || fangorn.is_one_leaf_selected()
   }
@@ -100,12 +104,16 @@ function Fangorn () {
   }
 
   fangorn.select_descendants_of_selected = function () {
-    if (fangorn.is_one_internal_selected()){
-      var node = fangorn.get_selection()[0]
+    var nodes = fangorn.get_selection()
 
-      var selection = fangorn.get_tree().select_all_descendants(node, true, true)
-      fangorn.get_tree().modify_selection(function (n) { return selection.includes(n.target) })
-    }
+    to_select = nodes
+
+    nodes.forEach((node) => {
+      var descs = fangorn.get_tree().select_all_descendants(node, true, true)
+      to_select = to_select.concat(descs)
+    })
+
+    fangorn.get_tree().modify_selection(function (n) { return to_select.includes(n.target) })
   }
 
   fangorn.init_phylotree = function (str) {

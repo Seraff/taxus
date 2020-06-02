@@ -71,6 +71,9 @@ function update_controls (fangorn) {
     if (fangorn.is_one_internal_selected()) {
       $('#rotate-branch-action').removeAttr('disabled')
       menu.enableItemById('rotate-branch')
+    }
+
+    if (fangorn.is_any_interlal_selected()) {
       $('#select-descendants-action').removeAttr('disabled')
       menu.enableItemById('select-descendants')
     }
