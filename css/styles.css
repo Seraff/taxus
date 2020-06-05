@@ -53,11 +53,6 @@ span.fasta-pane-entry-sequence{
   stroke-width: 4px !important;
 }
 
-.node-fangorn-marked {
-  fill: #e6550d !important;
-  font-weight: bold;
-}
-
 .node {
   font-style: italic;
 }

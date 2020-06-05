@@ -392,9 +392,8 @@ function Fangorn () {
     var node = selection[0]
 
     fangorn.get_tree().rotate_branch(node)
-    fangorn.get_tree().safe_update()
+
     fangorn.make_tree_dirty()
-    fangorn.reinit_nodes()
     dispatchDocumentEvent('tree_topology_changed')
   }
 

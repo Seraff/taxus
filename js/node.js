@@ -7,10 +7,14 @@ const features = require('./node_features')
 function Node(fangorn, phylotree_node){
   var node = phylotree_node
 
+  // We don't need to wrap it again if it's already wrapped
+  if (node.is_fangorn_node) {
+    return node
+  }
+
   node.fangorn = fangorn
   node.is_fangorn_node = true
   node.parsed_annotation = {}
-
   node.prev_branch = null
   node.next_branch = null
 

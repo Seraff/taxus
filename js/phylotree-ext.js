@@ -413,7 +413,7 @@ end;
         throw new NexusError("No trees found in the file")
       }
 
-      newick = phylotree.nexus.treesblock.trees[0].newick.match(/^(\[.+?\])?(.+)\;?$/)[2]
+      newick = phylotree.nexus.treesblock.trees[0].newick.match(/^(\[.+?\])?(.+)(?=\;)/)[2]
 
       phylotree.original_newick = newick
       phylotree.original_file_template = str.replace(newick, "%NWK%")
@@ -514,29 +514,40 @@ end;
   }
 
   phylotree.output_tree = function(metadata_json){
-    phylotree.get_nodes().forEach(function(n){
-      n.build_annotation()
-    })
+    var func = function (metadata_json) {
 
-    if (phylotree.is_nexus()){
-      phylotree.detranslate_nodes(phylotree.get_translations())
-      var newick = phylotree.to_fangorn_newick(true)
+      phylotree.get_nodes().forEach(function(n){
+        n.build_annotation()
+      })
 
-      phylotree.translate_nodes(phylotree.get_translations())
+      var result = null
 
-      var content = phylotree.original_file_template.replace("%NWK%", newick)
-      var fangorn_block = phylotree.build_fangorn_block()
+      if (phylotree.is_nexus()){
+        phylotree.detranslate_nodes(phylotree.get_translations())
+        var newick = phylotree.to_fangorn_newick(true)
 
-      if (fangorn_block.length > 0){
-        if (content.includes("%FG_BLK%"))
-          content = content.replace("%FG_BLK%", phylotree.build_fangorn_block())
-        else
-          content += "\n" + phylotree.build_fangorn_block()
+        phylotree.translate_nodes(phylotree.get_translations())
+
+        var content = phylotree.original_file_template.replace("%NWK%", newick)
+        var fangorn_block = phylotree.build_fangorn_block()
+
+        if (fangorn_block.length > 0){
+          if (content.includes("%FG_BLK%"))
+            content = content.replace("%FG_BLK%", phylotree.build_fangorn_block())
+          else
+            content += "\n" + phylotree.build_fangorn_block()
+        }
+
+        result = content
+      } else {
+        result = phylotree.to_fangorn_newick(true)
       }
 
-      return content
-    } else
-      return phylotree.to_fangorn_newick(true)
+      return result
+    }
+
+
+    return phylotree.withOriginalBranchLengths(func)(metadata_json)
   }
 
   phylotree.build_fangorn_block = function(){
@@ -660,14 +671,48 @@ end;
     }
 
     var new_children = [node.children[node.children.length-1], node.children[0]]
+
     node.children = new_children
 
-    phylotree.update_layout(phylotree.get_root(), true)
+    var prev_branch = new_children[0].prev_branch
+    new_children[0].prev_branch = new_children[1].prev_branch
+    new_children[1].prev_branch = prev_branch
+
+    phylotree.update_layout(phylotree.get_nodes()[0], true)
+    fangorn.get_tree().safe_update()
   }
 
   // Navigator
 
   phylotree.navigator = new PhylotreeNavigator(phylotree, zoom)
+
+  // Modifying tree in cladogram view workarounds
+
+  // decorator
+  phylotree.withOriginalBranchLengths = function (func, update = false) {
+    return function() {
+      var was_cladogram = phylotree.cladogram
+      phylotree.cladogram = false
+
+      const result = func.apply(this, arguments)
+
+      if (was_cladogram) {
+        phylotree.cladogram = true
+        if (update) {
+          phylotree.update_layout(phylotree.get_nodes()[0], true)
+          phylotree.safe_update()
+        }
+      }
+
+      return result
+    }
+  }
+
+  original_reroot = phylotree.reroot
+
+  phylotree.reroot = function (node) {
+    phylotree.withOriginalBranchLengths(original_reroot, true)(node)
+  }
 
   // Cladogram
   phylotree.setCladogramView = function (is_cladogram) {

@@ -9,17 +9,16 @@ class NodeStyler {
   }
 
   style_leaf (dom_element) {
-    if (this.node.is_marked() == true){
-      var klass = dom_element.attr('class')
-      klass += " node-fangorn-marked"
-      dom_element.attr('class', klass)
-    }
-
     this.setFontFamily(this.preferences.getPreference('taxaFontFamily'))
     this.setFontSize(this.preferences.getPreference('taxaFontSize'))
     this.setFontWeight(this.preferences.getPreference('taxaFontBold'))
     this.setFontStyle(this.preferences.getPreference('taxaFontItalic'))
     this.setFontUnderline(this.preferences.getPreference('taxaFontUnderline'))
+
+    if (this.node.is_marked() == true){
+      this.setFontWeight(true)
+      this.setColor('#e6550d')
+    }
   }
 
   style () {
