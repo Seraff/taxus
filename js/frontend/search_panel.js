@@ -37,9 +37,7 @@ class SearchPanel {
     })
 
     document.addEventListener('new_tree_is_loaded', () => {
-      if (!this.isHidden()) {
-        this.searchCurrent()
-      }
+      this.cleanSearchField()
     })
 
     document.addEventListener('node_titles_changed', () => {
@@ -149,6 +147,11 @@ class SearchPanel {
     })
 
     this.found_items = []
+  }
+
+  cleanSearchField () {
+    this.clean()
+    this.$search_field.val('')
   }
 
   isAnythingFound () {
