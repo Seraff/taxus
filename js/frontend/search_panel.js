@@ -112,15 +112,15 @@ class SearchPanel {
 
     if (query.length >= SearchPanel.QUERY_MIN_LEN) {
 
-      query = query.toLocaleLowerCase()
+      query = query
 
       if (this.isTreeMode()) {
         this.found_items = this.fangorn.get_leaves().filter((e) => {
-          return e.name.toLocaleLowerCase().includes(query)
+          return e.name.includes(query)
         })
       } else {
         this.found_items = this.fasta_pane.entries.filter((e) => {
-          return e.id.toLocaleLowerCase().includes(query)
+          return e.id.includes(query)
         })
       }
 
