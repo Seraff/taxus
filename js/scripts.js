@@ -48,7 +48,6 @@ function update_controls (fangorn) {
   $('#set-mode-to-branch-action').attr('disabled', 'disabled')
   $('#set-mode-to-taxa-action').attr('disabled', 'disabled')
   $('#find-action').attr('disabled', 'disabled')
-  $('#find-action').removeAttr('disabled')
 
   if (fangorn.tree_is_loaded()) {
     $('#set-mode-to-branch-action').removeAttr('disabled')

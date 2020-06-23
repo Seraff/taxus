@@ -6,8 +6,8 @@ class SearchPanel {
     this.$search_action_button = $('#find-action')
     this.$search_mode_buttons = $('#search-mode-btn-group')
     this.$search_field = $('#search-input')
+    this.$search_result_field = $('#search-result-number')
     this.$select_all_button = $('#search-select-all')
-    this.$meta_info = $("#footer-meta")
     this.$tree_mode_button = $('#set-search-mode-to-tree')
     this.$fasta_mode_button = $('#set-search-mode-to-fasta')
 
@@ -34,6 +34,18 @@ class SearchPanel {
         this.current_input_value = this.$search_field.val()
         this.searchCurrent()
       }
+    })
+
+    this.$search_field.on('focus', (e) => {
+      this.$search_result_field.addClass('focused')
+    })
+
+    this.$search_field.on('blur', (e) => {
+      this.$search_result_field.removeClass('focused')
+    })
+
+    this.$search_result_field.on('click', (e) => {
+      this.$search_field.focus()
     })
 
     document.addEventListener('new_tree_is_loaded', () => {
@@ -180,14 +192,14 @@ class SearchPanel {
 
   refreshMetaInfo () {
     if (this.isHidden()) {
-      this.$meta_info.html('')
+      this.$search_result_field.val('')
       return true
     }
 
     if (this.$search_field.val().length >= SearchPanel.QUERY_MIN_LEN) {
-      this.$meta_info.html(this.found_items.length + ' matches')
+      this.$search_result_field.val(this.found_items.length)
     } else {
-      this.$meta_info.html('')
+      this.$search_result_field.val('')
     }
   }
 }
