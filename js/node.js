@@ -94,9 +94,9 @@ function Node(fangorn, phylotree_node){
   }
 
   node.add_tip_to_node = function(text){
-    if (node.is_leaf() || !text)
-      return;
-
+    if (node.is_leaf() || (!text && text !== 0)){
+      return
+    }
 
     d3.select(node.container).html("");
     d3.select(node.container).append("text")
