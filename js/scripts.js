@@ -147,7 +147,7 @@ function open_tree_action (e) {
     })
   }
 
-  if (fangorn.tree_is_dirty){
+  if (fangorn.tree_is_dirty || fangorn.fasta_is_dirty){
     showUnsavedFileAlert(open_tree)
   } else {
     open_tree()
@@ -505,7 +505,7 @@ $(document).ready(function () {
       fangorn.load_tree_file(message)
     }
 
-    if (fangorn.tree_is_dirty){
+    if (fangorn.tree_is_dirty || fangorn.fasta_is_dirty){
       showUnsavedFileAlert(open_tree)
     } else {
       open_tree()
