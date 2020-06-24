@@ -10,6 +10,7 @@ class SearchPanel {
     this.$select_all_button = $('#search-select-all')
     this.$tree_mode_button = $('#set-search-mode-to-tree')
     this.$fasta_mode_button = $('#set-search-mode-to-fasta')
+    this.$case_sensitive_button = $('#case-sensitive-search')
 
     this.fangorn = fangorn
     this.fasta_pane = fasta_pane
@@ -75,6 +76,17 @@ class SearchPanel {
       this.search_mode = this.search_mode_radio.active_button.data('mode')
       this.searchCurrent()
     }
+
+    this.$case_sensitive_button.on('click', () => {
+      if (this.$case_sensitive_button.hasClass('btn-pressed')){
+        this.$case_sensitive_button.removeClass('btn-pressed')
+      } else {
+        this.$case_sensitive_button.addClass('btn-pressed')
+      }
+
+      this.clean()
+      this.searchCurrent()
+    })
   }
 
   hide () {
@@ -107,6 +119,10 @@ class SearchPanel {
     return this.search_mode === 'tree'
   }
 
+  isCaseSensitive () {
+    return this.$case_sensitive_button.hasClass('btn-pressed')
+  }
+
   enableSelectAll () {
     this.$select_all_button.removeAttr('disabled')
   }
@@ -121,18 +137,23 @@ class SearchPanel {
 
   search (query) {
     this.clean()
+    var case_sensitive = this.isCaseSensitive()
 
     if (query.length >= SearchPanel.QUERY_MIN_LEN) {
 
-      query = query
+      if (!case_sensitive){
+        query = query.toLocaleLowerCase()
+      }
 
       if (this.isTreeMode()) {
         this.found_items = this.fangorn.get_leaves().filter((e) => {
-          return e.name.includes(query)
+          var str = case_sensitive ? e.name : e.name.toLocaleLowerCase()
+          return str.includes(query)
         })
       } else {
         this.found_items = this.fasta_pane.entries.filter((e) => {
-          return e.id.includes(query)
+          var str = case_sensitive ? e.id : e.id.toLocaleLowerCase()
+          return str.includes(query)
         })
       }
 
