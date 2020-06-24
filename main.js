@@ -13,6 +13,7 @@ function createWindow () {
     minWidth: 700,
     minHeight: 200,
     titleBarStyle: "hidden",
+    acceptFirstMouse: true,
     webPreferences: {
       nodeIntegration: true
     }
