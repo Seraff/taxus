@@ -562,5 +562,11 @@ $(document).ready(function () {
     }
   })
 
+  // Windows/Linux tweaks
+
+  if (process.platform !== 'darwin') {
+    $('#window-header').hide()
+  }
+
   ipcRenderer.send('scripts_loaded')
 })
