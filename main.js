@@ -29,14 +29,22 @@ function createWindow () {
   })
 }
 
+function sendFileOpen() {
+  if (app.isReady() && win && file_to_open) {
+    win.webContents.send('open_file', file_to_open)
+  }
+}
+
 app.on('will-finish-launching', () => {
   app.on('open-file', (event, path) => {
     file_to_open = path
-
-    if (app.isReady() && win) {
-      win.webContents.send('open_file', file_to_open)
-    }
+    sendFileOpen()
   })
+
+  if (process.platform !== 'darwin' && process.argv.length >= 2) {
+    file_to_open = process.argv[1]
+    sendFileOpen()
+  }
 })
 
 app.on('ready', createWindow)
