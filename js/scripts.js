@@ -26,7 +26,7 @@ var fangorn = null
 var modeSelector = null
 
 function update_controls (fangorn) {
-  menu = app.remote.Menu.getApplicationMenu()
+  var menu = app.remote.Menu.getApplicationMenu()
 
   var disabled_menu_items = ['open-fasta', 'save-fasta', 'save-fasta-as', 'save-selection-as-fasta',
                              'reroot', 'rotate-branch', 'select-all', 'select-descendants',
@@ -362,6 +362,8 @@ function resetSelectionMode () {
 }
 
 $(document).ready(function () {
+  var menu = app.remote.Menu.getApplicationMenu()
+
   unhandled({ showDialog: true })
 
   Split(['#tree-pane', '#fasta-panel'], { gutterSize: 10, cursor: 'col-resize' })

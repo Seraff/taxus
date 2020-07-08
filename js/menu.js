@@ -258,13 +258,37 @@ if (process.platform === 'darwin') {
         type: 'separator'
       },
       {
-
         label: 'Quit',
         id: 'quit',
         accelerator: 'Command+Q'
       },
     ]
   });
+} else {
+  file_submenu = template[0].submenu
+
+  file_submenu.push({
+                      label: 'Preferences',
+                      accelerator: 'CmdOrCtrl+,',
+                      role: 'preferences',
+                      click: _ => {
+                        new PreferencesWindow()
+                      },
+                    })
+
+  file_submenu.push({ type: 'separator' })
+
+  file_submenu.push({
+                      label: 'Quit',
+                      id: 'quit'
+                    })
+
+  help_submenu = template[template.length - 1].submenu
+  help_submenu.unshift({
+                          label: 'About Fangorn',
+                          role: 'about'
+                        })
+
 }
 
 function build_menu() {
@@ -282,7 +306,9 @@ function build_menu() {
 
   menu.setCallbackOnItem = function(item_id, callback){
     var item = menu.getMenuItemById(item_id);
-    item.click = callback;
+    if (item !== null){
+      item.click = callback;
+    }
   }
 
   Menu.setApplicationMenu(menu);
