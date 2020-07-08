@@ -14,13 +14,14 @@
     "standard": "standard",
     "pack": "electron-builder --dir",
     "dist": "electron-builder -mwl",
-    "dist-mac": "electron-builder -m"
+    "dist-mac": "electron-builder -m",
+    "dist-win": "electron-builder -w"
   },
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "electron": "^9.0.0",
-    "electron-builder": "^21.2.0",
+    "electron-builder": "^22.7.0",
     "mocha": "^7.2.0",
     "spectron": "^11.0.0",
     "spectron-menu-addon": "^0.4.1",
