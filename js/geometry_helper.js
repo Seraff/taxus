@@ -9,6 +9,25 @@ class GeometryHelper {
 
     return xOverlap && yOverlap;
   }
+
+  static makeAbsoluteContext (element) {
+    return function(x,y) {
+      var matrix = element.getCTM();
+      return {
+        x: (matrix.a * x) + (matrix.c * y) + matrix.e,
+        y: (matrix.b * x) + (matrix.d * y) + matrix.f
+      };
+    };
+  }
+
+  static screenToGlobal(current_transform, bbox) {
+    var bbox_glob = {}
+    bbox_glob.x = (bbox.x - current_transform.translate[0]) / current_transform.scale[0]
+    bbox_glob.y = (bbox.y - current_transform.translate[1]) / current_transform.scale[1]
+    bbox_glob.width = bbox.width / current_transform.scale[0]
+    bbox_glob.height = bbox.height / current_transform.scale[1]
+    return bbox_glob
+  }
 }
 
 module.exports = GeometryHelper

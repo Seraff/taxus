@@ -219,19 +219,9 @@ end;
     return d3.transform(d3.select("."+phylotree.get_css_classes()["tree-container"]).attr("transform"))
   }
 
-  // Returns absolute coordinates of the element after all the pan/zoom transformations
+  // Returns global coordinates of the element
   function get_leaf_geometry (node) {
-    var current_transform = get_current_transform()
-    var bbox = d3.select(node.container).node().getBBox()
-    var convert = makeAbsoluteContext(d3.select(node.container).node())
-
-    var bbox_translated = {}
-    bbox_translated.x = (convert(bbox.x, bbox.y).x)
-    bbox_translated.y = (convert(bbox.x, bbox.y).y)
-    bbox_translated.width = bbox.width * current_transform.scale[0]
-    bbox_translated.height = bbox.height * current_transform.scale[1]
-
-    return [bbox_translated]
+    return [node.getBBox()]
   }
 
   function get_branch_geometry (node) {
@@ -239,16 +229,8 @@ end;
       return []
     }
 
-    var current_transform = get_current_transform()
     var branch = node.prev_branch
     var bbox = branch.get_element().node().getBBox()
-    var convert = makeAbsoluteContext(branch.get_element().node())
-
-    var bbox_translated = {}
-    bbox_translated.x = (convert(bbox.x, bbox.y).x)
-    bbox_translated.y = (convert(bbox.x, bbox.y).y)
-    bbox_translated.width = bbox.width * current_transform.scale[0]
-    bbox_translated.height = bbox.height * current_transform.scale[1]
 
     // detect, if the branch ┌─ or └─
 
@@ -258,13 +240,13 @@ end;
     geometry = []
 
     // adding | line
-    geometry.push({ x: bbox_translated.x, y: bbox_translated.y, width: 0, height: bbox_translated.height })
+    geometry.push({ x: bbox.x, y: bbox.y, width: 0, height: bbox.height })
 
     //adding ── line
     if (branch_goes_up) {
-      geometry.push({ x: bbox_translated.x, y: bbox_translated.y, width: bbox_translated.width, height: 0 })
+      geometry.push({ x: bbox.x, y: bbox.y, width: bbox.width, height: 0 })
     } else {
-      geometry.push({ x: bbox_translated.x, y: bbox_translated.y + bbox_translated.height, width: bbox_translated.width, height: 0 })
+      geometry.push({ x: bbox.x, y: bbox.y + bbox.height, width: bbox.width, height: 0 })
     }
 
     return geometry
@@ -305,7 +287,10 @@ end;
                                width: Math.abs(start[0] - finish[0]),
                                height: Math.abs(start[1] - finish[1]) }
 
-        var to_select = nodes.filter(function(n){ return rect_overlaps_geometry(selection_rect, n.geometry) })
+        var current_transform = get_current_transform()
+        var selection_rect_glob = GeometryHelper.screenToGlobal(current_transform, selection_rect)
+
+        var to_select = nodes.filter(function(n){ return rect_overlaps_geometry(selection_rect_glob, n.geometry) })
         var selected = phylotree.get_selection()
 
         if (shift_mode) {

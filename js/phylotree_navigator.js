@@ -51,6 +51,17 @@ class PhylotreeNavigator {
       .style('stroke', 'none')
   }
 
+  drawRect (x, y, width, height, fill='red') {
+    this.svg.insert('rect')
+      .attr('x', x)
+      .attr('y', y)
+      .attr('width', width)
+      .attr('height', height)
+      .attr('opacity', 0.5)
+      .style('fill', fill)
+      .style('stroke', 'none')
+  }
+
   panToLeaf (node) {
     if (!node.is_leaf()) {
       return false

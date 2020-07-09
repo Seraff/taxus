@@ -127,21 +127,6 @@ function Node(fangorn, phylotree_node){
     return bbox;
   }
 
-  node.getTranslatedBBox = function(){
-    var bbox = node.getBBox()
-    var translated_bbox = bbox
-
-    var current_transform = d3.transform(d3.select("." + node.fangorn.get_tree().get_css_classes()["tree-container"]).attr("transform"))
-    var convert = makeAbsoluteContext(d3.select(node.get_html_element()).node())
-
-    translated_bbox.x = (convert(bbox.x, bbox.y).x)
-    translated_bbox.y = (convert(bbox.x, bbox.y).y)
-    translated_bbox.width = bbox.width * current_transform.scale[0]
-    translated_bbox.height = bbox.height * current_transform.scale[1]
-
-    return translated_bbox;
-  }
-
   node.parse_annotation = function(){
     var result = {}
 
