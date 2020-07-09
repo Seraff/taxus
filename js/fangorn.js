@@ -176,11 +176,17 @@ function Fangorn () {
 
   fangorn.load_tree_file = function (path) {
     try {
+      // var t0 = performance.now()
+
       var content = fs.readFileSync(path, 'utf8')
       fangorn.load_tree_string(content)
       fangorn.tree_path = path
 
       fangorn.make_tree_clean()
+
+      // var t1 = performance.now()
+      // console.log("It took " + ((t1 - t0)/1000).toFixed(2) + " seconds.")
+
     } catch (err) {
       console.error(err)
     }

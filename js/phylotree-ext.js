@@ -316,7 +316,14 @@ end;
           }
         }
 
-        phylotree.modify_selection(function(n){ return to_select.includes(n.target) })
+        // selection is modified, but refresh is skipped
+        phylotree.modify_selection(function(n){ return to_select.includes(n.target) },
+                                   undefined,
+                                   undefined,
+                                   true)
+
+        phylotree.refreshSpecific(selected)
+        phylotree.refreshSpecific(to_select)
 
         selection.attr("visibility", "hidden")
         subject.on("mousemove.selection", null).on("mouseup.selection", null)

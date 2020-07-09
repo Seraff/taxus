@@ -2470,6 +2470,26 @@ const parseString = require('xml2js').parseString;
       }
     };
 
+    // For Fangorn
+    phylotree.refreshSpecific = function (elements) {
+      var self = this;
+
+      elements.forEach(function(e) {
+        if (e.prev_branch) {
+          var edge_dom = e.prev_branch.get_element()
+          edge_dom.attr("class", phylotree.reclass_edge)
+          edge_styler(edge_dom, e.prev_branch);
+        }
+
+        var dom = e.get_html_element()
+        var d3_dom = d3.select(dom)
+        if (d3.layout.phylotree.is_leafnode(e)) {
+          d3_dom.attr("class", phylotree.reclass_node)
+        }
+        node_styler(d3_dom, e)
+      })
+    }
+
     phylotree.reclass_edge = function(edge) {
       var class_var = css_classes["branch"];
       if (d3_phylotree_item_tagged(edge)) {
