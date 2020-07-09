@@ -48,3 +48,7 @@ node_modules/
 # python
 .pyc
 __pycache__/
+
+# docs
+docs/_build/*
+docs/*.bat
