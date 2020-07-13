@@ -16,7 +16,6 @@ function Node(fangorn, phylotree_node){
   node.is_fangorn_node = true
   node.parsed_annotation = {}
   node.prev_branch = null
-  node.next_branch = null
 
   node.features = []
 

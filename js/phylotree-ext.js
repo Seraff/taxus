@@ -36,6 +36,7 @@ end;
 
   var $svg = $('svg#tree_display')
   var $window = $(window)
+  var $document = $(document)
   var $tree_display = $("#tree_display")
 
   var svg = phylotree.get_svg()
@@ -48,6 +49,10 @@ end;
   $window.unbind("keyup")
   $window.unbind("wheel")
   $window.unbind("focus")
+
+  $document.unbind('d3.layout.phylotree.event')
+  $document.unbind('tree_topology_changed')
+  $document.unbind('new_tree_is_loaded')
 
   $window.on("keydown", onkeydown)
 
@@ -221,11 +226,15 @@ end;
 
   // Returns global coordinates of the element
   function get_leaf_geometry (node) {
-    return [node.getBBox()]
+    if (node) {
+      return [node.getBBox()]
+    } else {
+      return []
+    }
   }
 
   function get_branch_geometry (node) {
-    if (!node.prev_branch) {
+    if (!node || !node.prev_branch || !node.prev_branch.get_element().node()) {
       return []
     }
 
@@ -252,7 +261,28 @@ end;
     return geometry
   }
 
+  phylotree.dumpNodesGeometry = function () {
+    console.log('dump')
+    phylotree.get_nodes().forEach((n) => {
+      if (!n.is_fangorn_node) {
+        return null
+      }
+
+      if (n.prev_branch) {
+        n.branch_geometry = get_branch_geometry(n)
+      }
+
+      if (phylotree.is_leafnode(n)) {
+        n.leaf_geometry = get_leaf_geometry(n)
+      }
+    })
+  }
+
   function rect_overlaps_geometry (rect, geometry) {
+    if (!geometry) {
+      return false
+    }
+
     return geometry.some( (g) => { return GeometryHelper.rectsOverlap(rect, g) } )
   }
 
@@ -270,12 +300,6 @@ end;
     selection.attr("d", GeometryHelper.rect(start[0], start[0], 0, 0))
         .attr("visibility", "visible")
 
-    nodes = phylotree.get_nodes().filter(function(n){ return selection_mode == 'taxa' ? phylotree.is_leafnode(n) : true })
-
-    nodes.forEach(function(n){
-      n.geometry = (selection_mode == 'taxa') ? get_leaf_geometry(n) : get_branch_geometry(n)
-    })
-
     subject
       .on("mousemove.selection", function() {
         var current = d3.mouse(_svg)
@@ -290,7 +314,13 @@ end;
         var current_transform = get_current_transform()
         var selection_rect_glob = GeometryHelper.screenToGlobal(current_transform, selection_rect)
 
-        var to_select = nodes.filter(function(n){ return rect_overlaps_geometry(selection_rect_glob, n.geometry) })
+        var nodes = phylotree.get_nodes().filter(function(n){ return selection_mode == 'taxa' ? phylotree.is_leafnode(n) : true })
+
+        var to_select = nodes.filter(function(n){
+          var geometry = (selection_mode == 'taxa') ? n.leaf_geometry : n.branch_geometry
+          return rect_overlaps_geometry(selection_rect_glob, geometry)
+        })
+
         var selected = phylotree.get_selection()
 
         if (shift_mode) {
@@ -316,7 +346,7 @@ end;
   })
 
   // Branches and taxa selection-by-click logic
-  document.addEventListener('d3.layout.phylotree.event', function(e) {
+  $document.on('d3.layout.phylotree.event', function(e) {
     if (e.detail[0] === 'count_update') {
 
       // Branch selection in branch mode
@@ -348,6 +378,14 @@ end;
       d3.selectAll('g.node').on('mouseup', null)
       d3.selectAll('g.node').on('mousemove', null)
     }
+  })
+
+  $document.on('tree_topology_changed', () => {
+    phylotree.dumpNodesGeometry()
+  })
+
+  $document.on('new_tree_is_loaded', () => {
+    phylotree.dumpNodesGeometry()
   })
 
   phylotree.to_fangorn_newick = function(annotations = false){
@@ -665,10 +703,6 @@ end;
     var new_children = [node.children[node.children.length-1], node.children[0]]
 
     node.children = new_children
-
-    var prev_branch = new_children[0].prev_branch
-    new_children[0].prev_branch = new_children[1].prev_branch
-    new_children[1].prev_branch = prev_branch
 
     phylotree.update_layout(phylotree.get_nodes()[0], true)
     fangorn.get_tree().safe_update()

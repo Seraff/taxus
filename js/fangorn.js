@@ -325,7 +325,6 @@ function Fangorn () {
       this.get_tree().get_svg().selectAll('.branch').each(function (b) { _branches.push(b) })
 
       _branches.forEach(function (b) {
-        b.source.next_branch = b
         b.target.prev_branch = b
         b.get_element = function () { return d3.select("path[d='" + b.existing_path + "']") }
       })
@@ -398,6 +397,7 @@ function Fangorn () {
     var node = selection[0]
 
     fangorn.get_tree().rotate_branch(node)
+    fangorn.reinit_nodes()
 
     fangorn.make_tree_dirty()
     dispatchDocumentEvent('tree_topology_changed')
