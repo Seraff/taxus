@@ -453,6 +453,7 @@ $(document).ready(function () {
     var which_function = $(this).data('direction') == 'vertical' ? fangorn.get_tree().spacing_x : fangorn.get_tree().spacing_y
     which_function(which_function() + (+$(this).data('amount'))).safe_update()
     fangorn.get_tree().redraw_scale_bar()
+    dispatchDocumentEvent('tree_topology_changed')
   })
 
   // Picker logic
