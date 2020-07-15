@@ -38,6 +38,7 @@ end;
   var $window = $(window)
   var $document = $(document)
   var $tree_display = $("#tree_display")
+  var $d3_container = d3.select("."+phylotree.get_css_classes()["tree-container"])
 
   var svg = phylotree.get_svg()
   var zoom_mode = false
@@ -140,6 +141,7 @@ end;
 
   phylotree.update = function(transitions, safe=false){
     phylotree.original_update(transitions, safe)
+
     phylotree.init_scale_bar()
     phylotree.redraw_scale_bar() // We draw scale bar in different way
   }
@@ -148,6 +150,7 @@ end;
 
   phylotree.safe_update = function(transitions){
     phylotree.original_safe_update(transitions)
+
     phylotree.init_scale_bar()
     phylotree.redraw_scale_bar() // We draw scale bar in different way
   }
@@ -249,28 +252,47 @@ end;
     geometry = []
 
     // adding | line
-    geometry.push({ x: bbox.x, y: bbox.y, width: 0, height: bbox.height })
+    geometry.push({ x: bbox.x-1, y: bbox.y, width: 2, height: bbox.height })
 
     //adding ── line
     if (branch_goes_up) {
-      geometry.push({ x: bbox.x, y: bbox.y, width: bbox.width, height: 0 })
+      geometry.push({ x: bbox.x, y: bbox.y-1, width: bbox.width, height: 2 })
     } else {
-      geometry.push({ x: bbox.x, y: bbox.y + bbox.height, width: bbox.width, height: 0 })
+      geometry.push({ x: bbox.x, y: bbox.y + bbox.height - 1, width: bbox.width, height: 2 })
     }
 
     return geometry
   }
 
+  // For debugging purposes
+  phylotree.drawGeometryBoundaries = function () {
+    phylotree.get_nodes().forEach((n) => {
+      var nav = new PhylotreeNavigator(phylotree)
+
+      if (!n.is_fangorn_node) {
+        return null
+      }
+
+      if (!phylotree.is_leafnode(n)) {
+        if (!n.branch_geometry) {
+          return false
+        }
+
+        n.branch_geometry.forEach((g) => {
+          var screen_box = GeometryHelper.globalToScreen(get_current_transform(), g)
+          nav.drawRect (screen_box.x, screen_box.y, screen_box.width, screen_box.height)
+        })
+      }
+    })
+  }
+
   phylotree.dumpNodesGeometry = function () {
-    console.log('dump')
     phylotree.get_nodes().forEach((n) => {
       if (!n.is_fangorn_node) {
         return null
       }
 
-      if (n.prev_branch) {
-        n.branch_geometry = get_branch_geometry(n)
-      }
+      n.branch_geometry = n.prev_branch ? get_branch_geometry(n) : []
 
       if (phylotree.is_leafnode(n)) {
         n.leaf_geometry = get_leaf_geometry(n)
@@ -311,13 +333,18 @@ end;
                                width: Math.abs(start[0] - finish[0]),
                                height: Math.abs(start[1] - finish[1]) }
 
+        if (selection_rect.width == 0 && selection_rect.height == 0){
+          selection_rect.width = 1
+          selection_rect.height = 1
+        }
+
         var current_transform = get_current_transform()
         var selection_rect_glob = GeometryHelper.screenToGlobal(current_transform, selection_rect)
 
-        var nodes = phylotree.get_nodes().filter(function(n){ return selection_mode == 'taxa' ? phylotree.is_leafnode(n) : true })
+        var nodes = phylotree.get_nodes().filter(function(n){ return selection_mode === 'taxa' ? phylotree.is_leafnode(n) : true })
 
         var to_select = nodes.filter(function(n){
-          var geometry = (selection_mode == 'taxa') ? n.leaf_geometry : n.branch_geometry
+          var geometry = (selection_mode === 'taxa') ? n.leaf_geometry : n.branch_geometry
           return rect_overlaps_geometry(selection_rect_glob, geometry)
         })
 
@@ -337,48 +364,33 @@ end;
                                    undefined,
                                    true)
 
-        phylotree.refreshSpecific(selected)
-        phylotree.refreshSpecific(to_select)
+        phylotree.refreshSpecific(to_select.concat(selected))
 
         selection.attr("visibility", "hidden")
         subject.on("mousemove.selection", null).on("mouseup.selection", null)
       })
   })
 
-  // Branches and taxa selection-by-click logic
-  $document.on('d3.layout.phylotree.event', function(e) {
-    if (e.detail[0] === 'count_update') {
+  // We don't want to trigger full refresh every time we selected the node
+  phylotree.original_draw_node = phylotree.draw_node
 
-      // Branch selection in branch mode
-      d3.selectAll('path.branch').on('click', null)
+  phylotree.draw_node = function(container, node, transitions) {
+    phylotree.original_draw_node(container, node, transitions)
 
-      d3.selectAll('path.branch').on('mousedown', function(e){
-        d3.event.stopPropagation()
-      })
+    container = d3.select(container)
+    container.on("mousedown", null)
+    container.on("mousemove", null)
+    container.on("mouseup", null)
+  }
 
-      d3.selectAll('path.branch').on('mouseup', function(e){
-        if (selection_mode === 'branch') {
-          var to_select = [e.target]
-          var selected = phylotree.get_selection()
+  phylotree.original_draw_edge = phylotree.draw_edge
 
-          if (shift_mode) {
-            if (selected.includes(to_select[0])){
-              to_select = selected.filter((n) => { return to_select[0] != n })
-            } else {
-              to_select = to_select.concat(selected)
-            }
-          }
+  // We don't want phylotreejs edge click event be in conflict with our handlers
+  phylotree.draw_edge = function(container, edge, transition) {
+    phylotree.original_draw_edge(container, edge, transition)
 
-          phylotree.modify_selection(function(n){ return to_select.includes(n.target) })
-        }
-      })
-
-      // Taxa selection in taxa mode
-      d3.selectAll('g.node').on('mousedown', null)
-      d3.selectAll('g.node').on('mouseup', null)
-      d3.selectAll('g.node').on('mousemove', null)
-    }
-  })
+    d3.select(container).on("click", null)
+  }
 
   $document.on('tree_topology_changed', () => {
     phylotree.dumpNodesGeometry()

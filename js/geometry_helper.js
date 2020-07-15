@@ -28,6 +28,15 @@ class GeometryHelper {
     bbox_glob.height = bbox.height / current_transform.scale[1]
     return bbox_glob
   }
+
+  static globalToScreen(current_transform, bbox) {
+    var bbox_scr = {}
+    bbox_scr.x = bbox.x * current_transform.scale[0] + current_transform.translate[0]
+    bbox_scr.y = bbox.y * current_transform.scale[1] + current_transform.translate[1]
+    bbox_scr.width = bbox.width * current_transform.scale[0]
+    bbox_scr.height = bbox.height * current_transform.scale[1]
+    return bbox_scr
+  }
 }
 
 module.exports = GeometryHelper
