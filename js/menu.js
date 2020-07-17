@@ -144,6 +144,19 @@ const template = [
     label: 'View',
     submenu: [
       {
+        id: "zoom-in",
+        label: "Zoom in",
+        accelerator: "CmdOrCtrl+Plus"
+      },
+      {
+        id: "zoom-out",
+        label: "Zoom out",
+        accelerator: "CmdOrCtrl+-"
+      },
+      {
+        type: 'separator'
+      },
+      {
         id: "toggle-cladogram-view",
         label: 'Toggle cladogram view',
         accelerator: 'CmdOrCtrl+Shift+C'

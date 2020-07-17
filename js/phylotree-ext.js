@@ -117,6 +117,14 @@ end;
     }
   })
 
+  phylotree.zoomIn = function() {
+    phylotree.add_zoom(0.3)
+  }
+
+  phylotree.zoomOut = function() {
+    phylotree.add_zoom(-0.3)
+  }
+
   phylotree.enter_zoom_mode = function(){
     svg.call(zoom)
     zoom_mode = true
@@ -211,6 +219,20 @@ end;
         .attr("transform", "translate(" + transform.translate + ")scale(" + transform.scale + ")")
 
     zoom.translate(transform.translate)
+
+    phylotree.redraw_scale_bar()
+  }
+
+  phylotree.add_zoom = function(delta) {
+    var transform = phylotree.get_current_transform()
+    var new_zoom = transform.scale[0] + delta
+
+    phylotree.current_zoom = new_zoom
+
+    d3.select("."+phylotree.get_css_classes()["tree-container"])
+      .attr("transform", "translate(" + phylotree.current_translate + ")scale(" + new_zoom + ")")
+
+    zoom.scale(new_zoom)
 
     phylotree.redraw_scale_bar()
   }

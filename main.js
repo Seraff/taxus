@@ -1,5 +1,6 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron')
 const menu = require('./js/menu.js')
+const electronLocalshortcut = require('electron-localshortcut');
 
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true
 
@@ -21,6 +22,11 @@ function createWindow () {
 
   menu.build_menu()
   win.loadFile('index.html')
+
+  // Workaround for zoom-in action alias
+  electronLocalshortcut.register(win, 'CmdOrCtrl+=', () => {
+    Menu.getApplicationMenu().getMenuItemById('zoom-in').click()
+  });
 
   ipcMain.on('scripts_loaded', (event) => {
     if (file_to_open) {

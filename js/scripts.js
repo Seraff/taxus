@@ -31,7 +31,7 @@ function update_controls (fangorn) {
   var disabled_menu_items = ['open-fasta', 'save-fasta', 'save-fasta-as', 'save-selection-as-fasta',
                              'reroot', 'rotate-branch', 'select-all', 'select-descendants',
                              'remove-selected', 'remove-unselected', 'restore-selected', 'find',
-                             'toggle-selection-mode', 'toggle-cladogram-view']
+                             'toggle-selection-mode', 'toggle-cladogram-view', 'zoom-in', 'zoom-out']
 
   disabled_menu_items.forEach(function (item) {
     menu.disableItemById(item)
@@ -48,11 +48,15 @@ function update_controls (fangorn) {
   $('#set-mode-to-branch-action').attr('disabled', 'disabled')
   $('#set-mode-to-taxa-action').attr('disabled', 'disabled')
   $('#find-action').attr('disabled', 'disabled')
+  $('#zoom-in-action').attr('disabled', 'disabled')
+  $('#zoom-out-action').attr('disabled', 'disabled')
 
   if (fangorn.tree_is_loaded()) {
     $('#set-mode-to-branch-action').removeAttr('disabled')
     $('#set-mode-to-taxa-action').removeAttr('disabled')
     $('[data-direction]').removeAttr('disabled')
+    $('#zoom-in-action').removeAttr('disabled')
+    $('#zoom-out-action').removeAttr('disabled')
     $('#open-fasta').removeAttr('disabled')
     $('#find-action').removeAttr('disabled')
 
@@ -61,6 +65,8 @@ function update_controls (fangorn) {
     menu.enableItemById('find')
     menu.enableItemById('toggle-selection-mode')
     menu.enableItemById('toggle-cladogram-view')
+    menu.enableItemById('zoom-in')
+    menu.enableItemById('zoom-out')
 
     if (fangorn.fasta_is_loaded() && fangorn.is_one_leaf_selected()) { $('#annotate-node-action').removeAttr('disabled') }
 
@@ -357,6 +363,14 @@ function quitAction () {
     app.remote.app.quit()
 }
 
+function zoomInAction () {
+  fangorn.get_tree().zoomIn()
+}
+
+function zoomOutAction () {
+  fangorn.get_tree().zoomOut()
+}
+
 function resetSelectionMode () {
   $('#set-mode-to-taxa-action').click()
 }
@@ -379,6 +393,8 @@ $(document).ready(function () {
 
   var fasta_pane = new FastaPane(fangorn)
 
+  $('button').on('click', function () { this.blur() })
+
   // *** Menu actions *** //
 
   // File
@@ -393,6 +409,12 @@ $(document).ready(function () {
 
   menu.setCallbackOnItem('export-to-png', export_to_png_action)
   menu.setCallbackOnItem('export-to-svg', export_to_svg_action)
+
+  menu.setCallbackOnItem('zoom-in', zoomInAction)
+  menu.setCallbackOnItem('zoom-out', zoomOutAction)
+
+  $("#zoom-in-action").on('click', zoomInAction)
+  $("#zoom-out-action").on('click', zoomOutAction)
 
   // Edit
 
@@ -455,6 +477,7 @@ $(document).ready(function () {
     fangorn.get_tree().redraw_scale_bar()
     dispatchDocumentEvent('tree_topology_changed')
   })
+
 
   // Picker logic
 
