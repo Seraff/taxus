@@ -4,7 +4,7 @@ const { app, BrowserWindow, ipcMain } = require('electron')
 
 class PreferencesWindow {
   constructor () {
-    this.mainWindow = BrowserWindow.getAllWindows()[0]
+    this.mainWindow = BrowserWindow.getFocusedWindow()
 
     this.window = new BrowserWindow({ width: 300, height: 500,
                                                                modal: false,
