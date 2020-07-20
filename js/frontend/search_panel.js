@@ -58,7 +58,6 @@ class SearchPanel {
         this.searchCurrent()
       }
     })
-
     document.addEventListener('tree_topology_changed', () => {
       if (!this.isHidden()) {
         this.clean()

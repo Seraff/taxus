@@ -16,6 +16,7 @@ const FastaPane = require('./js/fasta_pane.js')
 const SearchPanel = require('./js/frontend/search_panel.js')
 const ColorPicker = require('./js/color_picker.js')
 const BtnGroupRadio = require('./js/btn_group_radio.js')
+const ProgressBarManager = require('./js/progress_bar_manager.js')
 
 const unhandled = require('electron-unhandled');
 
@@ -24,6 +25,7 @@ const FASTA_EXT = ['fa', 'fas', 'fasta', 'fna', 'faa', 'ffn', 'frn']
 
 var fangorn = null
 var modeSelector = null
+var progressBar = null
 
 function update_controls (fangorn) {
   var menu = app.remote.Menu.getApplicationMenu()
@@ -138,6 +140,7 @@ function set_window_header (text = null) {
 }
 
 function open_tree_action (e) {
+
   var open_tree = function () {
     var options = {
       properties: ['openFile'],
@@ -146,10 +149,18 @@ function open_tree_action (e) {
     }
 
     dialog.showOpenDialog(options).then(result => {
-      if (result.filePaths.length == 0) { return false }
+      if (result.filePaths.length == 0) {
+        return false
+      }
 
-      var path = result.filePaths[0]
-      fangorn.load_tree_file(path)
+      progressBar.withProgressBar(() => {
+
+        var path = result.filePaths[0]
+        fangorn.load_tree_file(path)
+
+        progressBar.setNewComplexity(fangorn.get_nodes().length)
+      })
+
     })
   }
 
@@ -312,11 +323,15 @@ function annotate_node_action () {
 }
 
 function reroot_action () {
-  fangorn.reroot_to_selected_node()
+  progressBar.withProgressBarAttempt(() => {
+    fangorn.reroot_to_selected_node()
+  })
 }
 
 function rotate_branch_action () {
-  fangorn.rotate_selected_branch()
+  progressBar.withProgressBarAttempt(() => {
+    fangorn.rotate_selected_branch()
+  })
 }
 
 function select_descendants_action () {
@@ -348,7 +363,9 @@ function selectAllAction () {
 }
 
 function toggleCladogramViewAction () {
-  fangorn.toggleCladogramView()
+  progressBar.withProgressBarAttempt(() => {
+    fangorn.toggleCladogramView()
+  })
 }
 
 function applyPreferences () {
@@ -392,6 +409,8 @@ $(document).ready(function () {
   fangorn.dispatch_state_update()
 
   var fasta_pane = new FastaPane(fangorn)
+
+  progressBar = new ProgressBarManager()
 
   $('button').on('click', function () { this.blur() })
 
@@ -473,11 +492,14 @@ $(document).ready(function () {
 
   $('[data-direction]').on('click', function () {
     var which_function = $(this).data('direction') == 'vertical' ? fangorn.get_tree().spacing_x : fangorn.get_tree().spacing_y
-    which_function(which_function() + (+$(this).data('amount'))).safe_update()
-    fangorn.get_tree().redraw_scale_bar()
+
+    progressBar.withProgressBarAttempt(() => {
+      which_function(which_function() + (+$(this).data('amount'))).safe_update()
+      fangorn.get_tree().redraw_scale_bar()
+    })
+
     dispatchDocumentEvent('tree_topology_changed')
   })
-
 
   // Picker logic
 

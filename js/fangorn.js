@@ -150,6 +150,9 @@ function Fangorn () {
     try {
       _tree.read_tree(str)
     } catch (err) {
+      _tree.unbindFangornEvents()
+      _tree = null
+
       console.error(err)
       show_alert('Error', 'Unable to open tree: ' + err.message)
       return false

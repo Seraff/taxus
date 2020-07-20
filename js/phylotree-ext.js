@@ -46,16 +46,27 @@ end;
   var selection_mode = 'taxa'
   var scale_bar = true
 
-  $window.unbind("keydown", onkeydown)
-  $window.unbind("keyup")
-  $window.unbind("wheel")
-  $window.unbind("focus")
+  phylotree.unbindFangornEvents = function () {
+    $window.unbind("keydown", onkeydown)
+    $window.unbind("keyup", onkeyup)
+    $window.unbind("focus", onfocus)
+    $window.unbind("wheel", onwheel)
 
-  $document.unbind('d3.layout.phylotree.event')
-  $document.unbind('tree_topology_changed')
-  $document.unbind('new_tree_is_loaded')
+    $document.unbind('tree_topology_changed', on_tree_topology_changed)
+    $document.unbind('new_tree_is_loaded', on_new_tree_is_loaded)
+
+    svg.on("mousedown", null)
+  }
+
+  phylotree.unbindFangornEvents()
 
   $window.on("keydown", onkeydown)
+  $window.on("keyup", onkeyup)
+  $window.on('focus', onfocus)
+  $window.on("wheel", onwheel)
+
+  $document.on('tree_topology_changed', on_tree_topology_changed)
+  $document.on('new_tree_is_loaded', on_new_tree_is_loaded)
 
   function onkeydown (e) {
     if (e.target.tagName !== 'BODY') {
@@ -88,20 +99,20 @@ end;
     }
   }
 
-  $window.on('focus', function(e) {
+  function onfocus (e) {
     phylotree.exit_zoom_mode()
     phylotree.exit_shift_mode()
-  })
+  }
 
-  $window.on("keyup", function(e) {
+  function onkeyup (e) {
     if (e.key == 'Control'){
       phylotree.exit_zoom_mode()
     } else if (e.key == 'Shift') {
       phylotree.exit_shift_mode()
     }
-  })
+  }
 
-  $window.on("wheel", function(e) {
+  function onwheel (e) {
     var cursor_above_tree = ($("#tree-pane:hover").length != 0)
 
     if (!zoom_mode && cursor_above_tree){
@@ -115,7 +126,7 @@ end;
         phylotree.move("W", 5)
       }
     }
-  })
+  }
 
   phylotree.zoomIn = function() {
     phylotree.add_zoom(0.3)
@@ -414,13 +425,12 @@ end;
     d3.select(container).on("click", null)
   }
 
-  $document.on('tree_topology_changed', () => {
+  function on_tree_topology_changed () {
     phylotree.dumpNodesGeometry()
-  })
-
-  $document.on('new_tree_is_loaded', () => {
+  }
+  function on_new_tree_is_loaded () {
     phylotree.dumpNodesGeometry()
-  })
+  }
 
   phylotree.to_fangorn_newick = function(annotations = false){
     if (annotations){
