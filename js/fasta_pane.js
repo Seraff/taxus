@@ -28,6 +28,8 @@ class FastaPane {
     })
 
     document.addEventListener('fasta_closed', () => {
+      this.fasta_is_loaded = false
+      this.title = null
       this.show_no_fasta()
     })
 

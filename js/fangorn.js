@@ -243,6 +243,8 @@ function Fangorn () {
   }
 
   fangorn.load_fasta_file = function (path, quiet = false) {
+    fangorn.close_fasta()
+
     var fasta_rep = new FastaRepresentation()
 
     fasta_rep.read_from_file(path)
