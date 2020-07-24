@@ -392,6 +392,15 @@ function resetSelectionMode () {
   $('#set-mode-to-taxa-action').click()
 }
 
+function printTaxaCount () {
+  cnt = fangorn.get_leaves().length
+  printMetaInfo(cnt + ' taxa')
+}
+
+function printMetaInfo (msg) {
+  $('#footer-meta').html(msg)
+}
+
 $(document).ready(function () {
   var menu = app.remote.Menu.getApplicationMenu()
 
@@ -590,6 +599,7 @@ $(document).ready(function () {
 
   document.addEventListener('new_tree_is_loaded', () => {
     $("#footer-text").show()
+    printTaxaCount()
   })
 
   // Header update logic
