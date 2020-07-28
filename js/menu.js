@@ -225,10 +225,10 @@ const template = [
 
 if (process.platform === 'darwin') {
   template.unshift({
-    label: "Fangorn",
+    label: "Sequoia",
     submenu: [
       {
-        label: 'About Fangorn',
+        label: 'About Sequoia',
         role: 'about'
       },
       {
@@ -254,7 +254,7 @@ if (process.platform === 'darwin') {
         type: 'separator'
       },
       {
-        label: 'Hide Fangorn',
+        label: 'Hide Sequoia',
         accelerator: 'Command+H',
         role: 'hide'
       },
@@ -298,7 +298,7 @@ if (process.platform === 'darwin') {
 
   help_submenu = template[template.length - 1].submenu
   help_submenu.unshift({
-                          label: 'About Fangorn',
+                          label: 'About Sequoia',
                           role: 'about'
                         })
 
