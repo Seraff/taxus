@@ -1,0 +1,14 @@
+.menuselection {
+  background-color: #efefef;
+  padding: 3px 3px;
+  border-radius: 4px;
+}
+
+.kbd {
+    color: inherit;
+    background-color: white;
+    border: 1px solid #efefef;
+    border-radius: 4px;
+    padding: 3px 3px;
+    margin: auto 2px;
+}
