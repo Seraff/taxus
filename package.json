@@ -1,11 +1,11 @@
 {
-  "name": "fangorn",
+  "name": "sequoia",
   "version": "0.1.3-alpha",
   "description": "",
   "main": "main.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/Seraff/fangorn"
+    "url": "git://github.com/Seraff/sequoia"
   },
   "scripts": {
     "start": "electron .",
@@ -33,7 +33,7 @@
     "bioinformatics"
   ],
   "build": {
-    "appId": "com.kolisko-lab.fangorn",
+    "appId": "com.kolisko-lab.sequoia",
     "fileAssociations": [
       {
         "ext": [
