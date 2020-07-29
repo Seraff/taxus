@@ -1,12 +1,16 @@
 Basics
 ======
 
-Opening trees
--------------
+Trees Opening and Saving
+------------------------
 
-The software supports NEXUS and Newick formats.
+Sequoia can load tree in NEXUS and Newick formats.
 
 To open the tree select :menuselection:`File --> Open Tree`.
+
+The tree can be saved only to NEXUS format.
+
+To save the tree select :menuselection:`File --> Save Tree` or :menuselection:`File --> Save Tree As...` if you want to save the tree under the different name.
 
 Navigation
 ----------
@@ -19,7 +23,7 @@ For zooming it is also possible to click "Zoom out" and "Zoom in" buttons of the
 .. |zoom_actions| image:: _static/img/zoom_actions.png
   :scale: 50%
 
-Branch/Taxa selection
+Branch/Taxa Selection
 ---------------------
 
 There are two modes of selection: branch and taxa.
@@ -55,7 +59,7 @@ When a branch mode is enabled and one or several internal branches are selected 
   :scale: 75%
   :align: center
 
-Tree visualization and modification
+Tree Visualization and Modification
 -----------------------------------
 
 Changing the Proportions
@@ -121,11 +125,47 @@ Select :menuselection:`File --> Preferences` (:menuselection:`Sequoia --> Prefer
 
 * **Branch width** option specifies the width of the tree branches (in pixels)
 * **Default branch color** option defines the default color of the branches and taxa that are not colored manually
-* **Show alignment coverage** - show or hide the proportion of #TODO (visible only if fasta file is loaded)
-* **Show bootstrap** - show or hide the bootstrap support of the clades (if it is specified in the tree)
+* **Show alignment coverage** - show the proportion of data represented in the sequence alignment (visible only if fasta file is loaded)
+* **Show bootstrap** - show the bootstrap support of the clades (if it is specified in the tree)
 * **Taxa label font** option specifies the type, size and decorations of the font used for taxa names
 
 .. Note:: The settings are not global. All the settings in the Preferences window work only for the current tree and are saved to the tree file. Changes in Preferences will not influence the trees you will open in future.
+
+Search
+------
+
+Click the search button (|search_button|) to open the search panel.
+
+
+
+.. image:: _static/img/search.png
+  :scale: 50%
+  :align: center
+
+| The search work in two modes:
+| * |search_tree_mode_button| - search inside the tree
+| * |search_fasta_mode_button| - search inside fasta file (if loaded)
+
+Next to the search field the number of occurrences is displayed.
+
+To make a search case sensitive press the "Case sensitive search" button (|search_case_sensitive_button|)
+
+To select all the found taxa press |search_select_all_button| button.
+
+.. |search_button| image:: _static/img/search_button.png
+  :scale: 50%
+
+.. |search_case_sensitive_button| image:: _static/img/search_case_sensitive_button.png
+  :scale: 50%
+
+.. |search_tree_mode_button| image:: _static/img/search_tree_mode_button.png
+  :scale: 50%
+
+.. |search_fasta_mode_button| image:: _static/img/search_fasta_mode_button.png
+  :scale: 50%
+
+.. |search_select_all_button| image:: _static/img/search_select_all_button.png
+  :scale: 50%
 
 Shortcuts
 ---------
@@ -135,6 +175,7 @@ Shortcuts
   :align: center
 
   "Open Tree", :kbd:`Ctrl` + :kbd:`O`, :kbd:`Cmd` + :kbd:`O`
+  "Save Tree", :kbd:`Ctrl` + :kbd:`S`, :kbd:`Cmd` + :kbd:`S`
   "Zoom Out", :kbd:`Ctrl` + :kbd:`-`, :kbd:`Cmd` + :kbd:`-`
   "Zoom In", :kbd:`Ctrl` + :kbd:`+`, :kbd:`Cmd` + :kbd:`+`
   "Pan Up", :kbd:`🡓`, :kbd:`🡓`
@@ -144,3 +185,4 @@ Shortcuts
     "Toggle cladogram View", :kbd:`Shift` + :kbd:`Ctrl` + :kbd:`C`, :kbd:`Shift` + :kbd:`Cmd` + :kbd:`C`
   "Reroot tree", :kbd:`Ctrl` + :kbd:`R`, :kbd:`Cmd` + :kbd:`R`
   "Rotate branch", :kbd:`Shift` + :kbd:`Ctrl` + :kbd:`R`, :kbd:`Shift` + :kbd:`Cmd` + :kbd:`R`
+  "Toggle search panel", :kbd:`Ctrl` + :kbd:`F`, :kbd:`Cmd` + :kbd:`F`

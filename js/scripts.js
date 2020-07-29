@@ -132,7 +132,7 @@ function show_log_alert (title, subtitle, rows) {
 }
 
 function set_window_header (text = null) {
-  var header = 'Fangorn'
+  var header = 'Sequoia'
 
   if (text) { header += ' — ' + text }
 
