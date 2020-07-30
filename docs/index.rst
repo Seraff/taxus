@@ -10,7 +10,7 @@ Welcome to fangorn's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   introduction
    installation
    basics
    fasta_files
+   shortcuts
