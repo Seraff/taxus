@@ -2,11 +2,6 @@ class AlignmentCoverage {
   constructor (node) {
     this.node = node
     this.container = d3.select(this.node.container)
-
-    $(document).on('node_titles_changed', () => {
-      console.log('node_titles_changed')
-      this.redraw()
-    })
   }
 
   redraw () {
@@ -27,6 +22,7 @@ class AlignmentCoverage {
 
     var text = this.container.append('text').text(pct).attr('class', 'feature alignment-coverage')
     var prev_text = text.select(function(){ return this.previousSibling })
+
     var prev_text_box = prev_text.node().getBBox()
     var x = prev_text_box.width + 10
 

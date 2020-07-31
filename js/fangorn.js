@@ -377,7 +377,7 @@ function Fangorn () {
     fangorn.make_tree_dirty()
     fangorn.make_fasta_dirty()
 
-    dispatchDocumentEvent('node_titles_changed')
+    fangorn.redraw_features()
   }
 
   fangorn.reroot_to_selected_node = function () {
