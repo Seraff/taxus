@@ -8,7 +8,7 @@ Sequoia can load trees in NEXUS and Newick formats.
 
 To open the tree, select :menuselection:`File --> Open Tree`.
 
-The tree can be saved only to NEXUS format.
+Trees are saved in NEXUS format.
 
 To save the tree, select :menuselection:`File --> Save Tree` or :menuselection:`File --> Save Tree As...` if you want to save the tree under a different name.
 
