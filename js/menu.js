@@ -4,6 +4,7 @@ var electron = require("electron")
 var app = electron.app
 var Menu = electron.Menu
 var BrowserWindow = electron.BrowserWindow
+var shell = electron.shell
 
 var PreferencesWindow = require('./preferences_window.js')
 
@@ -216,8 +217,12 @@ const template = [
     role: 'help',
     submenu: [
       {
-        label: 'Learn More',
-        click: function() { shell.openExternal('http://electron.atom.io') }
+        label: 'Project GitHub',
+        click: function() { shell.openExternal('https://github.com/Seraff/sequoia') }
+      },
+      {
+        label: 'Documentation',
+        click: function() { shell.openExternal('https://sequoia.readthedocs.io/en/latest/') }
       },
     ]
   },
