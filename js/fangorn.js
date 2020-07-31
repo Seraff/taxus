@@ -186,6 +186,7 @@ function Fangorn () {
       fangorn.tree_path = path
 
       fangorn.make_tree_clean()
+      fangorn.make_fasta_clean()
 
       // var t1 = performance.now()
       // console.log("It took " + ((t1 - t0)/1000).toFixed(2) + " seconds.")
