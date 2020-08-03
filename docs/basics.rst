@@ -15,10 +15,10 @@ To save the tree, select :menuselection:`File --> Save Tree` or :menuselection:`
 Navigation
 ----------
 
-| To pan the tree press and hold :kbd:`Ctrl` button, then click and drag inside the tree display area.
-| To zoom the tree press and hold :kbd:`Ctrl` button, then scroll a mouse wheel inside the tree display area.
+| To move the tree press and hold :kbd:`Ctrl` button, then click and drag inside the tree display area.
+| To zoom in and out press and hold :kbd:`Ctrl` button, then scroll inside the tree display area.
 
-For zooming it is also possible to click "Zoom out" and "Zoom in" buttons of the toolbar (|zoom_actions|).
+Additionally there are "Zoom out" and "Zoom in" buttons in the toolbar (|zoom_actions|).
 
 .. |zoom_actions| image:: _static/img/zoom_actions.png
   :scale: 50%
@@ -31,13 +31,13 @@ Elements of a tree can be selected in two modes: branch and taxa.
 | In **taxa** selection mode all the selection will be limited to the leaves of the tree.
 | In **branch** selection mode no selection restrictions will be applied.
 
-To change the mode click corresponding buttons in the toolbar. Alternatively, selection modes can be toggled using :menuselection:`Edit --> Toggle Selection Mode`.
+To switch between modes, click the corresponding buttons in the toolbar. Alternatively, selection modes can be toggled using :menuselection:`Edit --> Toggle Selection Mode`.
 
 .. image:: _static/img/selection_modes.png
   :scale: 75%
 
-| Selection can be performed simply by clicking on the branch or taxa of the opened tree.
-| Click and drag in the tree display area initiates rectangular selection for picking several objects at the same time.
+| Selection can be performed simply by clicking on the branch or taxa of the tree.
+| Multiple objects can be selected at the same time by clicking and dragging to create a selection box. 
 
 .. image:: _static/img/rectangular_selection.png
   :scale: 50%
@@ -83,9 +83,9 @@ Select the option again to return to the standard view.
 Rerooting and Clade Rotation
 ############################
 
-To reroot the tree, select the branch you want to reroot to and click the "Reroot Tree" button from the toolbar (|reroot_button|) or by selecting :menuselection:`Edit --> Reroot`
+To reroot the tree, in branch mode, select the branch you want to reroot and click the "Reroot Tree" button in the toolbar (|reroot_button|) or by selecting :menuselection:`Edit --> Reroot`
 
-To rotate the clade, select the branch and click the "Rotate branch" button from the toolbar (|rotate_button|) or by selecting :menuselection:`Edit --> Rotate`
+To rotate the clade, select the branch and click the "Rotate branch" button in the toolbar (|rotate_button|) or by selecting :menuselection:`Edit --> Rotate`
 
 .. |reroot_button| image:: _static/img/reroot_button.png
   :scale: 50%
@@ -108,7 +108,7 @@ To apply a new color to selected objects, click the "Change color" button from t
   :scale: 50%
   :align: center
 
-HEX code of color can be specified. Sequoia saves previously selected colors to the history bar of the color picker window.
+HEX code of color can be specified. Sequoia saves previously selected colors to the history bar at the bottom of the color window.
 
 To remove the color annotation from selected branches/taxa, click the "Remove Color" button (|remove_color_button|).
 

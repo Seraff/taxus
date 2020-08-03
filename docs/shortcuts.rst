@@ -13,11 +13,10 @@ Keyboard shortcuts
   "Pan Down", :kbd:`🡑`, :kbd:`🡑`
   "Pan Left", :kbd:`🡒`, :kbd:`🡒`
   "Pan Right", :kbd:`🡐`, :kbd:`🡐`
-  "Toggle Cladogram View", :kbd:`Ctrl` + :kbd:`Shift` + :kbd:`C`, :kbd:`Cmd` + :kbd:`Shift` + :kbd:`C`
+  "Cladogram View", :kbd:`Ctrl` + :kbd:`Shift` + :kbd:`C`, :kbd:`Cmd` + :kbd:`Shift` + :kbd:`C`
   "Reroot Tree", :kbd:`Ctrl` + :kbd:`R`, :kbd:`Cmd` + :kbd:`R`
   "Rotate Branch", :kbd:`Ctrl` + :kbd:`Shift` + :kbd:`R`, :kbd:`Cmd` + :kbd:`Shift` + :kbd:`R`
   "Toggle Search Panel", :kbd:`Ctrl` + :kbd:`F`, :kbd:`Cmd` + :kbd:`F`
-  "Toggle Selection Mode", :kbd:`Ctrl` + :kbd:`Tab`, :kbd:`Ctrl` + :kbd:`Tab`
   "Toggle Selection Mode", :kbd:`Ctrl` + :kbd:`Tab`, :kbd:`Ctrl` + :kbd:`Tab`
   "Select All in Tree", :kbd:`Ctrl` + :kbd:`Shift` + :kbd:`A`, :kbd:`Cmd` + :kbd:`Shift` + :kbd:`A`
   "Preferences", ":kbd:`Ctrl` + :kbd:`,`", ":kbd:`Cmd` + :kbd:`,`"
