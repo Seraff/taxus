@@ -37,7 +37,6 @@ end;
   var $svg = $('svg#tree_display')
   var $window = $(window)
   var $document = $(document)
-  var $tree_display = $("#tree_display")
   var $d3_container = d3.select("."+phylotree.get_css_classes()["tree-container"])
 
   var svg = phylotree.get_svg()
@@ -139,13 +138,13 @@ end;
   phylotree.enter_zoom_mode = function(){
     svg.call(zoom)
     zoom_mode = true
-    $tree_display.css('cursor', 'grab')
+    $svg.css('cursor', 'grab')
   }
 
   phylotree.exit_zoom_mode = function(){
     svg.on(".zoom", null)
     zoom_mode = false
-    $tree_display.css('cursor', '')
+    $svg.css('cursor', '')
   }
 
   phylotree.enter_shift_mode = function(){
@@ -796,6 +795,7 @@ end;
     phylotree.redraw_scale_bar()
   }
 
+  phylotree.phylotree_navigator = new PhylotreeNavigator(phylotree, zoom)
 }
 
 module.exports = apply_extensions

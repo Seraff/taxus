@@ -1,6 +1,7 @@
 class PhylotreeNavigator {
   constructor (phylotree, zoom) {
     this.$svg = $('svg#tree_display')
+    this.$tree_pane = $('#tree-pane')
     this.svg = phylotree.get_svg();
 
     this.phylotree = phylotree
@@ -88,6 +89,30 @@ class PhylotreeNavigator {
         .attr("transform", "translate(" + transform.translate + ")scale(" + transform.scale + ")");
 
     this.zoom.translate(transform.translate)
+
+    this.phylotree.redraw_scale_bar()
+  }
+
+  scaleToFit () {
+    var container = d3.select("." + this.phylotree.get_css_classes()["tree-container"])
+
+    var tree_height = container.node().getBBox().height + 150
+    var tree_width = container.node().getBBox().width + 150
+
+    var window_height = this.$tree_pane[0].offsetHeight
+    var window_width = this.$tree_pane[0].offsetWidth
+
+    var new_zoom = Math.min(window_height/tree_height, window_width/tree_width)
+    var new_translate = [10, 10]
+
+    this.phylotree.current_translate = new_translate
+    this.phylotree.current_zoom = new_zoom
+
+    d3.select("." + this.phylotree.get_css_classes()["tree-container"])
+      .attr("transform", "translate(" + new_translate + ")scale(" + new_zoom + ")")
+
+    this.zoom.scale(new_zoom)
+    this.zoom.translate(new_translate)
 
     this.phylotree.redraw_scale_bar()
   }
