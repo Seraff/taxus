@@ -3,7 +3,7 @@ Fasta Files
 
 After opening a tree file it's possible to import a fasta file the tree built from.
 
-.. Attention:: The fasta file should have the same number of sequences as the number of taxa in the tree. Tree taxa names and fasta file headers should be the same.
+.. Attention:: The fasta file must have the same number of sequences as the number of taxa in the tree. Tree taxa names and fasta file headers also must be the same.
 
 Opening and Saving Fasta Files
 ------------------------------
@@ -14,12 +14,12 @@ To open a fasta file, select :menuselection:`File --> Open Fasta`.
 
 To save a fasta file, select :menuselection:`File --> Save Fasta` or :menuselection:`File --> Save Fasta as...` if you want to save the file under a different name.
 
-"Save Fasta" action doesn't rewrite the original file but saves a copy with `.fangorn.` suffix in the name.
+"Save Fasta" action doesn't rewrite the original file but saves a copy with `.fangorn.` in the name.
 
 Fasta Panel
 -----------
 
-To open a Fasta panel press "Show Fasta" button in the toolbar (|fasta_panel_button|).
+To view the fasta panel, press "Show Fasta" button in the toolbar (|fasta_panel_button|).
 
 The panel contains the name of the currently opened file and it's content.
 
@@ -42,7 +42,7 @@ To remove entries from fasta use the group of removal instruments in the toolbar
   :align: center
 
 * |remove_selected_button| - remove selected taxa from the fasta file
-* |remove_unselected_button| - keep in fasta file only selected taxa
+* |remove_unselected_button| - remove all unselected taxa from the fasta file
 * |return_selected_button| - return selected taxa to fasta file
 
 .. image:: _static/img/sequence_removal.gif
@@ -61,11 +61,11 @@ To remove entries from fasta use the group of removal instruments in the toolbar
 Headers editing
 ---------------
 
-When the fasta file is loaded it is possible to change the name of taxa and corresponding header of sequence simultaneously.
+When the fasta file is loaded it is possible to change the name of a taxon in the tree and in the fasta simultaneously.
 
-To change the header of taxa select it and click the "Annotate Node" button (|annotate_node_button|).
+To change the name of a taxon select it and click the "Annotate Node" button (|annotate_node_button|).
 
-Edit the name of taxa/header in the window and press "Save".
+Edit the name of in the window and press "Save".
 
 .. image:: _static/img/name_editing.png
   :scale: 50%
