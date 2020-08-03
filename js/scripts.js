@@ -50,6 +50,7 @@ function update_controls (fangorn) {
   $('#set-mode-to-branch-action').attr('disabled', 'disabled')
   $('#set-mode-to-taxa-action').attr('disabled', 'disabled')
   $('#find-action').attr('disabled', 'disabled')
+  $('#set-search-mode-to-fasta').attr('disabled', 'disabled')
   $('#zoom-in-action').attr('disabled', 'disabled')
   $('#zoom-out-action').attr('disabled', 'disabled')
 
@@ -103,6 +104,8 @@ function update_controls (fangorn) {
       $('#save-fasta-action').removeAttr('disabled')
       menu.enableItemById('save-fasta')
       menu.enableItemById('save-fasta-as')
+
+      $('#set-search-mode-to-fasta').removeAttr('disabled')
     } else {
       $('#save-fasta-action').attr('disabled', 'disabled')
     }
