@@ -342,12 +342,14 @@ function select_descendants_action () {
 }
 
 function export_to_png_action () {
-  options = { fonts: [], scale: 1.5 }
+  bbox = fangorn.get_tree().phylotree_navigator.getTreeScreenBBox()
+  options = { fonts: [], left: bbox.x, top: bbox.y, height: bbox.height, width: bbox.width }
   svgToPng.saveSvgAsPng(d3.select('svg#tree_display').node(), 'tree.png', options)
 }
 
 function export_to_svg_action () {
-  options = { fonts: [] }
+  bbox = fangorn.get_tree().phylotree_navigator.getTreeScreenBBox()
+  options = { fonts: [], left: bbox.x, top: bbox.y, height: bbox.height, width: bbox.width }
   svgToPng.saveSvg(d3.select('svg#tree_display').node(), 'tree.svg', options)
 }
 

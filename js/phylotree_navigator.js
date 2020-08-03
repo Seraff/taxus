@@ -1,3 +1,5 @@
+const GeometryHelper = require('./geometry_helper.js')
+
 class PhylotreeNavigator {
   constructor (phylotree, zoom) {
     this.$svg = $('svg#tree_display')
@@ -115,6 +117,20 @@ class PhylotreeNavigator {
     this.zoom.translate(new_translate)
 
     this.phylotree.redraw_scale_bar()
+  }
+
+  getTreeScreenBBox () {
+    var container = d3.select("." + this.phylotree.get_css_classes()["tree-container"])
+    var treeBBox = container.node().getBBox()
+    var transform = this.phylotree.get_current_transform()
+    treeBBox = GeometryHelper.globalToScreen(transform, treeBBox)
+
+    treeBBox.height += 50
+    treeBBox.width += 20
+    treeBBox.x -= 10
+    treeBBox.y -= 10
+
+    return treeBBox
   }
 }
 
