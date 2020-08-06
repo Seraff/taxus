@@ -80,11 +80,3 @@ Copying sequences
 -----------------
 
 When the fasta file is opened and one or several taxa is selected the sequences can be copied to system clipboard using :menuselection:`Edit --> Copy` action in the main menu (or standard Copy keystroke of your OS).
-
-Search
-------
-
-The fasta search mechanism works in the same way as the `search inside the tree <basics.html#search>`__. To enable search inside fasta headers press the "Fasta mode" button (|search_fasta_mode_button|) of the search panel.
-
-.. |search_fasta_mode_button| image:: _static/img/search_fasta_mode_button.png
-  :scale: 50%

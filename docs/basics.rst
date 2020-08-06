@@ -1,6 +1,8 @@
 Basics
 ======
 
+Sequoia is designed to be to link a tree and a fasta file to edit for downstream analysis.
+
 Trees Opening and Saving
 ------------------------
 
@@ -26,18 +28,18 @@ Additionally there are "Zoom out" and "Zoom in" buttons in the toolbar (|zoom_ac
 Branch/Taxa Selection
 ---------------------
 
+Selection can be performed simply by clicking on the branch or taxa of the tree. Multiple objects can be selected at the same time by clicking and dragging to create a selection box.
+
 Elements of a tree can be selected in two modes: branch and taxa.
 
-| In **taxa** selection mode all the selection will be limited to the leaves of the tree.
-| In **branch** selection mode no selection restrictions will be applied.
+Only taxa can be selected while using **taxa** selection mode. Use taxa mode to annotate or remove sequences from fasta file.
+
+Branches and their descendants can be selected in **branch** selection mode. Use branch selection mode to reroot the tree, rotate clades, and select descendant branches or taxa.
 
 To switch between modes, click the corresponding buttons in the toolbar. Alternatively, selection modes can be toggled using :menuselection:`Edit --> Toggle Selection Mode`.
 
 .. image:: _static/img/selection_modes.png
   :scale: 75%
-
-| Selection can be performed simply by clicking on the branch or taxa of the tree.
-| Multiple objects can be selected at the same time by clicking and dragging to create a selection box. 
 
 .. image:: _static/img/rectangular_selection.png
   :scale: 50%
@@ -49,7 +51,7 @@ Pressing and holding :kbd:`Shift` while selecting allows to select multiple item
   :scale: 75%
   :align: center
 
-When a branch mode is enabled and one or several internal branches are selected it's possible to use **Select Descendants** action to select all the children elements of selected items. The action is performed by clicking the corresponding button in the toolbar (|select_descentants_button|) or by selecting :menuselection:`Edit --> Select Descendants`.
+When branch mode is enabled and one or several internal branches are selected, the **Select Descendants** tool will select all descendant branches and taxa. The action is performed by clicking the corresponding button in the toolbar (|select_descentants_button|) or by selecting :menuselection:`Edit --> Select Descendants`.
 
 .. |select_descentants_button| image:: _static/img/select_descentants_button.png
   :scale: 50%
@@ -76,9 +78,7 @@ To expand or contract tree by width or height use the group of tools on the left
 
 Cladogram View
 ##############
-To enter the cladogram view of the tree select :menuselection:`Edit --> Select Descendants` in Main Menu.
-
-Select the option again to return to the standard view.
+To enter or exit the cladogram view of the tree select :menuselection:`Edit --> Toggle Cladogram View` in Main Menu.
 
 Rerooting and Clade Rotation
 ############################

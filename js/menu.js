@@ -14,38 +14,38 @@ const template = [
     submenu: [
       {
         id: "open-tree",
-        label: "Open tree",
+        label: "Open Tree",
         accelerator: "CmdOrCtrl+O"
       },
       {
         id: "save-tree",
-        label: "Save tree",
+        label: "Save Tree",
         accelerator: "CmdOrCtrl+S"
       },
       {
         id: "save-tree-as",
-        label: "Save tree as..."
+        label: "Save Tree as..."
       },
       {
         type: 'separator'
       },
       {
         id: "open-fasta",
-        label: "Open fasta",
+        label: "Open Fasta",
         accelerator: "CmdOrCtrl+Shift+O"
       },
       {
         id: "save-fasta",
-        label: "Save fasta",
+        label: "Save Fasta",
         accelerator: "CmdOrCtrl+Shift+S"
       },
       {
         id: "save-fasta-as",
-        label: "Save fasta as..."
+        label: "Save Fasta as..."
       },
       {
         id: "save-selection-as-fasta",
-        label: "Save selection as fasta"
+        label: "Save Selection as Fasta"
       },
       {
         type: 'separator'
@@ -108,7 +108,7 @@ const template = [
       },
       {
         id: "toggle-selection-mode",
-        label: 'Toggle selection mode',
+        label: 'Toggle Selection Mode',
         accelerator: 'Ctrl+Tab'
       },
       {
@@ -121,22 +121,22 @@ const template = [
       },
       {
         id: "rotate-branch",
-        label: 'Rotate branch',
+        label: 'Rotate Branch',
         accelerator: 'CmdOrCtrl+Shift+R'
       },
       {
         id: "remove-selected",
-        label: 'Delete selected',
+        label: 'Delete Selected',
         accelerator: 'CmdOrCtrl+D'
       },
       {
         id: "remove-unselected",
-        label: 'Delete unselected',
+        label: 'Delete Unselected',
         accelerator: 'CmdOrCtrl+U'
       },
       {
         id: "restore-selected",
-        label: 'Keep selected',
+        label: 'Keep Selected',
         accelerator: 'CmdOrCtrl+K'
       }
     ]
@@ -159,7 +159,7 @@ const template = [
       },
       {
         id: "toggle-cladogram-view",
-        label: 'Toggle cladogram view',
+        label: 'Toggle Cladogram View',
         accelerator: 'CmdOrCtrl+Shift+C'
       },
       {

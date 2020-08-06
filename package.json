@@ -1,6 +1,6 @@
 {
   "name": "sequoia",
-  "version": "0.1.5-alpha",
+  "version": "0.1.6-alpha",
   "description": "",
   "main": "main.js",
   "repository": {
@@ -15,7 +15,8 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder -mwl",
     "dist-mac": "electron-builder -m",
-    "dist-win": "electron-builder -w"
+    "dist-win": "electron-builder -w",
+    "dist-lin": "electron-builder -l"
   },
   "devDependencies": {
     "chai": "^4.2.0",
@@ -35,18 +36,12 @@
   "build": {
     "appId": "com.kolisko-lab.sequoia",
     "fileAssociations": [
-      {
-        "ext": [
-          "tre",
-          "tree",
-          "nexus",
-          "nex",
-          "nxs",
-          "newick"
-        ],
-        "name": "Tree file",
-        "role": "Editor"
-      }
+      {"name": "Tree file", "ext": "tre", "role": "Editor" },
+      {"name": "Tree file", "ext": "tree", "role": "Editor" },
+      {"name": "Tree file", "ext": "nexus", "role": "Editor" },
+      {"name": "Tree file", "ext": "nex", "role": "Editor" },
+      {"name": "Tree file", "ext": "nxs", "role": "Editor" },
+      {"name": "Tree file", "ext": "newick", "role": "Editor" }
     ]
   },
   "author": "Serafim Nenarokov",
