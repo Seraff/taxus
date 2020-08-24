@@ -68,7 +68,7 @@ To change the name of a taxon select it and click the "Annotate Node" button (|a
 Edit the name of in the window and press "Save".
 
 .. image:: _static/img/name_editing.png
-  :scale: 50%
+  :scale: 40%
   :align: center
 
 .. Note:: This operation changes a tree and a fasta file. To apply changes to files both tree and fasta files should be saved.
