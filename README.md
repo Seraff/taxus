@@ -1,5 +1,8 @@
-# Fangorn
+# Sequoia
 Nexus + Fasta = Sequoia ❤️
+
+# Documentation
+https://sequoia.readthedocs.io/en/latest/
 
 # The latest release
 [Fangorn for Mac (x64)](https://github.com/Seraff/sequoia/releases/download/v0.1.6-alpha/sequoia-0.1.6-alpha.dmg)
