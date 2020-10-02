@@ -12,5 +12,5 @@ https://sequoia.readthedocs.io/en/latest/
 [Fangorn for Windows (x64)](https://github.com/Seraff/sequoia/releases/download/v0.1.6-alpha/sequoia.Setup.0.1.6-alpha.exe)
 
 
-# Poster
+# Poster (deprecated)
 ![Poster](https://github.com/Seraff/fangorn/blob/master/media/poster.png)
