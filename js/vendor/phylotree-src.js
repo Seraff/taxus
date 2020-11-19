@@ -2964,7 +2964,7 @@ const parseString = require('xml2js').parseString;
         svg = svg.transition(100);
       }
 
-      // svg.attr("height", sizes[1]).attr("width", sizes[0]);
+      svg.attr("height", sizes[1]).attr("width", sizes[0]);
     }
 
     return sizes;

@@ -35,6 +35,7 @@ end;
 `
 
   var $svg = $('svg#tree_display')
+  var $tree_pane = $('div#tree-pane')
   var $window = $(window)
   var $document = $(document)
   var $d3_container = d3.select("."+phylotree.get_css_classes()["tree-container"])
@@ -44,17 +45,20 @@ end;
   var shift_mode = false
   var selection_mode = 'taxa'
   var scale_bar = true
+  const ARROW_SCROLL_DEFAULT = 15
+  const ARROW_SCROLL_FAST = 30
+  var scroll_pos = { top: 0, left: 0, x: 0, y: 0 };
 
   phylotree.unbindFangornEvents = function () {
-    $window.unbind("keydown", onkeydown)
-    $window.unbind("keyup", onkeyup)
-    $window.unbind("focus", onfocus)
-    $window.unbind("wheel", onwheel)
+    $window.off("keydown")
+    $window.off("keyup")
+    $window.off("focus")
 
-    $document.unbind('tree_topology_changed', on_tree_topology_changed)
-    $document.unbind('new_tree_is_loaded', on_new_tree_is_loaded)
+    $document.off('tree_topology_changed')
+    $document.off('new_tree_is_loaded')
 
     svg.on("mousedown", null)
+    $svg.off("mousedown")
   }
 
   phylotree.unbindFangornEvents()
@@ -62,7 +66,6 @@ end;
   $window.on("keydown", onkeydown)
   $window.on("keyup", onkeyup)
   $window.on('focus', onfocus)
-  $window.on("wheel", onwheel)
 
   $document.on('tree_topology_changed', on_tree_topology_changed)
   $document.on('new_tree_is_loaded', on_new_tree_is_loaded)
@@ -79,20 +82,20 @@ end;
     }
 
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
-      var delta = e.shiftKey ? 15 : 5
+      var delta = e.shiftKey ? ARROW_SCROLL_FAST : ARROW_SCROLL_DEFAULT
 
       switch(e.code){
         case('ArrowUp'):
-          phylotree.move("S", delta)
-          break
-        case('ArrowDown'):
           phylotree.move("N", delta)
           break
+        case('ArrowDown'):
+          phylotree.move("S", delta)
+          break
         case('ArrowLeft'):
-          phylotree.move("E", delta)
+          phylotree.move("W", delta)
           break
         case('ArrowRight'):
-          phylotree.move("W", delta)
+          phylotree.move("E", delta)
           break
       }
     }
@@ -111,22 +114,6 @@ end;
     }
   }
 
-  function onwheel (e) {
-    var cursor_above_tree = ($("#tree-pane:hover").length != 0)
-
-    if (!zoom_mode && cursor_above_tree){
-      if (e.originalEvent.deltaY < 0) {
-        phylotree.move("S", 10)
-      } else if (e.originalEvent.deltaY > 0) {
-        phylotree.move("N", 10)
-      } else if (e.originalEvent.deltaX < 0) {
-        phylotree.move("E", 5)
-      } else if (e.originalEvent.deltaX > 0) {
-        phylotree.move("W", 5)
-      }
-    }
-  }
-
   phylotree.zoomIn = function() {
     phylotree.add_zoom(0.3)
   }
@@ -136,13 +123,11 @@ end;
   }
 
   phylotree.enter_zoom_mode = function(){
-    svg.call(zoom)
     zoom_mode = true
     $svg.css('cursor', 'grab')
   }
 
   phylotree.exit_zoom_mode = function(){
-    svg.on(".zoom", null)
     zoom_mode = false
     $svg.css('cursor', '')
   }
@@ -160,6 +145,7 @@ end;
   phylotree.update = function(transitions, safe=false){
     phylotree.original_update(transitions, safe)
 
+    phylotree.update_svg_size()
     phylotree.init_scale_bar()
     phylotree.redraw_scale_bar() // We draw scale bar in different way
   }
@@ -168,69 +154,42 @@ end;
 
   phylotree.safe_update = function(transitions){
     phylotree.original_safe_update(transitions)
-
+    phylotree.update_svg_size()
     phylotree.init_scale_bar()
-    phylotree.redraw_scale_bar() // We draw scale bar in different way
   }
 
-  phylotree.update_zoom_transform = function(){
-    var translate = phylotree.current_translate
-    var scale = phylotree.current_zoom
+  phylotree.update_svg_size = function(){
+    var bbox = svg.node().getBBox()
+    var width = bbox.width + bbox.x
+    var height = bbox.height + bbox.y
 
-    d3.select("."+phylotree.get_css_classes()["tree-container"])
-      .attr("transform", "translate(" + translate + ")scale(" + scale + ")")
+    if (width < $tree_pane.width()) { width = $tree_pane.width() }
+    if (height < $tree_pane.height()) { height = $tree_pane.height() }
+
+    svg.attr('width', width)
+       .attr('height', height)
   }
 
   phylotree.current_translate = [0, 0]
   phylotree.current_zoom = 1
 
-  // Zoom and Pan event
-  var zoom = d3.behavior.zoom()
-    .scaleExtent([.1, 10])
-    .on("zoom", function(){
-      phylotree.current_translate = d3.event.translate
-      phylotree.current_zoom = d3.event.scale
-
-      var translate = d3.event.translate
-
-      translate[0] += phylotree.get_offsets()[1] + phylotree.get_options()["left-offset"]
-      translate[1] += phylotree.pad_height()
-
-      d3.select("." + phylotree.get_css_classes()["tree-container"])
-        .attr("transform", "translate(" + translate + ")scale(" + d3.event.scale + ")")
-
-      // Scale bar stuff
-
-      phylotree.redraw_scale_bar()
-
-    })
-
-  phylotree.move = function(direction, delta = 5) {
-    var transform = phylotree.get_current_transform()
+  phylotree.move = function(direction, delta) {
+    element = document.getElementById('tree-pane')
 
     switch(direction){
       case "N":
-        transform.translate[1] -= delta
+        element.scroll(element.scrollLeft, element.scrollTop - delta)
         break
       case "S":
-        transform.translate[1] += delta
+        element.scroll(element.scrollLeft, element.scrollTop + delta)
         break
       case "W":
-        transform.translate[0] -= delta
+        element.scroll(element.scrollLeft - delta, element.scrollTop)
         break
       case "E":
-        transform.translate[0] += delta
+        element.scroll(element.scrollLeft + delta, element.scrollTop)
         break
     }
-
-    phylotree.current_translate = transform.translate
-
-    d3.select("." + phylotree.get_css_classes()["tree-container"])
-        .attr("transform", "translate(" + transform.translate + ")scale(" + transform.scale + ")")
-
-    zoom.translate(transform.translate)
-
-    phylotree.redraw_scale_bar()
   }
 
   phylotree.add_zoom = function(delta) {
@@ -240,11 +199,10 @@ end;
     phylotree.current_zoom = new_zoom
 
     d3.select("."+phylotree.get_css_classes()["tree-container"])
-      .attr("transform", "translate(" + phylotree.current_translate + ")scale(" + new_zoom + ")")
+       .attr("transform", "translate(" + transform.translate + ")scale(" + new_zoom + ")")
 
-    zoom.scale(new_zoom)
-
-    phylotree.redraw_scale_bar()
+    phylotree.safe_update()
+    phylotree.update_svg_size()
   }
 
   /* Add link to SVG object to node */
@@ -344,8 +302,45 @@ end;
     .attr("class", "selection")
     .attr("visibility", "hidden")
 
+  function onZoomMouseMove(e) {
+    if (!zoom_mode) {
+      return
+    }
+
+    const dx = e.clientX - scroll_pos.x
+    const dy = e.clientY - scroll_pos.y
+
+    $tree_pane.scrollTop(scroll_pos.top - dy)
+    $tree_pane.scrollLeft(scroll_pos.left - dx)
+  }
+
+  function onZoomMouseDown(e) {
+    if (!zoom_mode) {
+      return
+    }
+
+    scroll_pos = {
+      left: $tree_pane.scrollLeft(),
+      top: $tree_pane.scrollTop(),
+      x: e.clientX,
+      y: e.clientY,
+    }
+
+    $svg.on('mousemove', onZoomMouseMove)
+    $svg.on('mouseup', onZoomMouseUp)
+  }
+
+  function onZoomMouseUp() {
+    $svg.off('mouseup', onZoomMouseUp)
+    $svg.off('mousemove', onZoomMouseMove)
+  }
+
+  $svg.on('mousedown', onZoomMouseDown)
+
   svg.on("mousedown", function() {
-    if (zoom_mode) return false
+    if (zoom_mode) {
+      return false
+    }
 
     var _svg = svg[0][0]
     var subject = d3.select(window)
@@ -751,10 +746,6 @@ end;
     fangorn.get_tree().safe_update()
   }
 
-  // Navigator
-
-  phylotree.navigator = new PhylotreeNavigator(phylotree, zoom)
-
   // Modifying tree in cladogram view workarounds
 
   // decorator
@@ -795,7 +786,6 @@ end;
     phylotree.redraw_scale_bar()
   }
 
-  phylotree.phylotree_navigator = new PhylotreeNavigator(phylotree, zoom)
 }
 
 module.exports = apply_extensions

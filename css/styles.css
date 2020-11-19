@@ -32,6 +32,10 @@
 
 /* phylotree */
 
+#tree-pane {
+  touch-action: none
+}
+
 span.fasta-pane-entry {
   white-space: nowrap;
 }
