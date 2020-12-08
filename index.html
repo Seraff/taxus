@@ -23,17 +23,17 @@
 
       <div class="toolbar-actions">
         <div class="btn-group">
-          <button id="horizontal-contract-action" class="btn btn-default" data-direction="horizontal" data-amount="-10">
+          <button id="horizontal-contract-action" class="btn btn-default expand-contract-action" data-direction="horizontal" data-amount="-10">
             <span class="ui-text fa fa-compress fa-rotate-45"></span>
           </button>
-          <button id="horizontal-expand-action" class="btn btn-default" data-direction="horizontal" data-amount="10">
+          <button id="horizontal-expand-action" class="btn btn-default expand-contract-action" data-direction="horizontal" data-amount="10">
             <span class="ui-text fa fa-arrows-h"></span>
           </button>
 
-          <button id="vertical-contract-action" class="btn btn-default" data-direction="vertical" data-amount="-10">
+          <button id="vertical-contract-action" class="btn btn-default expand-contract-action" data-direction="vertical" data-amount="-10">
             <span class="ui-text fa fa-compress fa-rotate-135"></span>
           </button>
-          <button id="vertical-expand-action" class="btn btn-default" data-direction="vertical" data-amount="10">
+          <button id="vertical-expand-action" class="btn btn-default expand-contract-action" data-direction="vertical" data-amount="10">
             <span class="ui-text fa fa-arrows-h fa-rotate-90"></span>
           </button>
         </div>
@@ -124,6 +124,15 @@
         <button id="case-sensitive-search" class="btn btn-default btn-pressed" title="Case sensitive search">
           Aa
         </button>
+
+        <div id="found-items-btn-group" class="btn-group">
+          <button id="found-items-go-to-prev" class="btn btn-default search-nav-button" disabled="disabled" data-direction="up" title="Go to previous">
+            <span class="icon icon-up-open"></span>
+          </button>
+          <button id="found-items-go-to-next" class="btn btn-default search-nav-button" disabled="disabled" data-direction="down" title="Go to next">
+            <span class="icon icon-down-open"></span>
+          </button>
+        </div>
 
         <button id="search-select-all" class="btn btn-default" disabled="disabled" title="Select all found items">
           Select All

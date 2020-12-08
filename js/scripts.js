@@ -504,7 +504,7 @@ $(document).ready(function () {
     $('#universal-dialog')[0].close(false)
   })
 
-  $('[data-direction]').on('click', function () {
+  $('.expand-contract-action').on('click', function () {
     var which_function = $(this).data('direction') == 'vertical' ? fangorn.get_tree().spacing_x : fangorn.get_tree().spacing_y
 
     progressBar.withProgressBarAttempt(() => {

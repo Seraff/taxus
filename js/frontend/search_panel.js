@@ -11,12 +11,14 @@ class SearchPanel {
     this.$tree_mode_button = $('#set-search-mode-to-tree')
     this.$fasta_mode_button = $('#set-search-mode-to-fasta')
     this.$case_sensitive_button = $('#case-sensitive-search')
+    this.$search_nav_buttons = $('.search-nav-button')
 
     this.fangorn = fangorn
     this.fasta_pane = fasta_pane
     this.search_mode = 'tree'
     this.search_mode_radio = new BtnGroupRadio(this.$search_mode_buttons)
     this.found_items = []
+    this.current_nav_item_index = null
 
     this.$search_action_button.on('click', () => {
       this.toggle()
@@ -68,6 +70,14 @@ class SearchPanel {
     this.$select_all_button.on('click', () => {
       this.selectFoundItems()
       this.$select_all_button.blur()
+    })
+
+    this.$search_nav_buttons.on('click', (e) => {
+      var direction = $(e.currentTarget).data('direction')
+
+      if (['up', 'down'].includes(direction)){
+        this.navigate(direction)
+      }
     })
 
     this.search_mode_radio.on_change = () => {
@@ -122,14 +132,6 @@ class SearchPanel {
     return this.$case_sensitive_button.hasClass('btn-pressed')
   }
 
-  enableSelectAll () {
-    this.$select_all_button.removeAttr('disabled')
-  }
-
-  disableSelectAll () {
-    this.$select_all_button.attr('disabled', 'disabled')
-  }
-
   searchCurrent () {
     this.search(this.current_input_value)
   }
@@ -151,6 +153,10 @@ class SearchPanel {
         })
       } else {
         this.found_items = this.fasta_pane.entries.filter((e) => {
+          if (e.isHidden()) {
+            return false
+          }
+
           var str = case_sensitive ? e.id : e.id.toLocaleLowerCase()
           return str.includes(query)
         })
@@ -166,6 +172,7 @@ class SearchPanel {
     }
 
     this.refreshSelectFoundButton()
+    this.refreshNavButtons()
     this.refreshMetaInfo()
   }
 
@@ -179,6 +186,7 @@ class SearchPanel {
     })
 
     this.found_items = []
+    this.current_nav_item_index = null
   }
 
   cleanSearchField () {
@@ -202,11 +210,54 @@ class SearchPanel {
     }
   }
 
+  navigate (direction) {
+    if (!this.isAnythingFound() || !['up', 'down'].includes(direction)) {
+      return false
+    }
+
+    if (this.current_nav_item_index == null) {
+      if (direction == 'up') {
+        this.current_nav_item_index = this.found_items.length - 1
+      } else if (direction == 'down') {
+        this.current_nav_item_index = 0
+      }
+    } else {
+      if (direction == 'up') {
+        this.current_nav_item_index -= 1
+      } else if (direction == 'down') {
+        this.current_nav_item_index += 1
+      }
+    }
+
+    if (this.current_nav_item_index < 0) {
+      this.current_nav_item_index = this.found_items.length - 1
+    } else if (this.current_nav_item_index > this.found_items.length - 1) {
+      this.current_nav_item_index = 0
+    }
+
+    var node = this.found_items[this.current_nav_item_index]
+
+    if (this.isTreeMode()) {
+      this.fangorn.get_tree().moveToNode(node)
+    } else {
+      this.fasta_pane.scrollTo({ entry: node })
+    }
+
+  }
+
   refreshSelectFoundButton () {
     if (this.isAnythingFound()) {
       this.$select_all_button.removeAttr('disabled')
     } else {
       this.$select_all_button.attr('disabled', 'disabled')
+    }
+  }
+
+  refreshNavButtons () {
+    if (this.isAnythingFound()) {
+      this.$search_nav_buttons.removeAttr('disabled')
+    } else {
+      this.$search_nav_buttons.attr('disabled', 'disabled')
     }
   }
 

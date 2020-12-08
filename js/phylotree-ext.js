@@ -174,7 +174,7 @@ end;
   phylotree.current_zoom = 1
 
   phylotree.move = function(direction, delta) {
-    element = document.getElementById('tree-pane')
+    var element = document.getElementById('tree-pane')
 
     switch(direction){
       case "N":
@@ -190,6 +190,13 @@ end;
         element.scroll(element.scrollLeft + delta, element.scrollTop)
         break
     }
+  }
+
+  phylotree.moveToNode = function(node) {
+    node.get_html_element().scrollIntoView()
+
+    phylotree.move('N', 20)
+    phylotree.move('W', 20)
   }
 
   phylotree.add_zoom = function(delta) {

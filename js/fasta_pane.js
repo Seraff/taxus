@@ -100,6 +100,22 @@ class FastaPane {
     }
 
   }
+
+  scrollTo (object = {}) {
+    var element = null
+
+    if (object.name !== undefined) {
+      element = this.entries_by_name[object.name]
+    } else if (object.entry !== undefined) {
+      element = object.entry
+    }
+
+    if (element == null || element == undefined) {
+      return false
+    }
+
+    element.$element.get(0).scrollIntoView()
+  }
 }
 
 class FastaPaneEntry {
@@ -117,7 +133,7 @@ class FastaPaneEntry {
       return '';
 
     var klass = this.node.selected == true ? 'selected' : ''
-    var hidden = this.node.is_marked() ? 'hidden' : ''
+    var hidden = this.isHidden() ? 'hidden' : ''
 
     var content = '<span id="' + this.alias + '" ' + hidden + ' class="fasta-pane-entry ' + klass + '">'
     content += "<span class='fasta-pane-entry-header'>>" + this.node.fasta.header + "</span><br>"
@@ -156,6 +172,10 @@ class FastaPaneEntry {
 
   unhide () {
     this.$element.show()
+  }
+
+  isHidden () {
+    return this.node.is_marked()
   }
 
   highlight () {
