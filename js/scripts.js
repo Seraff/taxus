@@ -385,12 +385,20 @@ function quitAction () {
     app.remote.app.quit()
 }
 
-function zoomInAction () {
+function zoomInMenuAction () {
   fangorn.get_tree().zoomIn()
 }
 
-function zoomOutAction () {
+function zoomOutMenuAction () {
   fangorn.get_tree().zoomOut()
+}
+
+function zoomInButtonAction () {
+  fangorn.get_tree().zoomIn(fangorn.get_tree().is_shift_mode())
+}
+
+function zoomOutButtonAction () {
+  fangorn.get_tree().zoomOut(fangorn.get_tree().is_shift_mode())
 }
 
 function resetSelectionMode () {
@@ -443,11 +451,11 @@ $(document).ready(function () {
   menu.setCallbackOnItem('export-to-png', export_to_png_action)
   menu.setCallbackOnItem('export-to-svg', export_to_svg_action)
 
-  menu.setCallbackOnItem('zoom-in', zoomInAction)
-  menu.setCallbackOnItem('zoom-out', zoomOutAction)
+  menu.setCallbackOnItem('zoom-in', zoomInMenuAction)
+  menu.setCallbackOnItem('zoom-out', zoomOutMenuAction)
 
-  $("#zoom-in-action").on('click', zoomInAction)
-  $("#zoom-out-action").on('click', zoomOutAction)
+  $("#zoom-in-action").on('click', zoomInButtonAction)
+  $("#zoom-out-action").on('click', zoomOutButtonAction)
 
   // Edit
 

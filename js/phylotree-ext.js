@@ -114,12 +114,12 @@ end;
     }
   }
 
-  phylotree.zoomIn = function() {
-    phylotree.add_zoom(0.3)
+  phylotree.zoomIn = function(smooth=false) {
+    phylotree.add_zoom(smooth ? 0.1 : 0.3)
   }
 
-  phylotree.zoomOut = function() {
-    phylotree.add_zoom(-0.3)
+  phylotree.zoomOut = function(smooth=false) {
+    phylotree.add_zoom(smooth ? -0.1 : -0.3)
   }
 
   phylotree.enter_zoom_mode = function(){
@@ -138,6 +138,10 @@ end;
 
   phylotree.exit_shift_mode = function(){
     shift_mode = false
+  }
+
+  phylotree.is_shift_mode = function(){
+    return shift_mode
   }
 
   phylotree.original_update = phylotree.update
