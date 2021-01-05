@@ -1,13 +1,16 @@
-# Fangorn
+# Sequoia
 Nexus + Fasta = Sequoia ❤️
 
+# Documentation
+https://sequoia.readthedocs.io/en/latest/
+
 # The latest release
-[Fangorn for Mac (x64)](https://github.com/Seraff/fangorn/releases/latest/download/fangorn_mac.dmg)
+[Fangorn for Mac (x64)](https://github.com/Seraff/sequoia/releases/download/v0.1.6-alpha/sequoia-0.1.6-alpha.dmg)
 
-[Fangorn for Linux (x64)](https://github.com/Seraff/fangorn/releases/latest/download/fangorn_linux.AppImage)
+[Fangorn for Linux (x64)](https://github.com/Seraff/sequoia/releases/download/v0.1.6-alpha/sequoia-0.1.6-alpha.AppImage)
 
-[Fangorn for Windows (x64)](https://github.com/Seraff/fangorn/releases/latest/download/fangorn_windows.exe)
+[Fangorn for Windows (x64)](https://github.com/Seraff/sequoia/releases/download/v0.1.6-alpha/sequoia.Setup.0.1.6-alpha.exe)
 
 
-# Poster
+# Poster (deprecated)
 ![Poster](https://github.com/Seraff/fangorn/blob/master/media/poster.png)
