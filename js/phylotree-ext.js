@@ -149,17 +149,19 @@ end;
   phylotree.update = function(transitions, safe=false){
     phylotree.original_update(transitions, safe)
 
-    phylotree.update_svg_size()
     phylotree.init_scale_bar()
     phylotree.redraw_scale_bar() // We draw scale bar in different way
+    phylotree.update_svg_size()
   }
 
   phylotree.original_safe_update = phylotree.safe_update
 
   phylotree.safe_update = function(transitions){
     phylotree.original_safe_update(transitions)
-    phylotree.update_svg_size()
+
     phylotree.init_scale_bar()
+    phylotree.redraw_scale_bar()
+    phylotree.update_svg_size()
   }
 
   phylotree.update_svg_size = function(){
