@@ -1,12 +1,12 @@
 Basics
 ======
 
-Sequoia is designed to be to link a tree and a fasta file to edit for downstream analysis.
+Taxus is designed to be to link a tree and a fasta file to edit for downstream analysis.
 
 Trees Opening and Saving
 ------------------------
 
-Sequoia can load trees in NEXUS and Newick formats.
+Taxus can load trees in NEXUS and Newick formats.
 
 To open the tree, select :menuselection:`File --> Open Tree`.
 
@@ -108,7 +108,7 @@ To apply a new color to selected objects, click the "Change color" button from t
   :scale: 50%
   :align: center
 
-HEX code of color can be specified. Sequoia saves previously selected colors to the history bar at the bottom of the color window.
+HEX code of color can be specified. Taxus saves previously selected colors to the history bar at the bottom of the color window.
 
 To remove the color annotation from selected branches/taxa, click the "Remove Color" button (|remove_color_button|).
 
@@ -118,7 +118,7 @@ To remove the color annotation from selected branches/taxa, click the "Remove Co
 Other Preferences
 #################
 
-Select :menuselection:`File --> Preferences` (:menuselection:`Sequoia --> Preferences` in macOS) to enter the Preferences window.
+Select :menuselection:`File --> Preferences` (:menuselection:`Taxus --> Preferences` in macOS) to enter the Preferences window.
 
 .. image:: _static/img/preferences_window.png
   :scale: 50%

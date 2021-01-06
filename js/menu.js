@@ -218,11 +218,11 @@ const template = [
     submenu: [
       {
         label: 'Project GitHub',
-        click: function() { shell.openExternal('https://github.com/Seraff/sequoia') }
+        click: function() { shell.openExternal('https://github.com/Seraff/taxus') }
       },
       {
         label: 'Documentation',
-        click: function() { shell.openExternal('https://sequoia.readthedocs.io/en/latest/') }
+        click: function() { shell.openExternal('https://taxus.readthedocs.io/en/latest/') }
       },
     ]
   },
@@ -230,10 +230,10 @@ const template = [
 
 if (process.platform === 'darwin') {
   template.unshift({
-    label: "Sequoia",
+    label: "Taxus",
     submenu: [
       {
-        label: 'About Sequoia',
+        label: 'About Taxus',
         role: 'about'
       },
       {
@@ -259,7 +259,7 @@ if (process.platform === 'darwin') {
         type: 'separator'
       },
       {
-        label: 'Hide Sequoia',
+        label: 'Hide Taxus',
         accelerator: 'Command+H',
         role: 'hide'
       },
@@ -303,7 +303,7 @@ if (process.platform === 'darwin') {
 
   help_submenu = template[template.length - 1].submenu
   help_submenu.unshift({
-                          label: 'About Sequoia',
+                          label: 'About Taxus',
                           role: 'about'
                         })
 

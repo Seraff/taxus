@@ -17,7 +17,7 @@ import sphinx_rtd_theme
 
 # -- Project information -----------------------------------------------------
 
-project = 'Sequoia'
+project = 'Taxus'
 copyright = '2020, Serafim Nenarokov'
 author = 'Serafim Nenarokov'
 
