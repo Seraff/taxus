@@ -125,10 +125,10 @@ class PhylotreeNavigator {
     var transform = this.phylotree.get_current_transform()
     treeBBox = GeometryHelper.globalToScreen(transform, treeBBox)
 
-    treeBBox.height += 50
-    treeBBox.width += 20
-    treeBBox.x -= 10
-    treeBBox.y -= 10
+    treeBBox.height += 100
+    treeBBox.width += 100
+    treeBBox.x -= 50
+    treeBBox.y -= 50
 
     return treeBBox
   }

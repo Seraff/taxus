@@ -49,6 +49,8 @@ end;
   const ARROW_SCROLL_FAST = 30
   var scroll_pos = { top: 0, left: 0, x: 0, y: 0 };
 
+  phylotree.phylotree_navigator = new PhylotreeNavigator(phylotree)
+
   phylotree.unbindFangornEvents = function () {
     $window.off("keydown")
     $window.off("keyup")
