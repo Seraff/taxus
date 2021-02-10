@@ -271,7 +271,7 @@ function restore_selected_action () {
 
 function save_fasta_action () {
   fangorn.save_fasta(null, function () {
-    fangorn.load_fasta_file(fangorn.fasta.out_path, true)
+    fangorn.load_fasta_file(fangorn.fasta_out_path(), true)
   })
 }
 
@@ -319,7 +319,7 @@ function annotate_node_action () {
   if (!fangorn.fasta_is_loaded() || fangorn.get_selection().length != 1) { return false }
 
   var node = fangorn.get_selection()[0]
-  var header = node.fasta.header
+  var header = node.fasta().header
   $('#seq-title-input').val(header)
 
   $('#annotate-dialog')[0].showModal()

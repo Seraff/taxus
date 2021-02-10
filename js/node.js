@@ -1,5 +1,5 @@
-const FastaRepresentation = require('./fasta_representation.js');
-const NodeStyler = require('./node_styler.js');
+const FastaRepresentation = require('./fasta_representation.js')
+const NodeStyler = require('./node_styler.js')
 const features = require('./node_features')
 
 // Our phylotreejs node wrapper
@@ -20,7 +20,17 @@ function Node(fangorn, phylotree_node){
   node.features = []
 
   if (!hasOwnProperty(phylotree_node, 'fasta')){
-    node.fasta = null;
+    node.own_fasta = null
+  }
+
+  node.fasta = function () {
+    return node.applied_fasta() || node.own_fasta
+  }
+
+  node.applied_fasta = function () {
+    if (node.fangorn.fasta_is_loaded()) {
+      return node.fangorn.fastaMapping.getFastaForNode(node)
+    }
   }
 
   node.is_leaf = function(){
@@ -37,6 +47,7 @@ function Node(fangorn, phylotree_node){
 
   node.mark = function(){
     node.add_annotation({ '!fangorn_marked': true })
+    node.own_fasta = node.fasta()
     node.fangorn.make_tree_dirty()
     node.fangorn.make_fasta_dirty()
   }
@@ -65,25 +76,26 @@ function Node(fangorn, phylotree_node){
     }
   }
 
-  node.apply_fasta = function(fasta){
-    if (fasta.id == node.name)
-      node.fasta = fasta;
-    else
-      console.error("Cannot apply fasta " + node.fasta.id + " to node " + node.name)
+  node.apply_own_fasta = function(fasta){
+    if (fasta.id === node.name){
+      node.own_fasta = fasta
+    } else {
+      console.error("Cannot apply fasta " + fasta.id + " to node " + node.name)
+    }
   }
 
   node.fasta_is_loaded = function(){
-    return node.fasta != null;
+    return node.fasta() != null
   }
 
   node.raw_fasta_entry = function(){
     if (!node.fasta_is_loaded())
-      return null;
+      return null
 
-    content = '>' + node.fasta.id + '\n';
-    content += node.fasta.sequence + '\n';
+    content = '>' + node.fasta().id + '\n'
+    content += node.fasta().sequence + '\n'
 
-    return content;
+    return content
   }
 
   node.bootstrap = function(){
@@ -97,13 +109,13 @@ function Node(fangorn, phylotree_node){
       return
     }
 
-    d3.select(node.container).html("");
+    d3.select(node.container).html("")
     d3.select(node.container).append("text")
                .classed("node-tip", true)
                .text(text)
                .attr("dx", ".3em")
                .attr("text-anchor", "start")
-               .attr("alignment-baseline", "middle");
+               .attr("alignment-baseline", "middle")
   }
 
   node.remove_node_tip = function () {
@@ -111,11 +123,11 @@ function Node(fangorn, phylotree_node){
   }
 
   node.get_html_element = function(){
-    return node.is_leaf() ? node.container : node.prev_branch.get_element().node();
+    return node.is_leaf() ? node.container : node.prev_branch.get_element().node()
   }
 
   node.getBBox = function(){
-    var bbox = node.get_html_element().getBBox();
+    var bbox = node.get_html_element().getBBox()
 
     if (node.is_leaf()){
       transform = d3.transform(d3.select(node.get_html_element()).attr('transform'))
@@ -123,7 +135,7 @@ function Node(fangorn, phylotree_node){
       bbox.y = bbox.y + transform.translate[1]
     }
 
-    return bbox;
+    return bbox
   }
 
   node.parse_annotation = function(){
@@ -174,7 +186,7 @@ function Node(fangorn, phylotree_node){
 
     keys.forEach(function(k){
       delete node.parsed_annotation[k]
-    });
+    })
 
     node.build_annotation()
   }

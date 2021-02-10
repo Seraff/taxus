@@ -44,6 +44,10 @@ span.fasta-pane-entry.selected {
   color: #3182bd;
 }
 
+span.fasta-pane-entry.not-in-tree {
+  color: #737475;
+}
+
 span.fasta-pane-entry-header{
   font-weight: bold;
 }

@@ -21,6 +21,7 @@ class FastaPane {
 
     document.addEventListener('new_fasta_applied', () => {
       this.render()
+      this.fasta_is_loaded = true
     })
 
     document.addEventListener('node_titles_changed', () => {
@@ -49,9 +50,7 @@ class FastaPane {
   }
 
   render () {
-    var nodes = fangorn.get_leaves()
-
-    this.title = Path.basename(this.fangorn.fasta.path)
+    this.title = Path.basename(this.fangorn.fasta_path)
 
     this.entries = []
     this.entries_by_name = {}
@@ -60,18 +59,22 @@ class FastaPane {
     this.$fasta_pane.html('')
     this.$fasta_pane.append('<b class="ui-text" id="fasta-title">' + this.title + '</b></br>')
 
-    if (nodes.length === 0){
-      this.show_no_fasta()
-      return true
-    }
+    this.fangorn.fastaMapping.eachMapping((m) => {
+      var fasta = null
 
-    nodes.forEach((node) => {
-      if (!node.fasta_is_loaded()){
-        this.fasta_is_loaded = false
-        this.show_no_fasta()
-        return true
+      // if fasta is loaded from node
+      if (m.fasta === null && m.node !== null) {
+        fasta = m.node.fasta() // take from node
+      } else {
+        fasta = m.fasta
       }
-      var entry = new FastaPaneEntry(this.$fasta_pane, node)
+
+      var entry = new FastaPaneEntry(this, fasta)
+
+      if (m.node === null) {
+        entry.not_in_tree = true
+      }
+
       entry.render()
 
       this.entries.push(entry)
@@ -119,39 +122,49 @@ class FastaPane {
 }
 
 class FastaPaneEntry {
-  constructor (pane_el, node) {
+  constructor (pane, fasta_entry) {
     this.$element = null
-    this.$fasta_pane = pane_el
 
-    this.node = node
-    this.id = node.fasta.id
+    this.$fasta_pane = pane.$fasta_pane
+    this.fastaMapping = pane.fangorn.fastaMapping
+    this.fasta_entry = fasta_entry
+    this.node = this.fastaMapping.getNodeForFasta(this.fasta_entry)
+
     this.alias = Math.random().toString(36).substring(2)
   }
 
   render () {
-    if (!this.node.fasta_is_loaded())
-      return '';
+    if (!this.fasta_entry) {
+      return ''
+    }
 
-    var klass = this.node.selected == true ? 'selected' : ''
+    var klass = ''
+
+    if (this.hasNode()) {
+      klass += this.node.selected === true ? 'selected' : ''
+    } else {
+      klass += this.not_in_tree === true ? 'not-in-tree' : ''
+    }
+
     var hidden = this.isHidden() ? 'hidden' : ''
 
     var content = '<span id="' + this.alias + '" ' + hidden + ' class="fasta-pane-entry ' + klass + '">'
-    content += "<span class='fasta-pane-entry-header'>>" + this.node.fasta.header + "</span><br>"
-    content += "<span class='fasta-pane-entry-sequence'>" + this.node.fasta.sequence + "</span><br>"
+    content += "<span class='fasta-pane-entry-header'>>" + this.fasta_entry.header + "</span><br>"
+    content += "<span class='fasta-pane-entry-sequence'>" + this.fasta_entry.sequence + "</span><br>"
     content += "</span>"
 
     this.$fasta_pane.append(content)
-    this.$element = $("span#"+this.alias)
+    this.$element = $('span#' + this.alias)
   }
 
   redraw () {
-    if (this.node.selected == true){
+    if (this.hasNode() && this.node.selected === true){
       this.select()
     } else {
       this.unselect()
     }
 
-    if (this.node.is_marked() == true){
+    if (this.hasNode() && this.node.is_marked() === true){
       this.hide()
     } else {
       this.unhide()
@@ -175,7 +188,11 @@ class FastaPaneEntry {
   }
 
   isHidden () {
-    return this.node.is_marked()
+    return this.hasNode() && this.node.is_marked()
+  }
+
+  hasNode () {
+    return this.node !== null
   }
 
   highlight () {
@@ -190,4 +207,4 @@ class FastaPaneEntry {
 
 FastaPaneEntry.HIGHLIGHT_COLOR = '#fff308'
 
-module.exports = FastaPane;
+module.exports = FastaPane

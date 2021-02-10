@@ -2,18 +2,19 @@ const fs = require('fs')
 const Node = require('./node.js')
 const FastaRepresentation = require('./fasta_representation.js')
 const Preferences = require('./preferences.js')
+const FastaMapping = require('./fasta_mapping.js')
 const apply_extensions = require('./phylotree-ext.js')
 
 function Fangorn () {
   var fangorn = this
 
   fangorn.tree_path = null
-  fangorn.fasta_path = null
 
   fangorn.tree_is_dirty = false
   fangorn.fasta_is_dirty = false
 
-  fangorn.fasta = null
+  fangorn.fasta_path = null
+  fangorn.fastaMapping = null
 
   fangorn.preferences = null
 
@@ -171,7 +172,7 @@ function Fangorn () {
     }
     document.fangorn_selection_modified_event_set = true
 
-    fangorn.fasta = null
+    fangorn.fastaMapping = null
     fangorn.dispatch_state_update()
 
     return true
@@ -230,7 +231,7 @@ function Fangorn () {
   fangorn.save_fasta = function (path = null, success_callback = null) {
     if (!fangorn.fasta_is_loaded()) { return false }
 
-    if (!path) { path = fangorn.fasta.out_path }
+    if (!path) { path = fangorn.fasta_out_path() }
 
     var content = fangorn.output_fasta()
 
@@ -247,77 +248,77 @@ function Fangorn () {
     fangorn.close_fasta()
 
     var fasta_rep = new FastaRepresentation()
-
     fasta_rep.read_from_file(path)
-    fangorn.apply_fasta(fasta_rep, quiet)
+
+    if (fangorn.apply_fasta(fasta_rep, quiet)) {
+      fangorn.fasta_path = path
+      dispatchDocumentEvent('new_fasta_applied')
+    }
+
     fangorn.make_fasta_clean()
     fangorn.redraw_features()
   }
 
-  fangorn.apply_fasta = function (fasta_rep, quiet = false) {
-    var leave_ids = fangorn.get_leaves().map(function (node) { return node.name })
-    var consistency = fasta_rep.check_consistency(leave_ids)
-
-    // check if not_in_fasta contains seqs which are marked in the tree
-    var fasta_without_marked_nodes = false
-
-    if (consistency != true) {
-      if (consistency.not_in_fasta.length > 0 && consistency.not_in_tree.length === 0) {
-        var marked_ids = fangorn.get_marked_leaf_names()
-
-        if (marked_ids.sort().join(',') === consistency.not_in_fasta.sort().join(',')) { fasta_without_marked_nodes = true }
-      }
+  fangorn.fasta_out_path = function () {
+    if (fangorn.fasta_is_loaded()) {
+      var path = fangorn.fasta_path
+      return path_is_fangorized(path) ? path : fangorize_path(path)
     }
+  }
 
-    if (consistency != true && !fasta_without_marked_nodes) {
-      fangorn.fasta = null
-      var rows = []
+  fangorn.apply_fasta = function (fasta_rep, quiet = false) {
+    var fastaMapping = new FastaMapping(fangorn.get_leaves(), fasta_rep)
 
-      if (consistency.not_in_fasta.length > 0) {
+    var nodes_without_fasta = fastaMapping.nodesWithoutFasta()
+    // debugger
+    if (nodes_without_fasta.length > 0) {
+      var nodes_with_own_fasta = _.select(nodes_without_fasta, (n) => { return n.fasta() !== null })
+
+      // all the nodes has it's own fasta
+      if (nodes_with_own_fasta.length === nodes_without_fasta.length) {
+        // ok, take fasta from nodes
+        if (!quiet){
+          show_alert('Warning', 'Sequences for restoring removed taxa will be taken from Nexus file')
+        }
+      } else {
+        // incostistency, cannot load the file
+        var rows = []
+
         rows.push('')
         rows.push('Not found in fasta file:')
-        rows = rows.concat(consistency.not_in_fasta)
+        nodes_without_fasta.forEach((node) => {
+          rows.push(node.name)
+        })
+        show_log_alert('File cannot be loaded', "The data doesn't match:", rows)
+
+        return false
       }
-
-      if (consistency.not_in_tree.length > 0) {
-        rows.push('')
-        rows.push('Not found in the tree:')
-        rows = rows.concat(consistency.not_in_tree)
-      }
-
-      show_log_alert('File cannot be loaded', "The data doesn't match:", rows)
-    } else {
-      fangorn.fasta = fasta_rep
-
-      // Apply fasta records from fasta file
-      fangorn.get_leaves().forEach(function (leaf) {
-        if (hasOwnProperty(fasta_rep.sequences, leaf.name)) { leaf.apply_fasta(fasta_rep.sequences[leaf.name]) }
-      })
-
-      // Apply fasta records for marked leaves from metadata
-      if (fasta_without_marked_nodes && !quiet) {
-        show_alert('Warning', 'Sequences for restoring removed taxa will be taken from Nexus file')
-      }
-
-      dispatchDocumentEvent('new_fasta_applied')
-      fangorn.dispatch_state_update()
-      fangorn.get_tree().refresh()
     }
+
+    fangorn.fastaMapping = fastaMapping
+
+    fangorn.dispatch_state_update()
+    fangorn.get_tree().refresh()
+    return true
   }
 
   fangorn.output_fasta = function () {
     var content = ''
 
-    fangorn.each_leaf(function (leaf) {
-      var raw_fasta = leaf.raw_fasta_entry()
-      if (!leaf.is_marked() && raw_fasta != null) { content += raw_fasta }
+    fangorn.fastaMapping.eachMapping((m) => {
+      // only fasta from entries where node is not marked or doesn't exist
+      if (m.node !== null && m.node.is_marked()) {
+        return
+      }
+      var fasta = m.fasta || m.node.fasta()
+      content += fasta.to_fasta()
     })
 
     return content
   }
 
   fangorn.close_fasta = function () {
-    fangorn.fasta = null
+    fangorn.fastaMapping = null
     dispatchDocumentEvent('fasta_closed')
   }
 
@@ -338,7 +339,7 @@ function Fangorn () {
   }
 
   fangorn.fasta_is_loaded = function () {
-    return fangorn.fasta != null
+    return fangorn.fastaMapping != null
   }
 
   fangorn.get_selected_leaves_fasta = function () {
@@ -369,8 +370,10 @@ function Fangorn () {
 
     var new_id = FastaRepresentation.extract_id(title)
     node.name = new_id
-    node.fasta.id = new_id
-    node.fasta.header = title
+
+    var fasta = node.fasta()
+    fasta.id = new_id
+    fasta.header = title
 
     fangorn.get_tree().safe_update()
 
@@ -437,7 +440,7 @@ function Fangorn () {
 
     if (!fangorn.get_tree().is_nexus()) { return result }
 
-    var our_removed_seqs = fangorn.get_marked_leaves().map(function (e) { return e.fasta })
+    var our_removed_seqs = fangorn.get_marked_leaves().map(function (e) { return e.fasta() })
 
     if (our_removed_seqs.length > 0) {
       result.removed_seqs = our_removed_seqs.map(function (e) { return e.to_fasta() }).join('')
@@ -461,7 +464,7 @@ function Fangorn () {
 
       removed_fasta_rep.read_from_str(metadata.removed_seqs)
       fangorn.get_marked_leaves().forEach(function (leaf) {
-        leaf.apply_fasta(removed_fasta_rep.sequences[leaf.name])
+        leaf.apply_own_fasta(removed_fasta_rep.sequences[leaf.name])
       })
     }
     fangorn.preferences.applyToDefaults(metadata)

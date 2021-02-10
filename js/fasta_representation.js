@@ -1,5 +1,5 @@
-const fs = require('fs');
-const p = require('path');
+const fs = require('fs')
+const p = require('path')
 /**
  * FastaRepresentation class doesn't know anything about Fangorn
  * Parses fasta sequence
@@ -27,12 +27,12 @@ function fasta_to_json(fasta_str){
 }
 
 function FastaRepresentation(){
-  var fasta = this;
+  var fasta = this
 
-  fasta.sequences = {};
-  fasta.original_str = null;
-  fasta.path = null;
-  fasta.out_path = null;
+  fasta.sequences = {}
+  fasta.original_str = null
+  fasta.path = null
+  fasta.out_path = null
 
   fasta.read_from_file = function(path, callback){
     fasta.sequences = {}
@@ -50,7 +50,7 @@ function FastaRepresentation(){
 
     json.forEach(function(el){
       var entry = new FastaEntry(el)
-      fasta.sequences[entry.id] = entry;
+      fasta.sequences[entry.id] = entry
     })
 
     fasta.original_str = str
@@ -60,36 +60,35 @@ function FastaRepresentation(){
   // returns true if fasta is compatible with tree
   // returns object { not_in_fasta: [...], not_in_tree: [...] } if problems found
   fasta.check_consistency = function(leave_ids){
-    var not_in_fasta = [];
-    var not_in_tree = [];
+    var result = { not_in_tree: [], not_in_fasta: [] }
 
     var fasta_ids = Object.values(fasta.sequences).map(function(e){ return e.id })
 
     fasta_ids.forEach(function(id){
       if (!(leave_ids.includes(id))){
-        not_in_tree.push(id);
+        result.not_in_tree.push(id)
       }
-    });
+    })
 
     leave_ids.forEach(function(id){
       if (!(fasta_ids.includes(id))){
-        not_in_fasta.push(id);
+        result.not_in_fasta.push(id)
       }
-    });
+    })
 
-    if (not_in_tree.length != 0 || not_in_fasta.length != 0){
-      return {  not_in_tree: not_in_tree, not_in_fasta: not_in_fasta };
-    }
-
-    return true;
+    return result
   }
 
   fasta.each_sequence = function(f){
     for (var k in fasta.sequences){
       if (hasOwnProperty(fasta.sequences, k)) {
-        f(fasta.sequences[k]);
+        f(fasta.sequences[k])
       }
     }
+  }
+
+  fasta.getIds = function () {
+    return Object.keys(fasta.sequences)
   }
 }
 
@@ -112,4 +111,4 @@ function FastaEntry(json){
   }
 }
 
-module.exports = FastaRepresentation;
+module.exports = FastaRepresentation

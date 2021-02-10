@@ -49,8 +49,8 @@ class AlignmentCoverage {
   }
 
   getPct () {
-    if (this.node.fasta) {
-      var seq = this.node.fasta.sequence
+    if (this.node.fasta_is_loaded()) {
+      var seq = this.node.fasta().sequence
       var len = seq.length
 
       var gaps = null
