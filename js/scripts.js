@@ -504,6 +504,7 @@ $(document).ready(function () {
   $('#annotation-dialog-save').on('click', function () {
     var node = fangorn.get_selection()[0]
     fangorn.update_node_title(node, $('#seq-title-input').val())
+    dispatchDocumentEvent('node_titles_changed')
     $('#seq-title-input').val('')
     $('#annotate-dialog')[0].close(false)
   })

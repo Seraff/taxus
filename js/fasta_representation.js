@@ -90,6 +90,10 @@ function FastaRepresentation(){
   fasta.getIds = function () {
     return Object.keys(fasta.sequences)
   }
+
+  fasta.getSeqs = function () {
+    return Object.values(fasta.sequences)
+  }
 }
 
 FastaRepresentation.extract_id = function(title){

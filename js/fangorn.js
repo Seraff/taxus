@@ -267,7 +267,7 @@ function Fangorn () {
   }
 
   fangorn.apply_fasta = function (fasta_rep, quiet = false) {
-    var fastaMapping = new FastaMapping(fangorn.get_leaves(), fasta_rep)
+    var fastaMapping = new FastaMapping(fangorn.get_leaves(), fasta_rep.getSeqs())
 
     var nodes_without_fasta = fastaMapping.nodesWithoutFasta()
     // debugger
@@ -369,11 +369,13 @@ function Fangorn () {
     if (!fangorn.fasta_is_loaded()) { return null }
 
     var new_id = FastaRepresentation.extract_id(title)
-    node.name = new_id
-
     var fasta = node.fasta()
+
+    node.name = new_id
     fasta.id = new_id
     fasta.header = title
+
+    fangorn.fastaMapping.buildIndex()
 
     fangorn.get_tree().safe_update()
 

@@ -1,19 +1,27 @@
 class FastaMapping {
-  constructor (nodes, fastaRep) {
+  constructor (nodes, fastas) {
     this.nodes = nodes
-    this.fastaRep = fastaRep
+    this.fastas = fastas
 
     this.nodes_by_name = {}
+    this.fasta_by_name = {}
+    this.mapping = {}
+
+    this.buildIndex()
+  }
+
+  buildIndex () {
+    this.nodes_by_name = {}
+    this.fasta_by_name = {}
+    this.mapping = {}
+
     this.nodes.forEach((n) => {
       this.nodes_by_name[n.name] = n
     })
 
-    this.fasta_by_name = {}
-    this.fastaRep.each_sequence((l) => {
-      this.fasta_by_name[l.id] = l
+    this.fastas.forEach((f) => {
+      this.fasta_by_name[f.id] = f
     })
-
-    this.mapping = {}
 
     var all_names = [...Object.keys(this.nodes_by_name), ...Object.keys(this.fasta_by_name)]
     _.uniq(all_names).forEach((name) => {

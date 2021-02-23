@@ -24,10 +24,6 @@ class FastaPane {
       this.fasta_is_loaded = true
     })
 
-    document.addEventListener('node_titles_changed', () => {
-      this.render()
-    })
-
     document.addEventListener('fasta_closed', () => {
       this.fasta_is_loaded = false
       this.title = null
@@ -39,6 +35,10 @@ class FastaPane {
     })
 
     document.addEventListener('node_mark_status_changed', () => {
+      this.redraw_entries()
+    })
+
+    document.addEventListener('node_titles_changed', () => {
       this.redraw_entries()
     })
 
@@ -99,9 +99,11 @@ class FastaPane {
     if (this.fasta_is_loaded) {
       var title_el = document.getElementById('fasta-title')
       title_el.innerHTML = this.title
-      if (this.fangorn.fasta_is_dirty) { title_el.innerHTML += "*" }
-    }
 
+      if (this.fangorn.fasta_is_dirty) {
+        title_el.innerHTML += "*"
+      }
+    }
   }
 
   scrollTo (object = {}) {
