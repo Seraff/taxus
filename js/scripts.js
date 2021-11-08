@@ -276,7 +276,7 @@ function save_fasta_action () {
 }
 
 function save_fasta_as_action () {
-  var options = { title: 'Save fasta as...', defaultPath: fangorn.fasta.out_path }
+  var options = { title: 'Save fasta as...', defaultPath: fangorn.fasta_out_path() }
 
   dialog.showSaveDialog(options).then(result => {
     if (result.canceled || result.filePath.length === 0) { return true }
