@@ -1,128 +1,137 @@
-const $ = require('jquery')
-const app = require('electron')
-const { BrowserWindow, dialog } = require('electron').remote
-const { clipboard } = require('electron')
-const ipcRenderer = require('electron').ipcRenderer
+const Split = window.modules.splitjs
 
-const fs = require('fs')
-const cp = require('child_process')
-const fileDialog = require('file-dialog')
-const AColorPicker = require('a-color-picker')
-const svgToPng = require('save-svg-as-png')
-const Split = require('split.js')
+// const unhandled = require('electron-unhandled');
 
-const Fangorn = require('./js/fangorn.js')
-const FastaPane = require('./js/fasta_pane.js')
-const SearchPanel = require('./js/frontend/search_panel.js')
-const ColorPicker = require('./js/color_picker.js')
-const BtnGroupRadio = require('./js/btn_group_radio.js')
-const ProgressBarManager = require('./js/progress_bar_manager.js')
-
-const unhandled = require('electron-unhandled');
-
-const TREE_EXT = ['tre', 'tree', 'nexus', 'nex', 'nxs', 'newick', 'txt']
-const FASTA_EXT = ['fa', 'fas', 'fasta', 'fna', 'faa', 'ffn', 'frn']
-
-var fangorn = null
+var taxus = null
 var modeSelector = null
 var progressBar = null
+var controls = null
 
-function update_controls (fangorn) {
-  var menu = app.remote.Menu.getApplicationMenu()
+function initControls() {
+  controls = new Controls()
 
-  var disabled_menu_items = ['open-fasta', 'save-fasta', 'save-fasta-as', 'save-selection-as-fasta',
-                             'reroot', 'rotate-branch', 'select-all', 'select-descendants',
-                             'remove-selected', 'remove-unselected', 'restore-selected', 'find',
-                             'toggle-selection-mode', 'toggle-cladogram-view', 'zoom-in', 'zoom-out']
+  // Control callback should be named like
+  // system_name: some_item
+  // callback: someItemAction
 
-  disabled_menu_items.forEach(function (item) {
-    menu.disableItemById(item)
+  controls
+    // Only menu
+    .register('open_tree', 'open-tree', undefined)
+    .register('save_tree', 'save-tree', undefined)
+    .register('save_tree_as', 'save-tree-as', undefined)
+    .register('open_fasta', 'open-fasta', undefined)
+    .register('save_fasta', 'save-fasta', undefined)
+    .register('save_fasta_as', 'save-fasta-as', undefined)
+    .register('save_selection_as_fasta', 'save-selection-as-fasta', undefined)
+    .register('select_all', 'select-all', undefined)
+    .register('toggle_selection_mode', 'toggle-selection-mode', undefined)
+    .register('toggle_cladogram_view', 'toggle-cladogram-view', undefined)
+    // Both menu and button
+    .register('reroot', 'reroot', '#reroot-action')
+    .register('rotate_branch', 'rotate-branch', '#rotate-branch-action')
+    .register('select_descendants', 'select-descendants', '#select-descendants-action')
+    .register('remove_selected', 'remove-selected', '#remove-selected-action')
+    .register('remove_unselected', 'remove-unselected', '#remove-unselected-action')
+    .register('restore_selected', 'restore-selected', '#restore-selected-action')
+    .register('find', 'find', '#find-action')
+    .register('zoom_in', 'zoom-in', '#zoom-in-action')
+    .register('zoom_out', 'zoom-out', '#zoom-out-action')
+    // Only button
+    .register('annotate_node', undefined, '#annotate-node-action')
+    .register('horizontal_contract', undefined, '#horizontal-contract-action')
+    .register('horizontal_expand', undefined, '#horizontal-expand-action')
+    .register('vertical_contract', undefined, '#vertical-contract-action')
+    .register('vertical_expand', undefined, '#vertical-expand-action')
+    .register('change_branch_color', undefined, '#change-branch-color-action')
+    .register('remove_branch_color', undefined, '#remove-branch-color-action')
+    .register('set_mode_to_branch', undefined, '#set-mode-to-branch-action')
+    .register('set_mode_to_taxa', undefined, '#set-mode-to-taxa-action')
+    .register('set_search_mode_to_fasta', undefined, '#set-search-mode-to-fasta')
+
+  // controls.setCallback('open_fasta', openFastaAction)
+  window.api.onMenuClicked((event, itemId) => {
+    controls.runMenuCallback(itemId)
   })
 
-  $('#annotate-node-action').attr('disabled', 'disabled')
-  $('#reroot-action').attr('disabled', 'disabled')
-  $('#rotate-branch-action').attr('disabled', 'disabled')
-  $('#select-descendants-action').attr('disabled', 'disabled')
-  $('[data-direction]').attr('disabled', 'disabled')
-  $('.mark-button').attr('disabled', 'disabled')
-  $('#change-branch-color-action').attr('disabled', 'disabled')
-  $('#remove-branch-color-action').attr('disabled', 'disabled')
-  $('#set-mode-to-branch-action').attr('disabled', 'disabled')
-  $('#set-mode-to-taxa-action').attr('disabled', 'disabled')
-  $('#find-action').attr('disabled', 'disabled')
-  $('#set-search-mode-to-fasta').attr('disabled', 'disabled')
-  $('#zoom-in-action').attr('disabled', 'disabled')
-  $('#zoom-out-action').attr('disabled', 'disabled')
-
-  if (fangorn.tree_is_loaded()) {
-    $('#set-mode-to-branch-action').removeAttr('disabled')
-    $('#set-mode-to-taxa-action').removeAttr('disabled')
-    $('[data-direction]').removeAttr('disabled')
-    $('#zoom-in-action').removeAttr('disabled')
-    $('#zoom-out-action').removeAttr('disabled')
-    $('#open-fasta').removeAttr('disabled')
-    $('#find-action').removeAttr('disabled')
-
-    menu.enableItemById('open-fasta')
-    menu.enableItemById('select-all')
-    menu.enableItemById('find')
-    menu.enableItemById('toggle-selection-mode')
-    menu.enableItemById('toggle-cladogram-view')
-    menu.enableItemById('zoom-in')
-    menu.enableItemById('zoom-out')
-
-    if (fangorn.fasta_is_loaded() && fangorn.is_one_leaf_selected()) { $('#annotate-node-action').removeAttr('disabled') }
-
-    if (fangorn.is_one_selected()) {
-      $('#reroot-action').removeAttr('disabled')
-      menu.enableItemById('reroot')
-    }
-
-    if (fangorn.is_one_internal_selected()) {
-      $('#rotate-branch-action').removeAttr('disabled')
-      menu.enableItemById('rotate-branch')
-    }
-
-    if (fangorn.is_any_interlal_selected()) {
-      $('#select-descendants-action').removeAttr('disabled')
-      menu.enableItemById('select-descendants')
-    }
-
-    if (fangorn.get_selection().length > 0) {
-      $('#change-branch-color-action').removeAttr('disabled')
-      $('#remove-branch-color-action').removeAttr('disabled')
-    }
-
-    if (fangorn.fasta_is_loaded() && fangorn.get_selected_leaves().length > 0) {
-      $('.mark-button').removeAttr('disabled')
-      menu.enableItemById('remove-selected')
-      menu.enableItemById('remove-unselected')
-      menu.enableItemById('restore-selected')
-    }
-
-    if (fangorn.fasta_is_loaded()) {
-      $('#save-fasta-action').removeAttr('disabled')
-      menu.enableItemById('save-fasta')
-      menu.enableItemById('save-fasta-as')
-
-      $('#set-search-mode-to-fasta').removeAttr('disabled')
-    } else {
-      $('#save-fasta-action').attr('disabled', 'disabled')
-    }
-
-    if (fangorn.get_selected_leaves_fasta()){
-      menu.enableItemById('save-selection-as-fasta')
-    }
-  }
+  return controls
 }
 
-function show_alert (title, body) {
+function updateControls () {
+  controls.disableAll()
+
+  controls.enableItem('open_tree')
+
+  if (taxus.tree_is_loaded()) {
+    controls.enableItem('save_tree')
+    controls.enableItem('save_tree_as')
+
+    controls.enableItem('open_fasta')
+    controls.enableItem('select_all')
+    controls.enableItem('toggle_selection_mode')
+    controls.enableItem('toggle_cladogram_view')
+
+    controls.enableItem('zoom_in')
+    controls.enableItem('zoom_out')
+    controls.enableItem('find')
+
+    controls.enableItem('set_mode_to_branch')
+    controls.enableItem('set_mode_to_taxa')
+    controls.enableItem('horizontal_contract')
+    controls.enableItem('horizontal_expand')
+    controls.enableItem('vertical_contract')
+    controls.enableItem('vertical_expand')
+
+
+    if (taxus.fasta_is_loaded() && taxus.is_one_leaf_selected()) {
+      controls.enableItem('annotate_node')
+    }
+
+    if (taxus.is_one_selected()) {
+      controls.enableItem('reroot')
+    }
+
+    if (taxus.is_one_internal_selected()) {
+      controls.enableItem('rotate_branch')
+    }
+
+    if (taxus.is_any_interlal_selected()) {
+      controls.enableItem('select_descendants')
+    }
+
+    if (taxus.get_selection().length > 0) {
+      controls.enableItem('change_branch_color')
+      controls.enableItem('remove_branch_color')
+    }
+
+    if (taxus.fasta_is_loaded() && taxus.get_selected_leaves().length > 0) {
+      controls.enableItem('remove_selected')
+      controls.enableItem('remove_unselected')
+      controls.enableItem('restore_selected')
+    }
+
+    if (taxus.fasta_is_loaded()) {
+      controls.enableItem('save_fasta')
+      controls.enableItem('save_fasta_as')
+
+      controls.enableItem('set_search_mode_to_fasta')
+    }
+
+    if (taxus.get_selected_leaves_fasta()){
+      controls.enableItem('save_selection_as_fasta')
+    }
+  }
+
+  var menuStates = controls.menuStateDict()
+  window.api.updateMenu(menuStates)
+}
+
+function showAlert (title, body) {
   $('#universal-dialog').find('.title').html(title)
   $('#universal-dialog').find('.modal-body').html(body)
   $('#universal-dialog')[0].showModal()
 }
 
-function show_log_alert (title, subtitle, rows) {
+function showLogAlert (title, subtitle, rows) {
   $('#universal-dialog').find('.title').html(title)
 
   $('#universal-dialog').find('.modal-body').html('')
@@ -134,43 +143,50 @@ function show_log_alert (title, subtitle, rows) {
   $('#universal-dialog')[0].showModal()
 }
 
-function set_window_header (text = null) {
+function setWindowHeader (text = null) {
   var header = 'Taxus'
 
   if (text) { header += ' — ' + text }
 
   $('h1#window-header').html(header)
+  // TODO header to backend
 }
 
-function open_tree_action (e) {
+async function openTreeAction (e) {
 
-  var open_tree = function () {
+  var openTree = async function () {
     var options = {
       properties: ['openFile'],
-      filters: [{ name: 'Tree files', extensions: TREE_EXT }, { name: 'All files', extensions: ['*'] }],
+      filters: [
+        { name: 'Tree files', extensions: Taxus.TREE_EXT },
+        { name: 'All files', extensions: ['*'] }],
       title: 'Open tree'
     }
 
-    dialog.showOpenDialog(options).then(result => {
-      if (result.filePaths.length == 0) {
-        return false
-      }
-
-      progressBar.withProgressBar(() => {
-
-        var path = result.filePaths[0]
-        fangorn.load_tree_file(path)
-
-        progressBar.setNewComplexity(fangorn.get_nodes().length)
-      })
-
+    window.api.openFileDialog(options).then(path => {
+      taxus.load_tree_file(path)
     })
+
+    // TODO progressbar
+    // dialog.showOpenDialog(options).then(result => {
+    //   if (result.filePaths.length == 0) {
+    //     return false
+    //   }
+
+    //   progressBar.withProgressBar(() => {
+
+    //     taxus.load_tree_file(path)
+
+    //     progressBar.setNewComplexity(taxus.get_nodes().length)
+    //   })
+
+    // })
   }
 
-  if (fangorn.tree_is_dirty || fangorn.fasta_is_dirty){
-    showUnsavedFileAlert(open_tree)
+  if (taxus.tree_is_dirty || taxus.fasta_is_dirty){
+    showUnsavedFileAlert(openTree)
   } else {
-    open_tree()
+    openTree()
   }
 
   resetSelectionMode()
@@ -184,30 +200,31 @@ function getMode () {
   return undefined
 }
 
-function save_tree_action () {
-  fangorn.save_tree()
+function saveTreeAction () {
+  taxus.save_tree()
 }
 
-function save_tree_as_action () {
-  var options = { title: 'Save tree as...', defaultPath: fangorn.tree_path }
-  dialog.showSaveDialog(options).then(result => {
-    if (result.canceled || result.filePath.length === 0) { return true }
+function saveTreeAsAction () {
+  var options = {
+    title: 'Save tree as...',
+    defaultPath: taxus.tree_path }
 
-    fangorn.save_tree(result.filePath)
+  window.api.saveFileDialog(options).then(path => {
+    taxus.save_tree(path)
 
-    var fasta_is_loaded = fangorn.fasta_is_loaded()
-    var fasta_path = fasta_is_loaded && fangorn.fasta.path
+    var fasta_is_loaded = taxus.fasta_is_loaded()
+    var fasta_path = fasta_is_loaded && taxus.fasta.path
 
-    fangorn.load_tree_file(result.filePath)
-    if (fasta_is_loaded) { fangorn.load_fasta_file(fasta_path, true) }
+    taxus.load_tree_file(result.filePath)
+    if (fasta_is_loaded) { taxus.load_fasta_file(fasta_path, true) }
   })
 }
 
-function open_fasta_action () {
+function openFastaAction () {
   var open_fasta = function () {
     var options = {
       properties: ['openFile'],
-      filters: [{ name: 'Fasta files', extensions: FASTA_EXT }, { name: 'All files', extensions: ['*'] }],
+      filters: [{ name: 'Fasta files', extensions: Taxus.FASTA_EXT }, { name: 'All files', extensions: ['*'] }],
       title: 'Open fasta file'
     }
 
@@ -215,27 +232,27 @@ function open_fasta_action () {
       if (result.filePaths.length === 0) { return false }
 
       var path = result.filePaths[0]
-      fangorn.load_fasta_file(path)
+      taxus.load_fasta_file(path)
     })
   }
 
-  if (fangorn.fasta_is_dirty){
+  if (taxus.fasta_is_dirty){
     showUnsavedFileAlert(open_fasta)
   } else
     open_fasta()
 
 }
 
-function copy_action () {
+function copyAction () {
   if (!fangorn.tree_is_loaded()){
     return
   }
 
-  var fasta = fangorn.get_selected_leaves_fasta()
+  var fasta = taxus.get_selected_leaves_fasta()
   if (fasta) { clipboard.writeText(fasta) }
 }
 
-function toggle_selection_mode_action () {
+function toggleSelectionModeAction () {
   if ($('#set-mode-to-taxa-action').hasClass('active')) {
     $('#set-mode-to-branch-action').click()
   } else if ($('#set-mode-to-branch-action').hasClass('active')) {
@@ -243,52 +260,61 @@ function toggle_selection_mode_action () {
   }
 }
 
-function remove_selected_action () {
-  fangorn.get_selection().forEach(function (n) { n.mark() })
-  fangorn.get_tree().refresh()
-  fangorn.select_none()
+function setModeToTaxaAction() {
+
+}
+
+function setModeToBranchAction() {
+
+}
+
+function removeSelectedAction() {
+  taxus.get_selection().forEach(function (n) { n.mark() })
+  taxus.get_tree().refresh()
+  taxus.select_none()
   dispatchDocumentEvent('node_mark_status_changed')
 }
 
-function remove_unselected_action () {
-  var selected = fangorn.get_selection()
+function removeUnselectedAction() {
+  var selected = taxus.get_selection()
 
-  fangorn.get_leaves().forEach(function (l) {
+  taxus.get_leaves().forEach(function (l) {
     if (!selected.includes(l)) { l.mark() }
   })
 
-  fangorn.get_tree().refresh()
-  fangorn.select_none()
+  taxus.get_tree().refresh()
+  taxus.select_none()
   dispatchDocumentEvent('node_mark_status_changed')
 }
 
-function restore_selected_action () {
-  fangorn.get_selection().forEach(function (n) { n.unmark() })
-  fangorn.get_tree().refresh()
-  fangorn.select_none()
+function restoreSelectedAction() {
+  taxus.get_selection().forEach(function (n) { n.unmark() })
+  taxus.get_tree().refresh()
+  taxus.select_none()
   dispatchDocumentEvent('node_mark_status_changed')
 }
 
-function save_fasta_action () {
-  fangorn.save_fasta(null, function () {
-    fangorn.load_fasta_file(fangorn.fasta_out_path(), true)
+function saveFastaAction() {
+  taxus.save_fasta(null, function () {
+    taxus.load_fasta_file(taxus.fasta_out_path(), true)
   })
 }
 
-function save_fasta_as_action () {
-  var options = { title: 'Save fasta as...', defaultPath: fangorn.fasta_out_path() }
+function saveFastaAsAction() {
+  var options = { title: 'Save fasta as...', defaultPath: taxus.fasta_out_path() }
 
   dialog.showSaveDialog(options).then(result => {
     if (result.canceled || result.filePath.length === 0) { return true }
 
-    fangorn.save_fasta(result.filePath, function () {
-      fangorn.load_fasta_file(result.filePath, true)
+    taxus.save_fasta(result.filePath, function () {
+      taxus.load_fasta_file(result.filePath, true)
     })
   })
 }
 
-function save_selection_as_fasta_action () {
-  var fasta = fangorn.get_selected_leaves_fasta()
+function saveSelectionAsFastaAction() {
+  // TODO: make it properly
+  var fasta = taxus.get_selected_leaves_fasta()
 
   if (!fasta) { return false }
 
@@ -305,7 +331,7 @@ function save_selection_as_fasta_action () {
   })
 }
 
-function show_fasta_action () {
+function showFastaAction() {
   if ($('#fasta-panel').is(':hidden')) {
     $('#fasta-panel').show()
     $('#show-fasta-action').addClass('btn-pressed')
@@ -315,90 +341,82 @@ function show_fasta_action () {
   }
 }
 
-function annotate_node_action () {
-  if (!fangorn.fasta_is_loaded() || fangorn.get_selection().length != 1) { return false }
+function annotateNodeAction() {
+  if (!fangorn.fasta_is_loaded() || taxus.get_selection().length != 1) { return false }
 
-  var node = fangorn.get_selection()[0]
+  var node = taxus.get_selection()[0]
   var header = node.fasta().header
   $('#seq-title-input').val(header)
 
   $('#annotate-dialog')[0].showModal()
 }
 
-function reroot_action () {
+function rerootAction() {
   progressBar.withProgressBarAttempt(() => {
-    fangorn.reroot_to_selected_node()
+    taxus.reroot_to_selected_node()
   })
 }
 
-function rotate_branch_action () {
+function rotateBranchAction() {
   progressBar.withProgressBarAttempt(() => {
-    fangorn.rotate_selected_branch()
+    taxus.rotate_selected_branch()
   })
 }
 
-function select_descendants_action () {
-  fangorn.select_descendants_of_selected()
+function selectDescendantsAction() {
+  taxus.select_descendants_of_selected()
 }
 
-function export_to_png_action () {
-  bbox = fangorn.get_tree().phylotree_navigator.getTreeScreenBBox()
+function exportToPngAction() {
+  bbox = taxus.get_tree().phylotree_navigator.getTreeScreenBBox()
   options = { fonts: [], left: bbox.x, top: bbox.y, height: bbox.height, width: bbox.width }
   svgToPng.saveSvgAsPng(d3.select('svg#tree_display').node(), 'tree.png', options)
 }
 
-function export_to_svg_action () {
-  bbox = fangorn.get_tree().phylotree_navigator.getTreeScreenBBox()
+function exportToSvgAction() {
+  bbox = taxus.get_tree().phylotree_navigator.getTreeScreenBBox()
   options = { fonts: [], left: bbox.x, top: bbox.y, height: bbox.height, width: bbox.width }
   svgToPng.saveSvg(d3.select('svg#tree_display').node(), 'tree.svg', options)
 }
 
-function remove_branch_color_action () {
-  fangorn.set_selected_nodes_annotation({ '!color': undefined })
-  fangorn.get_tree().dispatch_selection_modified_event() // for picker to reset color
+function removeBranchColorAction() {
+  taxus.set_selected_nodes_annotation({ '!color': undefined })
+  taxus.get_tree().dispatch_selection_modified_event() // for picker to reset color
 }
 
 function selectAllAction () {
   var mode = getMode()
   if (mode === 'taxa'){
-    fangorn.select_all_leaves()
+    taxus.select_all_leaves()
   } else if (mode === 'branch') {
-    fangorn.select_all()
+    taxus.select_all()
   }
 }
 
 function toggleCladogramViewAction () {
   progressBar.withProgressBarAttempt(() => {
-    fangorn.toggleCladogramView()
+    taxus.toggleCladogramView()
   })
 }
 
 function applyPreferences () {
-  fangorn.get_tree().safe_update()
-  fangorn.redraw_features()
+  taxus.get_tree().safe_update()
+  taxus.redraw_features()
 }
 
 function quitAction () {
-  if (fangorn.has_dirty_files()){
+  if (taxus.has_dirty_files()){
     showUnsavedFileAlert((e) => app.remote.app.quit())
   } else
     app.remote.app.quit()
 }
 
-function zoomInMenuAction () {
-  fangorn.get_tree().zoomIn()
+function zoomInAction () {
+  taxus.get_tree().zoomIn()
 }
 
-function zoomOutMenuAction () {
-  fangorn.get_tree().zoomOut()
-}
-
-function zoomInButtonAction () {
-  fangorn.get_tree().zoomIn(fangorn.get_tree().is_shift_mode())
-}
-
-function zoomOutButtonAction () {
-  fangorn.get_tree().zoomOut(fangorn.get_tree().is_shift_mode())
+function zoomOutAction () {
+  taxus.get_tree().zoomOut()
 }
 
 function resetSelectionMode () {
@@ -406,7 +424,7 @@ function resetSelectionMode () {
 }
 
 function printTaxaCount () {
-  cnt = fangorn.get_leaves().length
+  cnt = taxus.get_leaves().length
   printMetaInfo(cnt + ' taxa')
 }
 
@@ -415,86 +433,43 @@ function printMetaInfo (msg) {
 }
 
 $(document).ready(function () {
-  var menu = app.remote.Menu.getApplicationMenu()
-
-  unhandled({ showDialog: true })
+  // unhandled({ showDialog: true })
 
   Split(['#tree-pane', '#fasta-panel'], { gutterSize: 10, cursor: 'col-resize' })
 
-  set_window_header()
+  setWindowHeader()
 
   document.addEventListener('fangorn_state_update', function (e) {
-    update_controls(fangorn)
+    updateControls(taxus)
   })
 
-  fangorn = Fangorn()
-  fangorn.dispatch_state_update()
+  taxus = new Taxus()
 
-  var fasta_pane = new FastaPane(fangorn)
+  // $('#annotate-node-action').on('click', async () => { // DEBUGGING
+  //   open_tree_action()
+  // }) // DEBUGGING
 
-  progressBar = new ProgressBarManager()
+  var controls = initControls()
+
+  updateControls()
 
   $('button').on('click', function () { this.blur() })
 
-  // *** Menu actions *** //
+  var fasta_pane = new FastaPane(taxus)
 
-  // File
-  menu.setCallbackOnItem('open-tree', open_tree_action)
-  menu.setCallbackOnItem('save-tree', save_tree_action)
-  menu.setCallbackOnItem('save-tree-as', save_tree_as_action)
+  return
 
-  menu.setCallbackOnItem('open-fasta', open_fasta_action)
-  menu.setCallbackOnItem('save-fasta', save_fasta_action)
-  menu.setCallbackOnItem('save-fasta-as', save_fasta_as_action)
-  menu.setCallbackOnItem('save-selection-as-fasta', save_selection_as_fasta_action)
 
-  menu.setCallbackOnItem('export-to-png', export_to_png_action)
-  menu.setCallbackOnItem('export-to-svg', export_to_svg_action)
-
-  menu.setCallbackOnItem('zoom-in', zoomInMenuAction)
-  menu.setCallbackOnItem('zoom-out', zoomOutMenuAction)
-
-  $("#zoom-in-action").on('click', zoomInButtonAction)
-  $("#zoom-out-action").on('click', zoomOutButtonAction)
+  // progressBar = new ProgressBarManager()
 
   // Edit
 
   document.addEventListener('copy', function(e) {
     if (e.target.tagName == 'BODY'){
-      copy_action()
+      copyAction()
       e.preventDefault()
     }
   })
-
-  menu.setCallbackOnItem('toggle-selection-mode', toggle_selection_mode_action)
-  menu.setCallbackOnItem('remove-selected', remove_selected_action)
-  menu.setCallbackOnItem('remove-unselected', remove_unselected_action)
-  menu.setCallbackOnItem('restore-selected', restore_selected_action)
-  menu.setCallbackOnItem('select-all', selectAllAction)
-
-  // View
-
-  menu.setCallbackOnItem('toggle-cladogram-view', toggleCladogramViewAction)
-
-  $('#remove-selected-action').on('click', remove_selected_action)
-  $('#remove-unselected-action').on('click', remove_unselected_action)
-  $('#restore-selected-action').on('click', restore_selected_action)
-
-
-  $('#show-fasta-action').on('click', show_fasta_action)
-
-  $('#annotate-node-action').on('click', annotate_node_action)
-
-  $('#reroot-action').on('click', reroot_action)
-  menu.setCallbackOnItem('reroot', reroot_action)
-
-  $('#rotate-branch-action').on('click', rotate_branch_action)
-  menu.setCallbackOnItem('rotate-branch', rotate_branch_action)
-
-  $('#select-descendants-action').on('click', select_descendants_action)
-  menu.setCallbackOnItem('select-descendants', select_descendants_action)
-
-  menu.setCallbackOnItem('quit', quitAction)
 
   $('#annotation-dialog-cancel').on('click', function () {
     $('#seq-title-input').val('')
@@ -502,8 +477,8 @@ $(document).ready(function () {
   })
 
   $('#annotation-dialog-save').on('click', function () {
-    var node = fangorn.get_selection()[0]
-    fangorn.update_node_title(node, $('#seq-title-input').val())
+    var node = taxus.get_selection()[0]
+    taxus.update_node_title(node, $('#seq-title-input').val())
     dispatchDocumentEvent('node_titles_changed')
     $('#seq-title-input').val('')
     $('#annotate-dialog')[0].close(false)
@@ -514,11 +489,11 @@ $(document).ready(function () {
   })
 
   $('.expand-contract-action').on('click', function () {
-    var which_function = $(this).data('direction') == 'vertical' ? fangorn.get_tree().spacing_x : fangorn.get_tree().spacing_y
+    var which_function = $(this).data('direction') == 'vertical' ? taxus.get_tree().spacing_x : taxus.get_tree().spacing_y
 
     progressBar.withProgressBarAttempt(() => {
       which_function(which_function() + (+$(this).data('amount'))).safe_update()
-      fangorn.get_tree().redraw_scale_bar()
+      taxus.get_tree().redraw_scale_bar()
     })
 
     dispatchDocumentEvent('tree_topology_changed')
@@ -528,11 +503,11 @@ $(document).ready(function () {
 
   var picker = new ColorPicker('#branch-color-picker', '#change-branch-color-action', ['#change-branch-color-box'])
   picker.add_color_change_callback(function (color) {
-    fangorn.set_selected_nodes_annotation({ "!color": color })
+    taxus.set_selected_nodes_annotation({ "!color": color })
   })
 
   document.addEventListener('selection_modified', function (e) {
-    var selection = fangorn.get_selection()
+    var selection = taxus.get_selection()
 
     if (selection.length === 1) {
       var color = selection[0].parsed_annotation['!color']
@@ -556,27 +531,27 @@ $(document).ready(function () {
     }
   })
 
-  $('#remove-branch-color-action').on('click', remove_branch_color_action)
+  $('#remove-branch-color-action').on('click', removebranchcoloraction)
 
   // Preferences logic
 
   document.addEventListener('preferences_update', applyPreferences)
 
   ipcRenderer.on('give_current_prefs', (event, message) => {
-    ipcRenderer.send('take_current_prefs', fangorn.preferences || {})
+    ipcRenderer.send('take_current_prefs', taxus.preferences || {})
   })
 
   ipcRenderer.on('take_new_prefs', (event, message) => {
-    if (fangorn.preferences) { fangorn.apply_new_preferences(message) }
+    if (taxus.preferences) { taxus.apply_new_preferences(message) }
     ipcRenderer.send('new_preferences_taken')
   })
 
   ipcRenderer.on('open_file', (event, message) => {
     var open_tree = function () {
-      fangorn.load_tree_file(message)
+      taxus.load_tree_file(message)
     }
 
-    if (fangorn.tree_is_dirty || fangorn.fasta_is_dirty){
+    if (taxus.tree_is_dirty || taxus.fasta_is_dirty){
       showUnsavedFileAlert(open_tree)
     } else {
       open_tree()
@@ -595,7 +570,7 @@ $(document).ready(function () {
     var $btn = $(new_button)
     var mode = $btn.data('mode')
 
-    fangorn.get_tree().set_selection_mode(mode)
+    taxus.get_tree().set_selection_mode(mode)
     $btn.blur()
   }
 
@@ -603,7 +578,7 @@ $(document).ready(function () {
 
   // Search panel
 
-  var search_panel = new SearchPanel($('#search-panel'), fangorn, fasta_pane)
+  var search_panel = new SearchPanel($('#search-panel'), taxus, fasta_pane)
 
   menu.setCallbackOnItem('find', function () {
     search_panel.toggle()
@@ -619,7 +594,7 @@ $(document).ready(function () {
   // Header update logic
 
   document.addEventListener('fangorn_tree_header_update', (e) => {
-    set_window_header(fangorn.tree_title())
+    setWindowHeader(taxus.tree_title())
   })
 
   // Key bindings

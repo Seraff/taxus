@@ -1,4 +1,3 @@
-const $ = require('jquery')
 /**
  * Very basic NEXUS parser
  *
@@ -100,37 +99,37 @@ StringTokens.quote    = 1;
 StringTokens.done     = 2;
 
 //--------------------------------------------------------------------------------------------------
-function NexusError(){}
-NexusError.ok       = 0;
-NexusError.nobegin    = 1;
-NexusError.noend    = 2;
-NexusError.syntax     = 3;
-NexusError.badcommand   = 4;
-NexusError.noblockname  = 5;
-NexusError.badblock   = 6;
-NexusError.nosemicolon  = 7;
-NexusError.notnexus  = 8;
+function NexusParseError(){}
+NexusParseError.ok       = 0;
+NexusParseError.nobegin    = 1;
+NexusParseError.noend    = 2;
+NexusParseError.syntax     = 3;
+NexusParseError.badcommand   = 4;
+NexusParseError.noblockname  = 5;
+NexusParseError.badblock   = 6;
+NexusParseError.nosemicolon  = 7;
+NexusParseError.notnexus  = 8;
 
 //--------------------------------------------------------------------------------------------------
-function NexusErrorHumanized(err){
+function NexusParseErrorHumanized(err){
   switch (err) {
-    case NexusError.ok:
+    case NexusParseError.ok:
       return "ok"
-    case NexusError.nobegin:
+    case NexusParseError.nobegin:
       return "problem with begin block"
-    case NexusError.noend:
+    case NexusParseError.noend:
       return "problem with end block"
-    case NexusError.syntax:
+    case NexusParseError.syntax:
       return "syntax error"
-    case NexusError.badcommand:
+    case NexusParseError.badcommand:
       return "bad command"
-    case NexusError.noblockname:
+    case NexusParseError.noblockname:
       return "block name doesn't exist"
-    case NexusError.badblock:
+    case NexusParseError.badblock:
       return "bad block"
-    case NexusError.nosemicolon:
+    case NexusParseError.nosemicolon:
       return "no semicolon"
-    case NexusError.notnexus:
+    case NexusParseError.notnexus:
       return "not a nexus file"
   }
 }
@@ -440,7 +439,7 @@ NexusReader.prototype.GetBlock = function()
 
   if (command.toLowerCase() != 'begin')
   {
-    this.error = NexusError.nobegin;
+    this.error = NexusParseError.nobegin;
   }
   else
   {
@@ -453,12 +452,12 @@ NexusReader.prototype.GetBlock = function()
       t = this.GetToken();
       if (t != TokenTypes.SemiColon)
       {
-        this.error = NexusError.noblockname;
+        this.error = NexusParseError.noblockname;
       }
     }
     else
     {
-      this.error = NexusError.noblockname;
+      this.error = NexusParseError.noblockname;
     }
 
   }
@@ -484,12 +483,12 @@ NexusReader.prototype.GetCommand = function()
     }
     else
     {
-      this.error = NexusError.badcommand;
+      this.error = NexusParseError.badcommand;
     }
   }
   else
   {
-    this.error = NexusError.syntax;
+    this.error = NexusParseError.syntax;
   }
   return command.toLowerCase();
 }
@@ -497,7 +496,7 @@ NexusReader.prototype.GetCommand = function()
 //----------------------------------------------------------------------------------------------
 NexusReader.prototype.IsNexusFile = function()
 {
-  this.error = NexusError.ok;
+  this.error = NexusParseError.ok;
 
   var nexus = false;
   var t = this.GetToken();
@@ -518,28 +517,28 @@ NexusReader.prototype.SkipCommand = function()
   var t = null;
   do {
     t = this.GetToken();
-  } while ((this.error == NexusError.ok) && (t != TokenTypes.SemiColon));
+  } while ((this.error == NexusParseError.ok) && (t != TokenTypes.SemiColon));
   return this.error;
 }
 
 //--------------------------------------------------------------------------------------------------
-function parse(str)
+function parseNexus(str)
 {
   var nexus = {};
 
-  nexus.status = NexusError.ok;
+  nexus.status = NexusParseError.ok;
 
   var nx = new NexusReader(str);
 
   if (!nx.IsNexusFile())
   {
-    nexus.status = NexusError.notnexus;
+    nexus.status = NexusParseError.notnexus;
     return nexus;
   }
 
   var blockname = nx.GetBlock();
 
-  var last_error = NexusError.ok;
+  var last_error = NexusParseError.ok;
 
   while(blockname != ""){
 
@@ -550,7 +549,7 @@ function parse(str)
       while (
         (command != 'end')
         && (command != 'endblock')
-        && (nx.error == NexusError.ok)
+        && (nx.error == NexusParseError.ok)
         )
       {
         switch (command)
@@ -595,7 +594,7 @@ function parse(str)
 
       while (
         ((command != 'end') && (command != 'endblock'))
-        && (nx.error == NexusError.ok)
+        && (nx.error == NexusParseError.ok)
         )
       {
         switch (command)
@@ -606,7 +605,7 @@ function parse(str)
             nexus.treesblock.translate = {};
 
             var done = false;
-            while (!done && (nx.error == NexusError.ok))
+            while (!done && (nx.error == NexusParseError.ok))
             {
               // get index of taxa
               var t = nx.GetToken();
@@ -636,18 +635,18 @@ function parse(str)
                       break;
 
                     default:
-                      nx.error = NexusError.syntax;
+                      nx.error = NexusParseError.syntax;
                       break;
                   }
                 }
                 else
                 {
-                  nx.error = NexusError.syntax;
+                  nx.error = NexusParseError.syntax;
                 }
               }
               else
               {
-                nx.error = NexusError.syntax;
+                nx.error = NexusParseError.syntax;
               }
             }
 
@@ -725,7 +724,7 @@ function parse(str)
       while (
         (command != 'end')
         && (command != 'endblock')
-        && (nx.error == NexusError.ok)
+        && (nx.error == NexusParseError.ok)
         )
       {
 
@@ -742,7 +741,7 @@ function parse(str)
             if (t == TokenTypes.QuotedString || t == TokenTypes.String){
               key = nx.buffer;
             } else {
-              nx.error = NexusError.syntax;
+              nx.error = NexusParseError.syntax;
               break;
             }
 
@@ -750,7 +749,7 @@ function parse(str)
             t = nx.GetToken();
 
             if (t != TokenTypes.Equals){
-              nx.error = NexusError.syntax;
+              nx.error = NexusParseError.syntax;
               break;
             }
 
@@ -795,7 +794,7 @@ function parse(str)
         command = nx.GetCommand();
 
         if ((command != 'end') && (command != 'endblock')){
-          nx.error = NexusError.ok;
+          nx.error = NexusParseError.ok;
           nx.SkipCommand();
         } else
           nx.GetToken();
@@ -807,21 +806,17 @@ function parse(str)
         counter += 1;
       }
 
-      nx.error = endNotFound ? NexusError.badblock : NexusError.ok;
+      nx.error = endNotFound ? NexusParseError.badblock : NexusParseError.ok;
     }
 
     last_error = nx.error;
     blockname = nx.GetBlock()
   }
 
-  if (nx.error == NexusError.nobegin)
+  if (nx.error == NexusParseError.nobegin)
     nx.error = last_error;
 
   nexus.status = nx.error;
 
   return nexus;
 }
-
-module.exports.parse = parse;
-module.exports.NexusError = NexusError;
-module.exports.NexusErrorHumanized = NexusErrorHumanized;

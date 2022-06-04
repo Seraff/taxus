@@ -1,4 +1,4 @@
-class AlignmentCoverage {
+class AlignmentCoverageFeature {
   constructor (node) {
     this.node = node
     this.container = d3.select(this.node.container)
@@ -67,5 +67,3 @@ class AlignmentCoverage {
     return null
   }
 }
-
-module.exports = AlignmentCoverage

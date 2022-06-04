@@ -1,10 +1,5 @@
-const $ = require('jquery')
-const pako = require('pako')
-require('path-data-polyfill')
-
-PhylotreeNavigator = require('./phylotree_navigator.js')
-const nexus = require('./nexus.js')
-const GeometryHelper = require('./geometry_helper.js')
+const pako = window.modules.pako
+// require('path-data-polyfill')
 
 class NexusError extends Error {
   constructor(message) {
@@ -27,7 +22,7 @@ class PhylotreeError extends Error {
   }
 }
 
-function apply_extensions(phylotree){
+function applyPhylotreeExtensions(phylotree){
   const basic_nexus_pattern = `#NEXUS
 begin trees;
 \ttree tree = [&R] %NEWICK%
@@ -250,7 +245,6 @@ end;
     var bbox = branch.get_element().node().getBBox()
 
     // detect, if the branch ┌─ or └─
-
     var path_data = branch.get_element().node().getPathData()
     var branch_goes_up = path_data[0].values[1] > path_data[1].values[0]
 
@@ -485,8 +479,8 @@ end;
     }
 
     // str is nexus now, parse it, check it
-    var parsed_nexus = nexus.parse(str)
-    if (parsed_nexus.status === nexus.NexusError.ok){
+    var parsed_nexus = parseNexus(str)
+    if (parsed_nexus.status === NexusParseError.ok){
       // it is nexus
       phylotree.nexus = parsed_nexus
 
@@ -508,7 +502,7 @@ end;
       }
 
     } else {
-      var error = nexus.NexusErrorHumanized(parsed_nexus.status)
+      var error = NexusParseErrorHumanized(parsed_nexus.status)
       throw new NexusError("Error in nexus file (" + error + ")")
     }
 
@@ -802,5 +796,3 @@ end;
   }
 
 }
-
-module.exports = apply_extensions

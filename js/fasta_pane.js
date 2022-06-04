@@ -1,5 +1,4 @@
-const $ = require('jquery')
-const Path = require('path')
+const Path = window.modules.path
 
 class FastaPane {
   constructor (fangorn) {
@@ -124,6 +123,8 @@ class FastaPane {
 }
 
 class FastaPaneEntry {
+  static HIGHLIGHT_COLOR = '#fff308'
+
   constructor (pane, fasta_entry) {
     this.$element = null
 
@@ -206,7 +207,3 @@ class FastaPaneEntry {
 
   }
 }
-
-FastaPaneEntry.HIGHLIGHT_COLOR = '#fff308'
-
-module.exports = FastaPane

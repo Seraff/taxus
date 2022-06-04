@@ -136,5 +136,3 @@ class NodeStyler {
 }
 
 NodeStyler.HIGHLIGHT_COLOR = '#fff308'
-
-module.exports = NodeStyler;

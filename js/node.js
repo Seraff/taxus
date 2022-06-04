@@ -1,7 +1,3 @@
-const FastaRepresentation = require('./fasta_representation.js')
-const NodeStyler = require('./node_styler.js')
-const features = require('./node_features')
-
 // Our phylotreejs node wrapper
 
 function Node(fangorn, phylotree_node){
@@ -194,7 +190,7 @@ function Node(fangorn, phylotree_node){
   node.init_features = function () {
     if (!node.is_leaf()) { return false }
 
-    node.features.push(new features.AlignmentCoverage(node))
+    node.features.push(new AlignmentCoverageFeature(node))
   }
 
   node.redraw_features = function () {
@@ -210,5 +206,3 @@ function Node(fangorn, phylotree_node){
 
   return node
 }
-
-module.exports = Node

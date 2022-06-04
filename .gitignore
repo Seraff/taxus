@@ -2,6 +2,8 @@
 tmp/*
 dist/*
 .idea/*
+.history
+*.code-workspace
 
 # Logs
 logs
@@ -52,3 +54,5 @@ __pycache__/
 # docs
 docs/_build/*
 docs/*.bat
+
+.code-workspace

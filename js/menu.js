@@ -8,6 +8,11 @@ var shell = electron.shell
 
 var PreferencesWindow = require('./preferences_window.js')
 
+function onClick(event, win) {
+  console.log('Clicked ' + event.id)
+  win.webContents.send('taxus:menu_clicked', event.id)
+}
+
 const template = [
   {
     label: 'File',
@@ -15,16 +20,19 @@ const template = [
       {
         id: "open-tree",
         label: "Open Tree",
-        accelerator: "CmdOrCtrl+O"
+        accelerator: "CmdOrCtrl+O",
+        click: onClick
       },
       {
         id: "save-tree",
         label: "Save Tree",
-        accelerator: "CmdOrCtrl+S"
+        accelerator: "CmdOrCtrl+S",
+        click: onClick
       },
       {
         id: "save-tree-as",
-        label: "Save Tree as..."
+        label: "Save Tree as...",
+        click: onClick
       },
       {
         type: 'separator'
@@ -32,20 +40,24 @@ const template = [
       {
         id: "open-fasta",
         label: "Open Fasta",
-        accelerator: "CmdOrCtrl+Shift+O"
+        accelerator: "CmdOrCtrl+Shift+O",
+        onClick
       },
       {
         id: "save-fasta",
         label: "Save Fasta",
-        accelerator: "CmdOrCtrl+Shift+S"
+        accelerator: "CmdOrCtrl+Shift+S",
+        onClick
       },
       {
         id: "save-fasta-as",
-        label: "Save Fasta as..."
+        label: "Save Fasta as...",
+        onClick
       },
       {
         id: "save-selection-as-fasta",
-        label: "Save Selection as Fasta"
+        label: "Save Selection as Fasta",
+        onClick
       },
       {
         type: 'separator'
@@ -56,11 +68,13 @@ const template = [
         submenu: [
         {
           id: "export-to-png",
-          label: "PNG"
+          label: "PNG",
+          onClick
         },
         {
           id: "export-to-svg",
-          label: "SVG"
+          label: "SVG",
+          onClick
         },
         ]
       }
@@ -92,11 +106,13 @@ const template = [
       {
         label: "Select All in Tree",
         id: 'select-all',
-        accelerator: "CmdOrCtrl+Shift+A"
+        accelerator: "CmdOrCtrl+Shift+A",
+        onClick
       },
       {
         id: 'select-descendants',
-        label: "Select Descendants"
+        label: "Select Descendants",
+        onClick
       },
       {
         type: 'separator'
@@ -104,12 +120,14 @@ const template = [
       {
         id: "find",
         label: 'Find',
-        accelerator: 'CmdOrCtrl+F'
+        accelerator: 'CmdOrCtrl+F',
+        onClick
       },
       {
         id: "toggle-selection-mode",
         label: 'Toggle Selection Mode',
-        accelerator: 'Ctrl+Tab'
+        accelerator: 'Ctrl+Tab',
+        onClick
       },
       {
         type: 'separator'
@@ -117,27 +135,32 @@ const template = [
       {
         id: "reroot",
         label: 'Reroot',
-        accelerator: 'CmdOrCtrl+R'
+        accelerator: 'CmdOrCtrl+R',
+        onClick
       },
       {
         id: "rotate-branch",
         label: 'Rotate Branch',
-        accelerator: 'CmdOrCtrl+Shift+R'
+        accelerator: 'CmdOrCtrl+Shift+R',
+        onClick
       },
       {
         id: "remove-selected",
         label: 'Delete Selected',
-        accelerator: 'CmdOrCtrl+D'
+        accelerator: 'CmdOrCtrl+D',
+        onClick
       },
       {
         id: "remove-unselected",
         label: 'Delete Unselected',
-        accelerator: 'CmdOrCtrl+U'
+        accelerator: 'CmdOrCtrl+U',
+        onClick
       },
       {
         id: "restore-selected",
         label: 'Keep Selected',
-        accelerator: 'CmdOrCtrl+K'
+        accelerator: 'CmdOrCtrl+K',
+        onClick
       }
     ]
   },
@@ -147,12 +170,14 @@ const template = [
       {
         id: "zoom-in",
         label: "Zoom in",
-        accelerator: "CmdOrCtrl+Plus"
+        accelerator: "CmdOrCtrl+Plus",
+        onClick
       },
       {
         id: "zoom-out",
         label: "Zoom out",
-        accelerator: "CmdOrCtrl+-"
+        accelerator: "CmdOrCtrl+-",
+        onClick
       },
       {
         type: 'separator'
@@ -160,7 +185,8 @@ const template = [
       {
         id: "toggle-cladogram-view",
         label: 'Toggle Cladogram View',
-        accelerator: 'CmdOrCtrl+Shift+C'
+        accelerator: 'CmdOrCtrl+Shift+C',
+        onClick
       },
       {
         type: 'separator'
@@ -312,16 +338,6 @@ if (process.platform === 'darwin') {
 function build_menu() {
   const menu = Menu.buildFromTemplate(template);
 
-  menu.disableItemById = function(id){
-    var item = menu.getMenuItemById(id);
-    item.enabled = false;
-  }
-
-  menu.enableItemById = function(id){
-    var item = menu.getMenuItemById(id);
-    item.enabled = true;
-  }
-
   menu.setCallbackOnItem = function(item_id, callback){
     var item = menu.getMenuItemById(item_id);
     if (item !== null){
@@ -330,6 +346,8 @@ function build_menu() {
   }
 
   Menu.setApplicationMenu(menu);
+
+  return menu
 }
 
 module.exports = { build_menu: build_menu };

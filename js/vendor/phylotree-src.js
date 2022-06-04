@@ -1,5 +1,5 @@
-const _ = require('underscore');
-const parseString = require('xml2js').parseString;
+const _ = window.modules.underscore
+const parseString = window.modules.xml2js.parseString;
 
 (function() {
   var d3_layout_phylotree_event_id = "d3.layout.phylotree.event",
@@ -1713,7 +1713,7 @@ const parseString = require('xml2js').parseString;
         var remove_me = node,
           current_node = node.parent,
           parent_length = current_node.__mapped_bl,
-          stashed_bl = _.noop();
+          stashed_bl = _.noop;
 
         // if parent node has another parent
         if (current_node.parent) {
@@ -2151,7 +2151,7 @@ const parseString = require('xml2js').parseString;
         });
 
       var spline = function() {};
-      var spline_f = _.noop();
+      var spline_f = _.noop;
 
       // Collapse radial differently
       if (phylotree.radial()) {

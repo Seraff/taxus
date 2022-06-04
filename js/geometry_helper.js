@@ -38,5 +38,3 @@ class GeometryHelper {
     return bbox_scr
   }
 }
-
-module.exports = GeometryHelper

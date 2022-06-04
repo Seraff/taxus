@@ -1,16 +1,14 @@
-const path = require('path')
-
 function sleep (time) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
 
 function fangorize_path (pth) {
-  var parsed = path.parse(pth)
-  return parsed.dir + path.sep + parsed.name + ".fangorn" + parsed.ext
+  var parsed = window.modules.path.parse(pth)
+  return parsed.dir + window.modules.path.sep + parsed.name + ".fangorn" + parsed.ext
 }
 
 function path_is_fangorized (pth) {
-  return path.parse(pth).name.match(/\.fangorn$/) != null
+  return window.modules.path.parse(pth).name.match(/\.fangorn$/) != null
 }
 
 function hasOwnProperty (object, property) {
@@ -37,4 +35,13 @@ function showUnsavedFileAlert(callback){
       callback()
     }
   })
+}
+
+function toCamel(str) {
+  return str.toLowerCase().replace(/([-_][a-z])/g, group =>
+    group
+      .toUpperCase()
+      .replace('-', '')
+      .replace('_', '')
+  )
 }

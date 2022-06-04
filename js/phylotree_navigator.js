@@ -1,5 +1,3 @@
-const GeometryHelper = require('./geometry_helper.js')
-
 class PhylotreeNavigator {
   constructor (phylotree, zoom) {
     this.$svg = $('svg#tree_display')
@@ -133,5 +131,3 @@ class PhylotreeNavigator {
     return treeBBox
   }
 }
-
-module.exports = PhylotreeNavigator

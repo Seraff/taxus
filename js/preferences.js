@@ -1,16 +1,16 @@
-const DEFAULTS = {
-  branchWidth: 2,
-  branchColor: '#303030',
-  displayAlignmentCoverage: 'true',
-  displayBootstrap: 'true',
-  taxaFontFamily: 'Sans-serif',
-  taxaFontSize: '12',
-  taxaFontBold: 'false',
-  taxaFontItalic: 'true',
-  taxaFontUnderline: 'false'
-}
-
 class Preferences {
+  static DEFAULTS = {
+    branchWidth: 2,
+    branchColor: '#303030',
+    displayAlignmentCoverage: 'true',
+    displayBootstrap: 'true',
+    taxaFontFamily: 'Sans-serif',
+    taxaFontSize: '12',
+    taxaFontBold: 'false',
+    taxaFontItalic: 'true',
+    taxaFontUnderline: 'false'
+  }
+
   constructor () {
     this.preferences = {}
     this.resetToDefaults()
@@ -26,8 +26,8 @@ class Preferences {
   }
 
   resetToDefaults () {
-    for (var key in DEFAULTS) {
-      this.preferences[key] = DEFAULTS[key]
+    for (var key in Preferences.DEFAULTS) {
+      this.preferences[key] = Preferences.DEFAULTS[key]
     }
   }
 
@@ -39,7 +39,7 @@ class Preferences {
   }
 
   applyToCurrent (otherPreferences){
-    for (var key in DEFAULTS) {
+    for (var key in Preferences.DEFAULTS) {
       if (hasOwnProperty(otherPreferences, key)) {
         this.preferences[key] = this.formatPreference(key, otherPreferences[key])
       }
@@ -72,5 +72,3 @@ class Preferences {
     return result
   }
 }
-
-module.exports = Preferences
