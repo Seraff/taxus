@@ -384,7 +384,7 @@ function removeBranchColorAction() {
   taxus.get_tree().dispatch_selection_modified_event() // for picker to reset color
 }
 
-function selectAllAction () {
+function selectAllAction() {
   var mode = getMode()
   if (mode === 'taxa'){
     taxus.select_all_leaves()
@@ -393,30 +393,62 @@ function selectAllAction () {
   }
 }
 
-function toggleCladogramViewAction () {
+function toggleCladogramViewAction() {
   progressBar.withProgressBarAttempt(() => {
     taxus.toggleCladogramView()
   })
 }
 
-function applyPreferences () {
+function applyPreferences() {
   taxus.get_tree().safe_update()
   taxus.redraw_features()
 }
 
-function quitAction () {
+function quitAction() {
   if (taxus.has_dirty_files()){
     showUnsavedFileAlert((e) => app.remote.app.quit())
   } else
     app.remote.app.quit()
 }
 
-function zoomInAction () {
+function zoomInAction() {
   taxus.get_tree().zoomIn()
 }
 
-function zoomOutAction () {
+function zoomOutAction() {
   taxus.get_tree().zoomOut()
+}
+
+function horizontalContractAction() {
+  func = taxus.get_tree().spacing_y
+  amount = -10
+  changeScale(func, amount)
+}
+
+function horizontalExpandAction() {
+  func = taxus.get_tree().spacing_y
+  amount = 10
+  changeScale(func, amount)
+}
+
+function verticalContractAction() {
+  func = taxus.get_tree().spacing_x
+  amount = -10
+  changeScale(func, amount)
+}
+
+function verticalExpandAction() {
+  func = taxus.get_tree().spacing_x
+  amount = 10
+  changeScale(func, amount)
+}
+
+function changeScale(func, amount){
+  // progressBar.withProgressBarAttempt(() => {
+  func(func() + amount).safe_update()
+  taxus.get_tree().redraw_scale_bar()
+  // })
+  dispatchDocumentEvent('tree_topology_changed')
 }
 
 function resetSelectionMode () {
