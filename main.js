@@ -37,11 +37,6 @@ function createWindow () {
     win = null;
   })
 
-  // Workaround for zoom-in action alias
-  electronLocalshortcut.register(win, 'CmdOrCtrl+=', () => {
-    Menu.getApplicationMenu().getMenuItemById('zoom-in').click()
-  });
-
   ipcMain.on('scripts_loaded', (event) => {
     console.log('Scripts loaded')
     // if (file_to_open) {

@@ -41,23 +41,23 @@ const template = [
         id: "open-fasta",
         label: "Open Fasta",
         accelerator: "CmdOrCtrl+Shift+O",
-        onClick
+        click: onClick
       },
       {
         id: "save-fasta",
         label: "Save Fasta",
         accelerator: "CmdOrCtrl+Shift+S",
-        onClick
+        click: onClick
       },
       {
         id: "save-fasta-as",
         label: "Save Fasta as...",
-        onClick
+        click: onClick
       },
       {
         id: "save-selection-as-fasta",
         label: "Save Selection as Fasta",
-        onClick
+        click: onClick
       },
       {
         type: 'separator'
@@ -69,12 +69,12 @@ const template = [
         {
           id: "export-to-png",
           label: "PNG",
-          onClick
+          click: onClick
         },
         {
           id: "export-to-svg",
           label: "SVG",
-          onClick
+          click: onClick
         },
         ]
       }
@@ -107,12 +107,12 @@ const template = [
         label: "Select All in Tree",
         id: 'select-all',
         accelerator: "CmdOrCtrl+Shift+A",
-        onClick
+        click: onClick
       },
       {
         id: 'select-descendants',
         label: "Select Descendants",
-        onClick
+        click: onClick
       },
       {
         type: 'separator'
@@ -121,13 +121,13 @@ const template = [
         id: "find",
         label: 'Find',
         accelerator: 'CmdOrCtrl+F',
-        onClick
+        click: onClick
       },
       {
         id: "toggle-selection-mode",
         label: 'Toggle Selection Mode',
         accelerator: 'Ctrl+Tab',
-        onClick
+        click: onClick
       },
       {
         type: 'separator'
@@ -136,31 +136,31 @@ const template = [
         id: "reroot",
         label: 'Reroot',
         accelerator: 'CmdOrCtrl+R',
-        onClick
+        click: onClick
       },
       {
         id: "rotate-branch",
         label: 'Rotate Branch',
         accelerator: 'CmdOrCtrl+Shift+R',
-        onClick
+        click: onClick
       },
       {
         id: "remove-selected",
         label: 'Delete Selected',
         accelerator: 'CmdOrCtrl+D',
-        onClick
+        click: onClick
       },
       {
         id: "remove-unselected",
         label: 'Delete Unselected',
         accelerator: 'CmdOrCtrl+U',
-        onClick
+        click: onClick
       },
       {
         id: "restore-selected",
         label: 'Keep Selected',
         accelerator: 'CmdOrCtrl+K',
-        onClick
+        click: onClick
       }
     ]
   },
@@ -171,13 +171,13 @@ const template = [
         id: "zoom-in",
         label: "Zoom in",
         accelerator: "CmdOrCtrl+Plus",
-        onClick
+        click: onClick
       },
       {
         id: "zoom-out",
         label: "Zoom out",
         accelerator: "CmdOrCtrl+-",
-        onClick
+        click: onClick
       },
       {
         type: 'separator'
@@ -186,7 +186,7 @@ const template = [
         id: "toggle-cladogram-view",
         label: 'Toggle Cladogram View',
         accelerator: 'CmdOrCtrl+Shift+C',
-        onClick
+        click: onClick
       },
       {
         type: 'separator'

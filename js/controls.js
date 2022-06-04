@@ -47,8 +47,10 @@ class Controls {
     }
 
     runMenuCallback(menu_id) {
-        if (menu_id in this._menu_items)
+        if (menu_id in this._menu_items){
+            console.log('run callback on ' + menu_id)
             this._menu_items[menu_id].runCallback()
+        }
     }
 }
 
