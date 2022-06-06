@@ -542,7 +542,7 @@ end;
         json.removed_seqs = btoa(pako.deflate(json.removed_seqs, {to: 'string'}))
       }
 
-      phylotree.nexus.fangorn = json
+      phylotree.nexus.taxus = json
     }
   }
 
@@ -551,10 +551,10 @@ end;
     var result = {}
 
     if (hasOwnProperty(phylotree.nexus, 'fangorn')) {
-      Object.assign(result, phylotree.nexus.fangorn)
+      Object.assign(result, phylotree.nexus.taxus)
 
-      if (hasOwnProperty(phylotree.nexus.fangorn, 'removed_seqs')) {
-        var encoded = phylotree.nexus.fangorn.removed_seqs
+      if (hasOwnProperty(phylotree.nexus.taxus, 'removed_seqs')) {
+        var encoded = phylotree.nexus.taxus.removed_seqs
         result['removed_seqs'] = pako.inflate(atob(encoded), {to: 'string'})
       }
     }
@@ -630,10 +630,10 @@ end;
   phylotree.build_fangorn_block = function(){
     var result = ""
 
-    if (phylotree.is_nexus() && Object.keys(phylotree.nexus.fangorn).length > 0){
+    if (phylotree.is_nexus() && Object.keys(phylotree.nexus.taxus).length > 0){
       result += "begin fangorn;\n"
-      for (var key in phylotree.nexus.fangorn){
-        result += "\tset " + key + "=\"" + phylotree.nexus.fangorn[key] + "\";\n"
+      for (var key in phylotree.nexus.taxus){
+        result += "\tset " + key + "=\"" + phylotree.nexus.taxus[key] + "\";\n"
       }
       result += "end;\n"
     }
@@ -752,7 +752,7 @@ end;
     node.children = new_children
 
     phylotree.update_layout(phylotree.get_nodes()[0], true)
-    fangorn.get_tree().safe_update()
+    taxus.get_tree().safe_update()
   }
 
   // Modifying tree in cladogram view workarounds

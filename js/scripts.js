@@ -2,10 +2,10 @@ const Split = window.modules.splitjs
 
 // const unhandled = require('electron-unhandled');
 
-var taxus = null
-var modeSelector = null
-var progressBar = null
-var controls = null
+let taxus = null
+let modeSelector = null
+let progressBar = null
+let controls = null
 
 function initControls() {
   controls = new Controls()
@@ -121,7 +121,7 @@ function updateControls () {
     }
   }
 
-  var menuStates = controls.menuStateDict()
+  let menuStates = controls.menuStateDict()
   window.api.updateMenu(menuStates)
 }
 
@@ -144,7 +144,7 @@ function showLogAlert (title, subtitle, rows) {
 }
 
 function setWindowHeader (text = null) {
-  var header = 'Taxus'
+  let header = 'Taxus'
 
   if (text) { header += ' — ' + text }
 
@@ -154,8 +154,8 @@ function setWindowHeader (text = null) {
 
 async function openTreeAction (e) {
 
-  var openTree = async function () {
-    var options = {
+  let openTree = async function () {
+    let options = {
       properties: ['openFile'],
       filters: [
         { name: 'Tree files', extensions: Taxus.TREE_EXT },
@@ -192,28 +192,20 @@ async function openTreeAction (e) {
   resetSelectionMode()
 }
 
-function getMode () {
-  if (modeSelector) {
-    return modeSelector.active_button.data('mode')
-  }
-
-  return undefined
-}
-
 function saveTreeAction () {
   taxus.save_tree()
 }
 
 function saveTreeAsAction () {
-  var options = {
+  let options = {
     title: 'Save tree as...',
     defaultPath: taxus.tree_path }
 
   window.api.saveFileDialog(options).then(path => {
     taxus.save_tree(path)
 
-    var fasta_is_loaded = taxus.fasta_is_loaded()
-    var fasta_path = fasta_is_loaded && taxus.fasta.path
+    let fasta_is_loaded = taxus.fasta_is_loaded()
+    let fasta_path = fasta_is_loaded && taxus.fasta.path
 
     taxus.load_tree_file(result.filePath)
     if (fasta_is_loaded) { taxus.load_fasta_file(fasta_path, true) }
@@ -221,8 +213,8 @@ function saveTreeAsAction () {
 }
 
 function openFastaAction () {
-  var open_fasta = function () {
-    var options = {
+  let open_fasta = function () {
+    let options = {
       properties: ['openFile'],
       filters: [{ name: 'Fasta files', extensions: Taxus.FASTA_EXT }, { name: 'All files', extensions: ['*'] }],
       title: 'Open fasta file'
@@ -231,7 +223,7 @@ function openFastaAction () {
     dialog.showOpenDialog(options).then(result => {
       if (result.filePaths.length === 0) { return false }
 
-      var path = result.filePaths[0]
+      let path = result.filePaths[0]
       taxus.load_fasta_file(path)
     })
   }
@@ -248,24 +240,22 @@ function copyAction () {
     return
   }
 
-  var fasta = taxus.get_selected_leaves_fasta()
+  let fasta = taxus.get_selected_leaves_fasta()
   if (fasta) { clipboard.writeText(fasta) }
 }
 
 function toggleSelectionModeAction () {
-  if ($('#set-mode-to-taxa-action').hasClass('active')) {
-    $('#set-mode-to-branch-action').click()
-  } else if ($('#set-mode-to-branch-action').hasClass('active')) {
-    $('#set-mode-to-taxa-action').click()
-  }
+  mode = modeSelector.active_button.data('mode')
+  new_mode = mode == 'taxa' ? 'branch' : 'taxa'
+  setMode(new_mode)
 }
 
 function setModeToTaxaAction() {
-
+  setMode('taxa')
 }
 
 function setModeToBranchAction() {
-
+  setMode('branch')
 }
 
 function removeSelectedAction() {
@@ -276,7 +266,7 @@ function removeSelectedAction() {
 }
 
 function removeUnselectedAction() {
-  var selected = taxus.get_selection()
+  let selected = taxus.get_selection()
 
   taxus.get_leaves().forEach(function (l) {
     if (!selected.includes(l)) { l.mark() }
@@ -301,7 +291,7 @@ function saveFastaAction() {
 }
 
 function saveFastaAsAction() {
-  var options = { title: 'Save fasta as...', defaultPath: taxus.fasta_out_path() }
+  let options = { title: 'Save fasta as...', defaultPath: taxus.fasta_out_path() }
 
   dialog.showSaveDialog(options).then(result => {
     if (result.canceled || result.filePath.length === 0) { return true }
@@ -314,11 +304,11 @@ function saveFastaAsAction() {
 
 function saveSelectionAsFastaAction() {
   // TODO: make it properly
-  var fasta = taxus.get_selected_leaves_fasta()
+  let fasta = taxus.get_selected_leaves_fasta()
 
   if (!fasta) { return false }
 
-  var options = { title: 'Save selection as fasta' }
+  let options = { title: 'Save selection as fasta' }
 
   dialog.showSaveDialog(options).then(result => {
     if (result.canceled || result.filePath.length === 0) { return true }
@@ -344,27 +334,27 @@ function showFastaAction() {
 function annotateNodeAction() {
   if (!fangorn.fasta_is_loaded() || taxus.get_selection().length != 1) { return false }
 
-  var node = taxus.get_selection()[0]
-  var header = node.fasta().header
+  let node = taxus.get_selection()[0]
+  let header = node.fasta().header
   $('#seq-title-input').val(header)
 
   $('#annotate-dialog')[0].showModal()
 }
 
 function rerootAction() {
-  progressBar.withProgressBarAttempt(() => {
-    taxus.reroot_to_selected_node()
-  })
+  // progressBar.withProgressBarAttempt(() => {
+    taxus.rerootToSelectedNode()
+  // })
 }
 
 function rotateBranchAction() {
-  progressBar.withProgressBarAttempt(() => {
-    taxus.rotate_selected_branch()
-  })
+  // progressBar.withProgressBarAttempt(() => {
+    taxus.rotateSelectedBranch()
+  // })
 }
 
 function selectDescendantsAction() {
-  taxus.select_descendants_of_selected()
+  taxus.selectDescendants()
 }
 
 function exportToPngAction() {
@@ -385,7 +375,7 @@ function removeBranchColorAction() {
 }
 
 function selectAllAction() {
-  var mode = getMode()
+  let mode = getMode()
   if (mode === 'taxa'){
     taxus.select_all_leaves()
   } else if (mode === 'branch') {
@@ -443,16 +433,35 @@ function verticalExpandAction() {
   changeScale(func, amount)
 }
 
+function getMode() {
+  if (modeSelector) {
+    return modeSelector.active_button.data('mode')
+  }
+
+  return undefined
+}
+
+function setMode(new_mode) {
+  if (taxus.tree_is_loaded())
+    taxus.get_tree().set_selection_mode(new_mode)
+
+  let btn = modeSelector.buttons.filter((i, b) => {
+    return $(b).data('mode') == new_mode
+  }).get(0)
+
+  modeSelector.makeActive(btn)
+}
+
+function resetSelectionMode() {
+  setMode('taxa')
+}
+
 function changeScale(func, amount){
   // progressBar.withProgressBarAttempt(() => {
   func(func() + amount).safe_update()
   taxus.get_tree().redraw_scale_bar()
   // })
   dispatchDocumentEvent('tree_topology_changed')
-}
-
-function resetSelectionMode () {
-  $('#set-mode-to-taxa-action').click()
 }
 
 function printTaxaCount () {
@@ -477,17 +486,15 @@ $(document).ready(function () {
 
   taxus = new Taxus()
 
-  // $('#annotate-node-action').on('click', async () => { // DEBUGGING
-  //   open_tree_action()
-  // }) // DEBUGGING
-
-  var controls = initControls()
-
+  let controls = initControls()
   updateControls()
 
-  $('button').on('click', function () { this.blur() })
+  let fasta_pane = new FastaPane(taxus)
 
-  var fasta_pane = new FastaPane(taxus)
+  // Selection modes logic
+
+  modeSelector = new BtnGroupRadio($('#mode-select-btn-group'))
+  resetSelectionMode()
 
   return
 
@@ -509,7 +516,7 @@ $(document).ready(function () {
   })
 
   $('#annotation-dialog-save').on('click', function () {
-    var node = taxus.get_selection()[0]
+    let node = taxus.get_selection()[0]
     taxus.update_node_title(node, $('#seq-title-input').val())
     dispatchDocumentEvent('node_titles_changed')
     $('#seq-title-input').val('')
@@ -521,7 +528,7 @@ $(document).ready(function () {
   })
 
   $('.expand-contract-action').on('click', function () {
-    var which_function = $(this).data('direction') == 'vertical' ? taxus.get_tree().spacing_x : taxus.get_tree().spacing_y
+    let which_function = $(this).data('direction') == 'vertical' ? taxus.get_tree().spacing_x : taxus.get_tree().spacing_y
 
     progressBar.withProgressBarAttempt(() => {
       which_function(which_function() + (+$(this).data('amount'))).safe_update()
@@ -533,16 +540,16 @@ $(document).ready(function () {
 
   // Picker logic
 
-  var picker = new ColorPicker('#branch-color-picker', '#change-branch-color-action', ['#change-branch-color-box'])
+  let picker = new ColorPicker('#branch-color-picker', '#change-branch-color-action', ['#change-branch-color-box'])
   picker.add_color_change_callback(function (color) {
     taxus.set_selected_nodes_annotation({ "!color": color })
   })
 
   document.addEventListener('selection_modified', function (e) {
-    var selection = taxus.get_selection()
+    let selection = taxus.get_selection()
 
     if (selection.length === 1) {
-      var color = selection[0].parsed_annotation['!color']
+      let color = selection[0].parsed_annotation['!color']
 
       if (color) {
         picker.set_color(color)
@@ -550,8 +557,8 @@ $(document).ready(function () {
         picker.remove_color()
       }
     } else if (selection.length > 1) {
-      var set = new Set(selection.map((e) => { return e.parsed_annotation.color }))
-      var first_color = set.values().next().value
+      let set = new Set(selection.map((e) => { return e.parsed_annotation.color }))
+      let first_color = set.values().next().value
 
       if (set.size === 1 && first_color !== undefined){
         picker.set_color(first_color)
@@ -579,7 +586,7 @@ $(document).ready(function () {
   })
 
   ipcRenderer.on('open_file', (event, message) => {
-    var open_tree = function () {
+    let open_tree = function () {
       taxus.load_tree_file(message)
     }
 
@@ -590,27 +597,9 @@ $(document).ready(function () {
     }
   })
 
-  // Selection modes logic
-
-  modeSelector = new BtnGroupRadio($('#mode-select-btn-group'))
-
-  modeSelector.on_change = (new_button) => {
-    if (!fangorn.tree_is_loaded()) {
-      return false
-    }
-
-    var $btn = $(new_button)
-    var mode = $btn.data('mode')
-
-    taxus.get_tree().set_selection_mode(mode)
-    $btn.blur()
-  }
-
-  resetSelectionMode()
-
   // Search panel
 
-  var search_panel = new SearchPanel($('#search-panel'), taxus, fasta_pane)
+  let search_panel = new SearchPanel($('#search-panel'), taxus, fasta_pane)
 
   menu.setCallbackOnItem('find', function () {
     search_panel.toggle()

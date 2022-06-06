@@ -105,10 +105,9 @@ class Taxus {
     this.get_tree().modify_selection(function (n) { return nodes.includes(n.target) })
   }
 
-  select_descendants_of_selected() {
+  selectDescendants() {
     let nodes = this.get_selection()
-
-    to_select = nodes
+    let to_select = nodes
 
     nodes.forEach((node) => {
       let descs = this.get_tree().select_all_descendants(node, true, true)
@@ -381,10 +380,11 @@ class Taxus {
     this.redraw_features()
   }
 
-  reroot_to_selected_node() {
+  rerootToSelectedNode() {
     if (!this.is_one_selected()) {
       return false
     }
+
     let selection = this.get_selection()
     let node = selection[0]
 
@@ -395,7 +395,7 @@ class Taxus {
     dispatchDocumentEvent('tree_topology_changed')
   }
 
-  rotate_selected_branch() {
+  rotateSelectedBranch() {
     if (!this.is_one_internal_selected()) {
       return false
     }

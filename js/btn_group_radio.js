@@ -13,18 +13,20 @@ class BtnGroupRadio {
 
     this.buttons.each((id, button) => {
       $(button).on('click', (e) => {
-        if (button !== this.active_button.get(0)) {
-          this.active_button.removeClass('active')
-          this.active_button = $(button)
-          this.active_button.addClass('active')
-
-          if (this.on_change !== undefined) {
-            this.on_change(button)
-          }
-        }
+        this.makeActive(button)
       })
     })
   }
-}
 
-module.exports = BtnGroupRadio
+  makeActive(button) {
+    if (button !== this.active_button.get(0)) {
+      this.active_button.removeClass('active')
+      this.active_button = $(button)
+      this.active_button.addClass('active')
+
+      if (this.on_change !== undefined) {
+        this.on_change(button)
+      }
+    }
+  }
+}
