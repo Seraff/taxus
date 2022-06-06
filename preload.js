@@ -29,7 +29,17 @@ contextBridge.exposeInMainWorld(
 contextBridge.exposeInMainWorld(
     "modules", {
         path: require("path"),
-        underscore: require('underscore'),
+        underscore: function() {
+            let _ = require('underscore')
+            let methods = ['contains', 'keys', 'values', 'isUndefined',
+                'findWhere', 'each', 'uniq', 'select',
+                'indexOf', 'pluck', 'noop', 'pick']
+            let result = {}
+            methods.forEach((m) => {
+                result[m] = _[m]
+            })
+            return result
+        },
         xml2js: require('xml2js'),
         splitjs: require('split.js'),
         pako: require('pako')

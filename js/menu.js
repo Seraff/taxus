@@ -282,7 +282,7 @@ if (process.platform === 'darwin') {
         label: 'Preferences',
         accelerator: 'Command+,',
         role: 'preferences',
-        click: _ => {
+        click: () => {
           new PreferencesWindow()
         },
       },
@@ -328,7 +328,7 @@ if (process.platform === 'darwin') {
                       label: 'Preferences',
                       accelerator: 'CmdOrCtrl+,',
                       role: 'preferences',
-                      click: _ => {
+                      click: () => {
                         new PreferencesWindow()
                       },
                     })

@@ -12,11 +12,12 @@ class FastaRepresentation {
     this.out_path = null
   }
 
-  read_from_file(path){
+  read_from_file(path, callback){
     window.api.loadFile(path).then(content => {
       this.read_from_str(content)
       this.path = path
       this.out_path = path_is_fangorized(path) ? path : fangorize_path(path)
+      callback()
     }, error => {
       console.error(error)
     })

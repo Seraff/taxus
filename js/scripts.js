@@ -47,6 +47,7 @@ function initControls() {
     .register('set_mode_to_branch', undefined, '#set-mode-to-branch-action')
     .register('set_mode_to_taxa', undefined, '#set-mode-to-taxa-action')
     .register('set_search_mode_to_fasta', undefined, '#set-search-mode-to-fasta')
+    .register('show_fasta', undefined, '#show-fasta-action')
 
   // controls.setCallback('open_fasta', openFastaAction)
   window.api.onMenuClicked((event, itemId) => {
@@ -73,6 +74,7 @@ function updateControls () {
     controls.enableItem('zoom_in')
     controls.enableItem('zoom_out')
     controls.enableItem('find')
+    controls.enableItem('show_fasta')
 
     controls.enableItem('set_mode_to_branch')
     controls.enableItem('set_mode_to_taxa')
@@ -220,10 +222,7 @@ function openFastaAction () {
       title: 'Open fasta file'
     }
 
-    dialog.showOpenDialog(options).then(result => {
-      if (result.filePaths.length === 0) { return false }
-
-      let path = result.filePaths[0]
+    window.api.openFileDialog(options).then(path => {
       taxus.load_fasta_file(path)
     })
   }

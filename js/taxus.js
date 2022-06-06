@@ -243,15 +243,16 @@ class Taxus {
     this.close_fasta()
 
     let fasta_rep = new FastaRepresentation()
-    fasta_rep.read_from_file(path)
 
-    if (this.apply_fasta(fasta_rep, quiet)) {
-      this.fasta_path = path
-      dispatchDocumentEvent('new_fasta_applied')
-    }
+    fasta_rep.read_from_file(path, () => {
+      if (this.apply_fasta(fasta_rep, quiet)) {
+        this.fasta_path = path
+        dispatchDocumentEvent('new_fasta_applied')
+      }
 
-    this.make_fasta_clean()
-    this.redraw_features()
+      this.make_fasta_clean()
+      this.redraw_features()
+    })
   }
 
   fasta_out_path() {
@@ -265,7 +266,7 @@ class Taxus {
     let fastaMapping = new FastaMapping(this.get_leaves(), fasta_rep.getSeqs())
 
     let nodes_without_fasta = fastaMapping.nodesWithoutFasta()
-    // debugger
+
     if (nodes_without_fasta.length > 0) {
       let nodes_with_own_fasta = _.select(nodes_without_fasta, (n) => { return n.fasta() !== null })
 

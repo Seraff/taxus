@@ -1,4 +1,4 @@
-const _ = window.modules.underscore
+const _ = window.modules.underscore()
 const parseString = window.modules.xml2js.parseString;
 
 (function() {
