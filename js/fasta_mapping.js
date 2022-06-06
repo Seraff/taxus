@@ -59,5 +59,3 @@ class FastaMapping {
     return this.mapping[node.name].fasta
   }
 }
-
-module.exports = FastaMapping

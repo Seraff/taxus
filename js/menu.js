@@ -18,6 +18,19 @@ const template = [
     label: 'File',
     submenu: [
       {
+        id: "new-window",
+        label: "New Window",
+        accelerator: "CmdOrCtrl+N",
+        click: (item, focusedWindow) => {
+          console.log('New Window')
+          if (focusedWindow)
+            focusedWindow.createWindow()
+        }
+      },
+      {
+        type: 'separator'
+      },
+      {
         id: "open-tree",
         label: "Open Tree",
         accelerator: "CmdOrCtrl+O",

@@ -25,6 +25,7 @@ function createWindow () {
   })
 
   win.menu = menu.build_menu()
+  win.createWindow = createWindow
 
   win.loadFile(path.join(__dirname, 'index.html'))
 
