@@ -16,7 +16,7 @@ function createWindow () {
     height: 600,
     minWidth: 740,
     minHeight: 400,
-    // titleBarStyle: "hidden",
+    titleBarStyle: "hidden",
     acceptFirstMouse: true,
     show: false,
     webPreferences: {

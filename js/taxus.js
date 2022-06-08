@@ -208,13 +208,14 @@ class Taxus {
   }
 
   save_tree(path = null) {
-    if (!this.tree_is_loaded()) { return false }
+    if (!this.tree_is_loaded())
+      return false
 
-    if (!path) { path = this.tree_path }
+    if (!path)
+      path = this.tree_path
 
-    if (this.get_tree().is_nexus()) {
+    if (this.get_tree().is_nexus())
       this.get_tree().apply_fangorn_metadata(this.metadata_from_current_state())
-    }
 
     let data = this.get_tree().output_tree()
 
@@ -233,7 +234,8 @@ class Taxus {
     let content = this.output_fasta()
 
     window.api.saveFile(path, content).then(() => {
-      if (success_callback) { success_callback() }
+      if (success_callback)
+        success_callback()
     }, error => {
       console.error(error)
     })

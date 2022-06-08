@@ -427,7 +427,7 @@ function NexusReader()
   Scanner.apply(this, arguments);
 
   this.nexusCommands = ['begin', 'dimensions', 'end', 'endblock', 'link', 'taxa', 'taxlabels', 'title', 'translate', 'tree', 'set'];
-  this.nexusBlocks = ['taxa', 'trees', 'fangorn'];
+  this.nexusBlocks = ['taxa', 'trees', 'taxus'];
 };
 
 //----------------------------------------------------------------------------------------------
@@ -714,9 +714,9 @@ function parseNexus(str)
       }
 
       // blockname = nx.GetBlock();
-    } else if (blockname == 'fangorn')
+    } else if (blockname == 'taxus')
     {
-      nexus.fangorn = {}
+      nexus.taxus = {}
 
       var command = nx.GetCommand();
       var counter = 0;
@@ -763,7 +763,7 @@ function parseNexus(str)
               t = nx.GetToken();
             }
 
-            nexus.fangorn[key] = value;
+            nexus.taxus[key] = value;
 
             command = nx.GetCommand();
             break;

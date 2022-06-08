@@ -231,7 +231,25 @@ function openFastaAction () {
     showUnsavedFileAlert(open_fasta)
   } else
     open_fasta()
+}
 
+function saveFastaAction() {
+  console.log('save fasta action in scripts.js')
+  taxus.save_fasta(null, function () {
+    taxus.load_fasta_file(taxus.fasta_out_path(), true)
+  })
+}
+
+function saveFastaAsAction() {
+  let options = { title: 'Save fasta as...', defaultPath: taxus.fasta_out_path() }
+
+  dialog.showSaveDialog(options).then(result => {
+    if (result.canceled || result.filePath.length === 0) { return true }
+
+    taxus.save_fasta(result.filePath, function () {
+      taxus.load_fasta_file(result.filePath, true)
+    })
+  })
 }
 
 function copyAction () {
@@ -281,24 +299,6 @@ function restoreSelectedAction() {
   taxus.get_tree().refresh()
   taxus.select_none()
   dispatchDocumentEvent('node_mark_status_changed')
-}
-
-function saveFastaAction() {
-  taxus.save_fasta(null, function () {
-    taxus.load_fasta_file(taxus.fasta_out_path(), true)
-  })
-}
-
-function saveFastaAsAction() {
-  let options = { title: 'Save fasta as...', defaultPath: taxus.fasta_out_path() }
-
-  dialog.showSaveDialog(options).then(result => {
-    if (result.canceled || result.filePath.length === 0) { return true }
-
-    taxus.save_fasta(result.filePath, function () {
-      taxus.load_fasta_file(result.filePath, true)
-    })
-  })
 }
 
 function saveSelectionAsFastaAction() {
