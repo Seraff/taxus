@@ -1,7 +1,5 @@
-const BtnGroupRadio = require('../btn_group_radio.js')
-
 class SearchPanel {
-  constructor (panel, fangorn, fasta_pane) {
+  constructor (panel, taxus, fasta_pane) {
     this.$panel = panel
     this.$search_action_button = $('#find-action')
     this.$search_mode_buttons = $('#search-mode-btn-group')
@@ -13,7 +11,7 @@ class SearchPanel {
     this.$case_sensitive_button = $('#case-sensitive-search')
     this.$search_nav_buttons = $('.search-nav-button')
 
-    this.fangorn = fangorn
+    this.taxus = taxus
     this.fasta_pane = fasta_pane
     this.search_mode = 'tree'
     this.search_mode_radio = new BtnGroupRadio(this.$search_mode_buttons)
@@ -147,7 +145,7 @@ class SearchPanel {
       }
 
       if (this.isTreeMode()) {
-        this.found_items = this.fangorn.get_leaves().filter((e) => {
+        this.found_items = this.taxus.get_leaves().filter((e) => {
           var str = case_sensitive ? e.name : e.name.toLocaleLowerCase()
           return str.includes(query)
         })
@@ -204,9 +202,9 @@ class SearchPanel {
     }
 
     if (this.isTreeMode()){
-      this.fangorn.select_specific(this.found_items)
+      this.taxus.select_specific(this.found_items)
     } else {
-      this.fangorn.select_specific(this.found_items.map((i) => { return i.node }))
+      this.taxus.select_specific(this.found_items.map((i) => { return i.node }))
     }
   }
 
@@ -238,7 +236,7 @@ class SearchPanel {
     var node = this.found_items[this.current_nav_item_index]
 
     if (this.isTreeMode()) {
-      this.fangorn.get_tree().moveToNode(node)
+      this.taxus.get_tree().moveToNode(node)
     } else {
       this.fasta_pane.scrollTo({ entry: node })
     }
@@ -276,5 +274,3 @@ class SearchPanel {
 }
 
 SearchPanel.QUERY_MIN_LEN = 2
-
-module.exports = SearchPanel

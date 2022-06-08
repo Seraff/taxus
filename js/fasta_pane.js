@@ -1,10 +1,10 @@
 const Path = window.modules.path
 
 class FastaPane {
-  constructor (fangorn) {
+  constructor (taxus) {
     this.$fasta_pane = $('#fasta-panel')
 
-    this.fangorn = fangorn
+    this.taxus = taxus
     this.fasta_is_loaded = false
     this.title = null
 
@@ -44,12 +44,12 @@ class FastaPane {
     $(document).on('click', '.fasta-pane-entry', (e) => {
       var alias = $(e.target).parent('.fasta-pane-entry').attr('id')
       var node = this.entries_by_alias[alias].node
-      fangorn.select_specific([node])
+      taxus.select_specific([node])
     })
   }
 
   render () {
-    this.title = Path.basename(this.fangorn.fasta_path)
+    this.title = Path.basename(this.taxus.fasta_path)
 
     this.entries = []
     this.entries_by_name = {}
@@ -58,7 +58,7 @@ class FastaPane {
     this.$fasta_pane.html('')
     this.$fasta_pane.append('<b class="ui-text" id="fasta-title">' + this.title + '</b></br>')
 
-    this.fangorn.fastaMapping.eachMapping((m) => {
+    this.taxus.fastaMapping.eachMapping((m) => {
       var fasta = null
 
       // if fasta is loaded from node
@@ -99,7 +99,7 @@ class FastaPane {
       var title_el = document.getElementById('fasta-title')
       title_el.innerHTML = this.title
 
-      if (this.fangorn.fasta_is_dirty) {
+      if (this.taxus.fasta_is_dirty) {
         title_el.innerHTML += "*"
       }
     }
@@ -129,7 +129,7 @@ class FastaPaneEntry {
     this.$element = null
 
     this.$fasta_pane = pane.$fasta_pane
-    this.fastaMapping = pane.fangorn.fastaMapping
+    this.fastaMapping = pane.taxus.fastaMapping
     this.fasta_entry = fasta_entry
     this.node = this.fastaMapping.getNodeForFasta(this.fasta_entry)
 

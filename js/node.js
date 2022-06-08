@@ -1,15 +1,15 @@
 // Our phylotreejs node wrapper
 
-function Node(fangorn, phylotree_node){
+function Node(taxus, phylotree_node){
   var node = phylotree_node
 
   // We don't need to wrap it again if it's already wrapped
-  if (node.is_fangorn_node) {
+  if (node.is_taxus_node) {
     return node
   }
 
-  node.fangorn = fangorn
-  node.is_fangorn_node = true
+  node.taxus = taxus
+  node.is_taxus_node = true
   node.parsed_annotation = {}
   node.prev_branch = null
 
@@ -24,8 +24,8 @@ function Node(fangorn, phylotree_node){
   }
 
   node.applied_fasta = function () {
-    if (node.fangorn.fasta_is_loaded()) {
-      return node.fangorn.fastaMapping.getFastaForNode(node)
+    if (node.taxus.fasta_is_loaded()) {
+      return node.taxus.fastaMapping.getFastaForNode(node)
     }
   }
 
@@ -42,20 +42,20 @@ function Node(fangorn, phylotree_node){
   }
 
   node.mark = function(){
-    node.add_annotation({ '!fangorn_marked': true })
+    node.add_annotation({ '!taxus_marked': true })
     node.own_fasta = node.fasta()
-    node.fangorn.make_tree_dirty()
-    node.fangorn.make_fasta_dirty()
+    node.taxus.make_tree_dirty()
+    node.taxus.make_fasta_dirty()
   }
 
   node.unmark = function(){
-    node.remove_annotation("!fangorn_marked")
-    node.fangorn.make_tree_dirty()
-    node.fangorn.make_fasta_dirty()
+    node.remove_annotation("!taxus_marked")
+    node.taxus.make_tree_dirty()
+    node.taxus.make_fasta_dirty()
   }
 
   node.is_marked = function(){
-    return node.parsed_annotation['!fangorn_marked'] && node.parsed_annotation['!fangorn_marked'] == true
+    return node.parsed_annotation['!taxus_marked'] && node.parsed_annotation['!taxus_marked'] == true
   }
 
   node.style = function(dom_element){
@@ -64,7 +64,7 @@ function Node(fangorn, phylotree_node){
     if (node.is_leaf()){
       node.styler.style_leaf(dom_element)
     } else {
-      if (node.fangorn.preferences.preferences.displayBootstrap === 'true'){
+      if (node.taxus.preferences.preferences.displayBootstrap === 'true'){
         node.add_tip_to_node(node.bootstrap())
       } else {
         node.remove_node_tip()

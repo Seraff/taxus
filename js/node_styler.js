@@ -1,7 +1,7 @@
 class NodeStyler {
   constructor (node) {
     this.node = node
-    this.preferences = node.fangorn.preferences
+    this.preferences = node.taxus.preferences
     this.drawn_shapes = []
 
     this.highlight_rect = null
@@ -79,7 +79,7 @@ class NodeStyler {
 
   setWidth () {
     if (this.node.prev_branch) {
-      var value = this.node.fangorn.preferences.getPreference('branchWidth')
+      var value = this.node.taxus.preferences.getPreference('branchWidth')
       $(this.node.prev_branch.get_element()[0]).css('stroke-width', value + 'px')
     }
   }
@@ -103,7 +103,7 @@ class NodeStyler {
   }
 
   defaultColor () {
-    return this.node.fangorn.preferences.getPreference('branchColor')
+    return this.node.taxus.preferences.getPreference('branchColor')
   }
 
   getLeafTextElement () {

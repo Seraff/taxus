@@ -2,13 +2,13 @@ function sleep (time) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
 
-function fangorize_path (pth) {
+function taxusize_path (pth) {
   var parsed = window.modules.path.parse(pth)
-  return parsed.dir + window.modules.path.sep + parsed.name + ".fangorn" + parsed.ext
+  return parsed.dir + window.modules.path.sep + parsed.name + ".taxus" + parsed.ext
 }
 
-function path_is_fangorized (pth) {
-  return window.modules.path.parse(pth).name.match(/\.fangorn$/) != null
+function path_is_taxusized (pth) {
+  return window.modules.path.parse(pth).name.match(/\.taxus$/) != null
 }
 
 function hasOwnProperty (object, property) {

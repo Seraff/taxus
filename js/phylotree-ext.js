@@ -46,7 +46,7 @@ end;
 
   phylotree.phylotree_navigator = new PhylotreeNavigator(phylotree)
 
-  phylotree.unbindFangornEvents = function () {
+  phylotree.unbindTaxusEvents = function () {
     $window.off("keydown")
     $window.off("keyup")
     $window.off("focus")
@@ -58,7 +58,7 @@ end;
     $svg.off("mousedown")
   }
 
-  phylotree.unbindFangornEvents()
+  phylotree.unbindTaxusEvents()
 
   $window.on("keydown", onkeydown)
   $window.on("keyup", onkeyup)
@@ -268,7 +268,7 @@ end;
     phylotree.get_nodes().forEach((n) => {
       var nav = new PhylotreeNavigator(phylotree)
 
-      if (!n.is_fangorn_node) {
+      if (!n.is_taxus_node) {
         return null
       }
 
@@ -287,7 +287,7 @@ end;
 
   phylotree.dumpNodesGeometry = function () {
     phylotree.get_nodes().forEach((n) => {
-      if (!n.is_fangorn_node) {
+      if (!n.is_taxus_node) {
         return null
       }
 
@@ -435,7 +435,7 @@ end;
     phylotree.dumpNodesGeometry()
   }
 
-  phylotree.to_fangorn_newick = function(annotations = false){
+  phylotree.to_taxus_newick = function(annotations = false){
     if (annotations){
       return phylotree.get_newick(function(e){ return e.annotation ? "[" + e.annotation + "]" : "" })
     } else {
@@ -464,7 +464,7 @@ end;
 
   phylotree.read_tree = function(str){
     var newick = null
-    var fangorn_block = null
+    var taxus_block = null
 
     phylotree.nexus = null
     phylotree.original_newick = null
@@ -495,10 +495,10 @@ end;
       phylotree.original_newick = newick
       phylotree.original_file_template = str.replace(newick, "%NWK%")
 
-      fangorn_block = phylotree.original_file_template.match(/begin\s+fangorn\s*;\s.*?end\s*;/si)
-      if (fangorn_block){
-        fangorn_block = fangorn_block[0]
-        phylotree.original_file_template = phylotree.original_file_template.replace(fangorn_block, "%FG_BLK%")
+      taxus_block = phylotree.original_file_template.match(/begin\s+taxus\s*;\s.*?end\s*;/si)
+      if (taxus_block){
+        taxus_block = taxus_block[0]
+        phylotree.original_file_template = phylotree.original_file_template.replace(taxus_block, "%FG_BLK%")
       }
 
     } else {
@@ -535,8 +535,8 @@ end;
     return phylotree.nexus != null
   }
 
-  // Metadata comes from Fangorn in it's format (when saving)
-  phylotree.apply_fangorn_metadata = function(json){
+  // Metadata comes from taxus in it's format (when saving)
+  phylotree.apply_taxus_metadata = function(json){
     if (phylotree.is_nexus()){
       if (hasOwnProperty(json, 'removed_seqs')){
         json.removed_seqs = btoa(pako.deflate(json.removed_seqs, {to: 'string'}))
@@ -546,11 +546,11 @@ end;
     }
   }
 
-  // Convert metadata to Fangorn format (when opening)
-  phylotree.nexus_to_fangorn_metadata = function(){
+  // Convert metadata to taxus format (when opening)
+  phylotree.nexus_to_taxus_metadata = function(){
     var result = {}
 
-    if (hasOwnProperty(phylotree.nexus, 'fangorn')) {
+    if (hasOwnProperty(phylotree.nexus, 'taxus')) {
       Object.assign(result, phylotree.nexus.taxus)
 
       if (hasOwnProperty(phylotree.nexus.taxus, 'removed_seqs')) {
@@ -601,23 +601,23 @@ end;
 
       if (phylotree.is_nexus()){
         phylotree.detranslate_nodes(phylotree.get_translations())
-        var newick = phylotree.to_fangorn_newick(true)
+        var newick = phylotree.to_taxus_newick(true)
 
         phylotree.translate_nodes(phylotree.get_translations())
 
         var content = phylotree.original_file_template.replace("%NWK%", newick)
-        var fangorn_block = phylotree.build_fangorn_block()
+        var taxus_block = phylotree.build_taxus_block()
 
-        if (fangorn_block.length > 0){
+        if (taxus_block.length > 0){
           if (content.includes("%FG_BLK%"))
-            content = content.replace("%FG_BLK%", phylotree.build_fangorn_block())
+            content = content.replace("%FG_BLK%", phylotree.build_taxus_block())
           else
-            content += "\n" + phylotree.build_fangorn_block()
+            content += "\n" + phylotree.build_taxus_block()
         }
 
         result = content
       } else {
-        result = phylotree.to_fangorn_newick(true)
+        result = phylotree.to_taxus_newick(true)
       }
 
       return result
@@ -627,11 +627,11 @@ end;
     return phylotree.withOriginalBranchLengths(func)(metadata_json)
   }
 
-  phylotree.build_fangorn_block = function(){
+  phylotree.build_taxus_block = function(){
     var result = ""
 
     if (phylotree.is_nexus() && Object.keys(phylotree.nexus.taxus).length > 0){
-      result += "begin fangorn;\n"
+      result += "begin taxus;\n"
       for (var key in phylotree.nexus.taxus){
         result += "\tset " + key + "=\"" + phylotree.nexus.taxus[key] + "\";\n"
       }
@@ -642,7 +642,7 @@ end;
   }
 
   phylotree.dispatch_selection_modified_event = function () {
-    // Fangorn stuff
+    // taxus stuff
     var event = new Event('selection_modified')
     document.dispatchEvent(event)
   }

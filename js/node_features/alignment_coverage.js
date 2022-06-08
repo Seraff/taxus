@@ -45,7 +45,7 @@ class AlignmentCoverageFeature {
   }
 
   isEnabled () {
-    return this.node.fangorn.preferences.getPreference('displayAlignmentCoverage') === true
+    return this.node.taxus.preferences.getPreference('displayAlignmentCoverage') === true
   }
 
   getPct () {

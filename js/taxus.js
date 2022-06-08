@@ -152,7 +152,7 @@ class Taxus {
     try {
       this._tree.read_tree(str)
     } catch (err) {
-      this._tree.unbindFangornEvents()
+      this._tree.unbindTaxusEvents()
       this._tree = null
 
       console.error(err)
@@ -168,10 +168,10 @@ class Taxus {
       this.dispatch_state_update()
     }
 
-    if (!document.fangorn_selection_modified_event_set) {
+    if (!document.taxus_selection_modified_event_set) {
       document.addEventListener('selection_modified', onSelectionModified)
     }
-    document.fangorn_selection_modified_event_set = true
+    document.taxus_selection_modified_event_set = true
 
     this.fastaMapping = null
     this.dispatch_state_update()
@@ -215,7 +215,7 @@ class Taxus {
       path = this.tree_path
 
     if (this.get_tree().is_nexus())
-      this.get_tree().apply_fangorn_metadata(this.metadata_from_current_state())
+      this.get_tree().apply_taxus_metadata(this.metadata_from_current_state())
 
     let data = this.get_tree().output_tree()
 
@@ -260,7 +260,7 @@ class Taxus {
   fasta_out_path() {
     if (this.fasta_is_loaded()) {
       let path = this.fasta_path
-      return path_is_fangorized(path) ? path : fangorize_path(path)
+      return path_is_taxusized(path) ? path : taxusize_path(path)
     }
   }
 
@@ -320,7 +320,7 @@ class Taxus {
     dispatchDocumentEvent('fasta_closed')
   }
 
-  // wrap phylotree nodes with fangorn nodes
+  // wrap phylotree nodes with taxus nodes
   // prepare branches
   reinit_nodes() {
     if (this.tree_is_loaded()) {
@@ -354,7 +354,7 @@ class Taxus {
   }
 
   dispatch_state_update() {
-    dispatchDocumentEvent('fangorn_state_update')
+    dispatchDocumentEvent('taxus_state_update')
   }
 
   each_leaf(f) {
@@ -431,7 +431,7 @@ class Taxus {
   // Nexus metdata stuff
 
   metadata_from_nexus() {
-    return this.get_tree().nexus_to_fangorn_metadata()
+    return this.get_tree().nexus_to_taxus_metadata()
   }
 
   // Make metadata from current tree
@@ -489,14 +489,14 @@ class Taxus {
 
   make_tree_dirty() {
     this.tree_is_dirty = true
-    dispatchDocumentEvent('fangorn_tree_header_update')
+    dispatchDocumentEvent('taxus_tree_header_update')
   }
 
   make_tree_clean() {
     console.log('make_tree_clean')
     console.log(this)
     this.tree_is_dirty = false
-    dispatchDocumentEvent('fangorn_tree_header_update')
+    dispatchDocumentEvent('taxus_tree_header_update')
   }
 
   make_fasta_dirty() {

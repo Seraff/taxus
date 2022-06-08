@@ -23,7 +23,7 @@ describe('Window opening', function () {
   // })
 
   it('loads a tree', async () => {
-    console.log(client.fangorn)
+    console.log(client.taxus)
 
   })
 })

@@ -279,7 +279,7 @@ Scanner.prototype.ParseComment = function()
 }
 
 //----------------------------------------------------------------------------------------------
-// we don't use it in Fangorn, parsing as string instead
+// we don't use it in Taxus, parsing as string instead
 Scanner.prototype.ParseNumber = function()
 {
   this.buffer = '';

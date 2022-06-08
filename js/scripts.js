@@ -253,7 +253,7 @@ function saveFastaAsAction() {
 }
 
 function copyAction () {
-  if (!fangorn.tree_is_loaded()){
+  if (!taxus.tree_is_loaded()){
     return
   }
 
@@ -331,7 +331,7 @@ function showFastaAction() {
 }
 
 function annotateNodeAction() {
-  if (!fangorn.fasta_is_loaded() || taxus.get_selection().length != 1) { return false }
+  if (!taxus.fasta_is_loaded() || taxus.get_selection().length != 1) { return false }
 
   let node = taxus.get_selection()[0]
   let header = node.fasta().header
@@ -479,7 +479,7 @@ $(document).ready(function () {
 
   setWindowHeader()
 
-  document.addEventListener('fangorn_state_update', function (e) {
+  document.addEventListener('taxus_state_update', function (e) {
     updateControls(taxus)
   })
 
@@ -613,7 +613,7 @@ $(document).ready(function () {
 
   // Header update logic
 
-  document.addEventListener('fangorn_tree_header_update', (e) => {
+  document.addEventListener('taxus_tree_header_update', (e) => {
     setWindowHeader(taxus.tree_title())
   })
 

@@ -1704,7 +1704,7 @@ const parseString = window.modules.xml2js.parseString;
           n.__mapped_bl = branch_length_accessor(n);
         });
         phylotree.branch_length(function(n) {
-          // FANGORN modified
+          // TAXUS modified
           return phylotree.cladogram ? undefined : n.__mapped_bl
         });
 
@@ -2470,7 +2470,7 @@ const parseString = window.modules.xml2js.parseString;
       }
     };
 
-    // For Fangorn
+    // For Taxus
     phylotree.refreshSpecific = function (elements) {
       var self = this;
 
@@ -2860,7 +2860,7 @@ const parseString = window.modules.xml2js.parseString;
     phylotree.links = d3.layout.cluster().links;
 
     //
-    // FANGORN extensions
+    // TAXUS extensions
     //
 
 
@@ -2869,7 +2869,7 @@ const parseString = window.modules.xml2js.parseString;
     phylotree.get_options = function(){ return options }
     phylotree.get_css_classes = function(){ return css_classes }
 
-    // FANGORN: cladogram mode
+    // TAXUS: cladogram mode
     phylotree.cladogram = false
 
     branch_length_accessor = function(_node) {
