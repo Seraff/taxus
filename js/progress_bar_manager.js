@@ -1,31 +1,33 @@
-const ipcRenderer = require('electron').ipcRenderer
-
 class ProgressBarManager {
-  constructor () {
+  static COMPLEXITY_THRESHOLD = 1000
+
+  constructor() {
     this.complexity = 0
   }
 
-  show () {
-    ipcRenderer.send('show_progress_bar')
+  show() {
+    window.api.showProgressBar()
   }
 
-  tryToShow () {
+  tryToShow() {
     if (this.shouldBeShown()) {
       this.show()
     }
   }
 
-  hide () {
-    ipcRenderer.send('hide_progress_bar')
+  hide() {
+    window.api.hideProgressBar()
   }
 
-  withProgressBar (func) {
+  withProgressBar(func) {
     this.show()
-    func()
-    this.hide()
+    func().then(() => {
+
+      this.hide()
+    })
   }
 
-  withProgressBarAttempt (func) {
+  withProgressBarAttempt(func) {
     if (this.shouldBeShown()){
       this.show()
     }
@@ -33,15 +35,11 @@ class ProgressBarManager {
     this.hide()
   }
 
-  setNewComplexity (val) {
+  setNewComplexity(val) {
     this.complexity = val
   }
 
-  shouldBeShown () {
+  shouldBeShown() {
     return this.complexity >= ProgressBarManager.COMPLEXITY_THRESHOLD
   }
 }
-
-ProgressBarManager.COMPLEXITY_THRESHOLD = 1500
-
-module.exports = ProgressBarManager

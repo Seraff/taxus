@@ -179,13 +179,17 @@ class Taxus {
     return true
   }
 
-  load_tree_file(path) {
+  load_tree_file(path, callback=undefined) {
     window.api.loadFile(path).then( content => {
       this.load_tree_string(content)
       this.tree_path = path
 
       this.make_tree_clean()
       this.make_fasta_clean()
+
+      if (callback)
+        callback()
+
     }, error => {
       console.error(error)
     })

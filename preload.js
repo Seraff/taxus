@@ -22,7 +22,10 @@ contextBridge.exposeInMainWorld(
         saveFile: (path, content) => ipcRenderer.invoke('taxus:save_file', path, content),
 
         updateMenu: (states) => ipcRenderer.invoke('taxus:update_menu', states),
-        onMenuClicked: (callback) => ipcRenderer.on('taxus:menu_clicked', callback)
+        onMenuClicked: (callback) => ipcRenderer.on('taxus:menu_clicked', callback),
+
+        showProgressBar: () => ipcRenderer.send('taxus:show_progress_bar'),
+        hideProgressBar: () => ipcRenderer.send('taxus:hide_progress_bar')
     }
 );
 

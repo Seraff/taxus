@@ -45,35 +45,9 @@ function createWindow () {
     // }
   })
 
-  ipcMain.on('show_progress_bar', (e) => {
-    showProgressBar(win)
-  })
-
-  ipcMain.on('hide_progress_bar', () => {
-    hideProgressBar(win)
-  })
-
   windows.add(win)
 
   return win
-}
-
-function showProgressBar(w) {
-  w.currentProgressBar = new ProgressBar({
-    text: 'Working...',
-    browserWindow: {
-      parent: w,
-      modal: true,
-      webPreferences: { nodeIntegration: true }
-    }
-  })
-}
-
-function hideProgressBar(w) {
-  if (w.currentProgressBar && !w.currentProgressBar.isCompleted()) {
-    w.currentProgressBar.setCompleted()
-    w.currentProgressBar = null
-  }
 }
 
 function sendFileOpen() {
@@ -102,6 +76,13 @@ app.on('window-all-closed', () => {
 })
 
 // Communication with renderer process
+
+function getSenderWindow(event) {
+  let win = BrowserWindow.getAllWindows().find((w) => {
+    return w.webContents.id === event.sender.id
+  })
+  return win
+}
 
 ipcMain.on("taxus:new_window", () => {
   createWindow()
@@ -134,9 +115,32 @@ ipcMain.handle('taxus:save_file', async (event, path, content) => {
 })
 
 ipcMain.handle('taxus:update_menu', async (event, states) => {
-  var win = BrowserWindow.getAllWindows().find((win) => win.webContents.id === event.sender.id)
+  let win = getSenderWindow(event)
 
   Object.keys(states).forEach((key) => {
     win.menu.getMenuItemById(key).enabled = states[key]
   })
+})
+
+// Progress Bar
+
+ipcMain.on('taxus:show_progress_bar', (event) => {
+  let win = getSenderWindow(event)
+
+  win.currentProgressBar = new ProgressBar({
+    text: 'Working...',
+    browserWindow: {
+      parent: win,
+      modal: true
+    }
+  })
+})
+
+ipcMain.on('taxus:hide_progress_bar', (event) => {
+  let win = getSenderWindow(event)
+
+  if (win.currentProgressBar && !win.currentProgressBar.isCompleted()) {
+    win.currentProgressBar.setCompleted()
+    win.currentProgressBar = null
+  }
 })

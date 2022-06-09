@@ -166,23 +166,12 @@ async function openTreeAction (e) {
     }
 
     window.api.openFileDialog(options).then(path => {
-      taxus.load_tree_file(path)
+      progressBar.show()
+      taxus.load_tree_file(path, () => {
+        progressBar.hide()
+        progressBar.setNewComplexity(taxus.get_nodes().length)
+      })
     })
-
-    // TODO progressbar
-    // dialog.showOpenDialog(options).then(result => {
-    //   if (result.filePaths.length == 0) {
-    //     return false
-    //   }
-
-    //   progressBar.withProgressBar(() => {
-
-    //     taxus.load_tree_file(path)
-
-    //     progressBar.setNewComplexity(taxus.get_nodes().length)
-    //   })
-
-    // })
   }
 
   if (taxus.tree_is_dirty || taxus.fasta_is_dirty){
@@ -341,15 +330,15 @@ function annotateNodeAction() {
 }
 
 function rerootAction() {
-  // progressBar.withProgressBarAttempt(() => {
+  progressBar.withProgressBarAttempt(() => {
     taxus.rerootToSelectedNode()
-  // })
+  })
 }
 
 function rotateBranchAction() {
-  // progressBar.withProgressBarAttempt(() => {
+  progressBar.withProgressBarAttempt(() => {
     taxus.rotateSelectedBranch()
-  // })
+  })
 }
 
 function selectDescendantsAction() {
@@ -401,11 +390,15 @@ function quitAction() {
 }
 
 function zoomInAction() {
-  taxus.get_tree().zoomIn()
+  progressBar.withProgressBarAttempt(() => {
+    taxus.get_tree().zoomIn()
+  })
 }
 
 function zoomOutAction() {
-  taxus.get_tree().zoomOut()
+  progressBar.withProgressBarAttempt(() => {
+    taxus.get_tree().zoomOut()
+  })
 }
 
 function horizontalContractAction() {
@@ -456,11 +449,11 @@ function resetSelectionMode() {
 }
 
 function changeScale(func, amount){
-  // progressBar.withProgressBarAttempt(() => {
-  func(func() + amount).safe_update()
-  taxus.get_tree().redraw_scale_bar()
-  // })
-  dispatchDocumentEvent('tree_topology_changed')
+  progressBar.withProgressBarAttempt(() => {
+    func(func() + amount).safe_update()
+    taxus.get_tree().redraw_scale_bar()
+    dispatchDocumentEvent('tree_topology_changed')
+  })
 }
 
 function printTaxaCount () {
@@ -495,10 +488,10 @@ $(document).ready(function () {
   modeSelector = new BtnGroupRadio($('#mode-select-btn-group'))
   resetSelectionMode()
 
+
+  progressBar = new ProgressBarManager()
+
   return
-
-
-  // progressBar = new ProgressBarManager()
 
   // Edit
 
@@ -524,17 +517,6 @@ $(document).ready(function () {
 
   $('#universal-dialog-close').on('click', function () {
     $('#universal-dialog')[0].close(false)
-  })
-
-  $('.expand-contract-action').on('click', function () {
-    let which_function = $(this).data('direction') == 'vertical' ? taxus.get_tree().spacing_x : taxus.get_tree().spacing_y
-
-    progressBar.withProgressBarAttempt(() => {
-      which_function(which_function() + (+$(this).data('amount'))).safe_update()
-      taxus.get_tree().redraw_scale_bar()
-    })
-
-    dispatchDocumentEvent('tree_topology_changed')
   })
 
   // Picker logic
