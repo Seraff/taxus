@@ -18,10 +18,6 @@ class SearchPanel {
     this.found_items = []
     this.current_nav_item_index = null
 
-    this.$search_action_button.on('click', () => {
-      this.toggle()
-    })
-
     $(window).on("keydown", (e) => {
       if (e.key == 'Escape'){
         this.hide()

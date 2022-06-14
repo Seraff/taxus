@@ -125,18 +125,19 @@ class FastaPane {
 class FastaPaneEntry {
   static HIGHLIGHT_COLOR = '#fff308'
 
-  constructor (pane, fasta_entry) {
+  constructor(pane, fasta_entry) {
     this.$element = null
 
     this.$fasta_pane = pane.$fasta_pane
     this.fastaMapping = pane.taxus.fastaMapping
     this.fasta_entry = fasta_entry
+    this.id = fasta_entry.id
     this.node = this.fastaMapping.getNodeForFasta(this.fasta_entry)
 
     this.alias = Math.random().toString(36).substring(2)
   }
 
-  render () {
+  render() {
     if (!this.fasta_entry) {
       return ''
     }
@@ -160,7 +161,7 @@ class FastaPaneEntry {
     this.$element = $('span#' + this.alias)
   }
 
-  redraw () {
+  redraw() {
     if (this.hasNode() && this.node.selected === true){
       this.select()
     } else {
@@ -174,35 +175,35 @@ class FastaPaneEntry {
     }
   }
 
-  select () {
+  select() {
     this.$element.addClass('selected')
   }
 
-  unselect () {
+  unselect() {
     this.$element.removeClass('selected')
   }
 
-  hide () {
+  hide() {
     this.$element.hide()
   }
 
-  unhide () {
+  unhide() {
     this.$element.show()
   }
 
-  isHidden () {
+  isHidden() {
     return this.hasNode() && this.node.is_marked()
   }
 
-  hasNode () {
+  hasNode() {
     return this.node !== null
   }
 
-  highlight () {
+  highlight() {
     this.$element.css('background-color', FastaPaneEntry.HIGHLIGHT_COLOR)
   }
 
-  unhighlight () {
+  unhighlight() {
     this.$element.css('background-color', '')
 
   }

@@ -6,6 +6,7 @@ let taxus = null
 let modeSelector = null
 let progressBar = null
 let controls = null
+let search_panel = null
 
 function initControls() {
   controls = new Controls()
@@ -47,7 +48,6 @@ function initControls() {
     .register('remove_branch_color', undefined, '#remove-branch-color-action')
     .register('set_mode_to_branch', undefined, '#set-mode-to-branch-action')
     .register('set_mode_to_taxa', undefined, '#set-mode-to-taxa-action')
-    .register('set_search_mode_to_fasta', undefined, '#set-search-mode-to-fasta')
     .register('show_fasta', undefined, '#show-fasta-action')
 
   // controls.setCallback('open_fasta', openFastaAction)
@@ -424,6 +424,10 @@ function verticalExpandAction() {
   changeScale(func, amount)
 }
 
+function findAction() {
+  search_panel.toggle()
+}
+
 function getMode() {
   if (modeSelector) {
     return modeSelector.active_button.data('mode')
@@ -511,6 +515,10 @@ $(document).ready(function () {
     taxus.set_selected_nodes_annotation({ "!color": color })
   })
 
+  // Search panel logic
+
+  search_panel = new SearchPanel($('#search-panel'), taxus, fasta_pane)
+
   return
 
   // Edit
@@ -566,8 +574,6 @@ $(document).ready(function () {
     }
   })
 
-  $('#remove-branch-color-action').on('click', removebranchcoloraction)
-
 
   ipcRenderer.on('open_file', (event, message) => {
     let open_tree = function () {
@@ -579,14 +585,6 @@ $(document).ready(function () {
     } else {
       open_tree()
     }
-  })
-
-  // Search panel
-
-  let search_panel = new SearchPanel($('#search-panel'), taxus, fasta_pane)
-
-  menu.setCallbackOnItem('find', function () {
-    search_panel.toggle()
   })
 
   // Footer text
