@@ -16,6 +16,7 @@ function initControls() {
 
   controls
     // Only menu
+    .register('preferences', 'preferences', undefined)
     .register('open_tree', 'open-tree', undefined)
     .register('save_tree', 'save-tree', undefined)
     .register('save_tree_as', 'save-tree-as', undefined)
@@ -63,6 +64,7 @@ function updateControls () {
   controls.enableItem('open_tree')
 
   if (taxus.tree_is_loaded()) {
+    controls.enableItem('preferences')
     controls.enableItem('save_tree')
     controls.enableItem('save_tree_as')
 

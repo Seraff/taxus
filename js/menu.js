@@ -288,11 +288,12 @@ if (process.platform === 'darwin') {
       },
       {
         label: 'Preferences',
+        id: 'preferences',
         accelerator: 'Command+,',
         role: 'preferences',
-        click: (item, focusedWindow) => {
+        click: (e, focusedWindow) => {
           createPrefWindow(focusedWindow)
-        },
+        }
       },
       {
         type: 'separator'
@@ -334,11 +335,12 @@ if (process.platform === 'darwin') {
 
   file_submenu.push({
                       label: 'Preferences',
+                      id: 'preferences',
                       accelerator: 'CmdOrCtrl+,',
                       role: 'preferences',
-                      click: (item, focusedWindow) => {
+                      click: (e, focusedWindow) => {
                         createPrefWindow(focusedWindow)
-                      },
+                      }
                     })
 
   file_submenu.push({ type: 'separator' })

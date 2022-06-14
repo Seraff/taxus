@@ -22,6 +22,10 @@ class PreferencesWindow {
     this.window.once('ready-to-show', () => {
       this.window.show()
     })
+
+    this.window.once('close', () => {
+      this.mainWindow.preferencesWindow = null
+    })
   }
 
   show () {
