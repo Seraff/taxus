@@ -1,6 +1,3 @@
-const $ = require('jquery')
-const AColorPicker = require('a-color-picker')
-
 function ColorPicker (pickerSelector, actionSelector, coloredSelectors = []) {
   var picker = this
   picker.color_change_callbacks = []
@@ -69,5 +66,3 @@ function ColorPicker (pickerSelector, actionSelector, coloredSelectors = []) {
     picker.color_change_callbacks.push(callback)
   }
 }
-
-module.exports = ColorPicker

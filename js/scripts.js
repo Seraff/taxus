@@ -359,6 +359,8 @@ function exportToSvgAction() {
   svgToPng.saveSvg(d3.select('svg#tree_display').node(), 'tree.svg', options)
 }
 
+function changeBranchColorAction() {}
+
 function removeBranchColorAction() {
   taxus.set_selected_nodes_annotation({ '!color': undefined })
   taxus.get_tree().dispatch_selection_modified_event() // for picker to reset color
@@ -490,13 +492,6 @@ $(document).ready(function () {
 
   // Preferences logic
 
-  // window.api.handleGetPreferences(() => {
-  //   console.log('Main window handles request for current preferences')
-  //   window.api.
-  // })
-
-  // document.addEventListener('preferences_update', applyPreferences)
-
   window.api.handleGiveCurrentPrefs((event, message) => {
     console.log('They asked for current prefs')
     window.api.takeCurrentPrefs(taxus.preferences || {})
@@ -507,6 +502,13 @@ $(document).ready(function () {
     if (taxus.preferences)
       taxus.apply_new_preferences(prefs)
     window.api.newPrefsTaken()
+  })
+
+  // Color picker logic
+
+  let picker = new ColorPicker('#branch-color-picker', '#change-branch-color-action', ['#change-branch-color-box'])
+  picker.add_color_change_callback(function (color) {
+    taxus.set_selected_nodes_annotation({ "!color": color })
   })
 
   return
@@ -537,12 +539,7 @@ $(document).ready(function () {
     $('#universal-dialog')[0].close(false)
   })
 
-  // Picker logic
 
-  let picker = new ColorPicker('#branch-color-picker', '#change-branch-color-action', ['#change-branch-color-box'])
-  picker.add_color_change_callback(function (color) {
-    taxus.set_selected_nodes_annotation({ "!color": color })
-  })
 
   document.addEventListener('selection_modified', function (e) {
     let selection = taxus.get_selection()

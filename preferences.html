@@ -112,6 +112,8 @@
       </footer>
     </div>
   <script src="node_modules/jquery/dist/jquery.js"></script>
+  <script src="node_modules/a-color-picker/dist/acolorpicker.js"></script>
+  <script src="js/color_picker.js"></script>
 
   <script type="text/javascript">
     function collectPreferences () {
@@ -147,10 +149,10 @@
         }
       })
 
-      // var picker = AColorPicker.createPicker('#default-branch-color-picker', { hueBarSize: [150, 11], slBarSize: [280, 50] }).on('change', (picker, color) => {
-      //   var hex = AColorPicker.parseColor(color, 'hex')
-      //   $('.fangorn-preference[data-pref-id=branchColor]').val(hex)
-      // })
+      var picker = AColorPicker.createPicker('#default-branch-color-picker', { hueBarSize: [150, 11], slBarSize: [280, 50] }).on('change', (picker, color) => {
+        var hex = AColorPicker.parseColor(color, 'hex')
+        $('.fangorn-preference[data-pref-id=branchColor]').val(hex)
+      })
 
       function takeCheckboxValue(pref_id, message) {
         var checkbox = $('.fangorn-preference[data-pref-id=' + pref_id + ']')
@@ -187,7 +189,7 @@
         for (key in message.preferences) {
           switch (key) {
             case 'branchColor':
-              // picker.setColor(message.preferences[key])
+              picker.setColor(message.preferences[key])
               break
             case 'displayAlignmentCoverage':
             case 'displayBootstrap':
