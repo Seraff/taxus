@@ -1,8 +1,3 @@
-// const Node = require('./node.js')
-// const Preferences = require('./preferences.js')
-// const FastaMapping = require('./fasta_mapping.js')
-// const apply_extensions = require('./phylotree-ext.js')
-
 class Taxus {
   static TREE_EXT = ['tre', 'tree', 'nexus', 'nex', 'nxs', 'newick', 'txt']
   static FASTA_EXT = ['fa', 'fas', 'fasta', 'fna', 'faa', 'ffn', 'frn']
@@ -472,6 +467,7 @@ class Taxus {
         leaf.apply_own_fasta(removed_fasta_rep.sequences[leaf.name])
       })
     }
+
     this.preferences.applyToDefaults(metadata)
   }
 
@@ -529,6 +525,8 @@ class Taxus {
   apply_new_preferences(prefs) {
     this.preferences.applyToCurrent(prefs)
     this.make_tree_dirty()
+    this.get_tree().safe_update()
+    this.redraw_features()
   }
 
   // Features

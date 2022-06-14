@@ -111,15 +111,9 @@
         </div>
       </footer>
     </div>
+  <script src="node_modules/jquery/dist/jquery.js"></script>
 
   <script type="text/javascript">
-    const $ = require('jquery')
-    const remote = require('electron').remote;
-
-    const ipcRenderer = require('electron').ipcRenderer
-
-    const AColorPicker = require('a-color-picker')
-
     function collectPreferences () {
       var result = {}
       $('.fangorn-preference').each( function () {
@@ -142,10 +136,6 @@
       return result
     }
 
-    function removeCallbacks () {
-      ipcRenderer.removeAllListeners('take_current_prefs', 'give_current_prefs')
-    }
-
     $(document).ready(function () {
       $('.btn-radio').on('click', (e) => {
         var el = $(e.target)
@@ -157,10 +147,10 @@
         }
       })
 
-      var picker = AColorPicker.createPicker('#default-branch-color-picker', { hueBarSize: [150, 11], slBarSize: [280, 50] }).on('change', (picker, color) => {
-        var hex = AColorPicker.parseColor(color, 'hex')
-        $('.fangorn-preference[data-pref-id=branchColor]').val(hex)
-      })
+      // var picker = AColorPicker.createPicker('#default-branch-color-picker', { hueBarSize: [150, 11], slBarSize: [280, 50] }).on('change', (picker, color) => {
+      //   var hex = AColorPicker.parseColor(color, 'hex')
+      //   $('.fangorn-preference[data-pref-id=branchColor]').val(hex)
+      // })
 
       function takeCheckboxValue(pref_id, message) {
         var checkbox = $('.fangorn-preference[data-pref-id=' + pref_id + ']')
@@ -192,11 +182,12 @@
         }
       }
 
-      ipcRenderer.on('take_current_prefs', (event, message) => {
+      window.api.handleTakeCurrentPrefs((event, message) => {
+        console.log('taking current preferences')
         for (key in message.preferences) {
           switch (key) {
             case 'branchColor':
-              picker.setColor(message.preferences[key])
+              // picker.setColor(message.preferences[key])
               break
             case 'displayAlignmentCoverage':
             case 'displayBootstrap':
@@ -215,15 +206,12 @@
 
       function submit () {
         var prefs = collectPreferences()
-        ipcRenderer.send('take_new_prefs', prefs)
+        window.api.takeNewPrefs(prefs)
       }
 
-      ipcRenderer.send('give_current_prefs')
 
       $('#cancel-button').on('click', () => {
-        var win = remote.getCurrentWindow()
-        removeCallbacks()
-        win.close()
+        window.api.closePrefWindow()
       })
 
       $('#save-button').on('click', () => {
@@ -236,11 +224,7 @@
         }
       })
 
-      ipcRenderer.on('new_preferences_taken', (event, message) => {
-        var win = remote.getCurrentWindow()
-        removeCallbacks()
-        win.close()
-      })
+      window.api.giveCurrentPrefs()
     })
   </script>
   </body>

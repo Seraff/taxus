@@ -25,7 +25,16 @@ contextBridge.exposeInMainWorld(
         onMenuClicked: (callback) => ipcRenderer.on('taxus:menu_clicked', callback),
 
         showProgressBar: () => ipcRenderer.send('taxus:show_progress_bar'),
-        hideProgressBar: () => ipcRenderer.send('taxus:hide_progress_bar')
+        hideProgressBar: () => ipcRenderer.send('taxus:hide_progress_bar'),
+
+        giveCurrentPrefs: () => ipcRenderer.send('taxus:give_current_prefs'),
+        handleGiveCurrentPrefs: (callback) => ipcRenderer.on('taxus:give_current_prefs', callback),
+        takeCurrentPrefs: (prefs) => ipcRenderer.send('taxus:take_current_prefs', prefs),
+        handleTakeCurrentPrefs: (callback) => ipcRenderer.on('taxus:take_current_prefs', callback),
+        takeNewPrefs: (prefs) => ipcRenderer.send('taxus:take_new_prefs', prefs),
+        handleTakeNewPrefs: (callback) => ipcRenderer.on('taxus:take_new_prefs', callback),
+        newPrefsTaken: () => ipcRenderer.send('taxus:new_prefs_taken'),
+        closePrefWindow: () => ipcRenderer.send('taxus:close_pref_window'),
     }
 );
 

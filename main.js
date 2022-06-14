@@ -26,6 +26,7 @@ function createWindow () {
 
   win.menu = menu.build_menu()
   win.createWindow = createWindow
+  win.preferencesWindow = null
 
   win.loadFile(path.join(__dirname, 'index.html'))
 
@@ -35,7 +36,7 @@ function createWindow () {
 
   win.on('closed', () => {
     windows.delete(win)
-    win = null;
+    win = null
   })
 
   ipcMain.on('scripts_loaded', (event) => {
@@ -143,4 +144,48 @@ ipcMain.on('taxus:hide_progress_bar', (event) => {
     win.currentProgressBar.setCompleted()
     win.currentProgressBar = null
   }
+})
+
+
+ipcMain.on('taxus:give_current_prefs', (event) => {
+  console.log('MAIN: give current preferences')
+
+  let prefWin = getSenderWindow(event)
+  let mainWin = prefWin.getParentWindow()
+
+  mainWin.webContents.send('taxus:give_current_prefs')
+})
+
+
+ipcMain.on('taxus:take_current_prefs', (event, prefs) => {
+  console.log('MAIN: take current preferences')
+
+  let mainWin = getSenderWindow(event)
+  let prefWin = mainWin.preferencesWindow
+
+  prefWin.window.webContents.send('taxus:take_current_prefs', prefs)
+})
+
+ipcMain.on('taxus:take_new_prefs', (event, prefs) => {
+  console.log('MAIN: take current preferences')
+
+  let prefWin = getSenderWindow(event)
+  let mainWin = prefWin.getParentWindow()
+
+  mainWin.webContents.send('taxus:take_new_prefs', prefs)
+})
+
+ipcMain.on('taxus:new_prefs_taken', (event, prefs) => {
+  let mainWin = getSenderWindow(event)
+
+  mainWin.preferencesWindow.window.close()
+  mainWin.preferencesWindow = null
+})
+
+ipcMain.on('taxus:close_pref_window', (event, prefs) => {
+  let prefWin = getSenderWindow(event)
+  let mainWin = prefWin.getParentWindow()
+
+  mainWin.preferencesWindow.window.close()
+  mainWin.preferencesWindow = null
 })

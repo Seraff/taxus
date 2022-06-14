@@ -13,6 +13,14 @@ function onClick(event, win) {
   win.webContents.send('taxus:menu_clicked', event.id)
 }
 
+function createPrefWindow(focusedWindow) {
+  let parent = focusedWindow.getParentWindow()
+  let mainWin = parent ? parent : focusedWindow
+
+  if (!mainWin.preferencesWindow)
+    mainWin.preferencesWindow = new PreferencesWindow()
+}
+
 const template = [
   {
     label: 'File',
@@ -282,8 +290,8 @@ if (process.platform === 'darwin') {
         label: 'Preferences',
         accelerator: 'Command+,',
         role: 'preferences',
-        click: () => {
-          new PreferencesWindow()
+        click: (item, focusedWindow) => {
+          createPrefWindow(focusedWindow)
         },
       },
       {
@@ -328,8 +336,8 @@ if (process.platform === 'darwin') {
                       label: 'Preferences',
                       accelerator: 'CmdOrCtrl+,',
                       role: 'preferences',
-                      click: () => {
-                        new PreferencesWindow()
+                      click: (item, focusedWindow) => {
+                        createPrefWindow(focusedWindow)
                       },
                     })
 

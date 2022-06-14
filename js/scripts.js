@@ -377,11 +377,6 @@ function toggleCladogramViewAction() {
   })
 }
 
-function applyPreferences() {
-  taxus.get_tree().safe_update()
-  taxus.redraw_features()
-}
-
 function quitAction() {
   if (taxus.has_dirty_files()){
     showUnsavedFileAlert((e) => app.remote.app.quit())
@@ -491,6 +486,27 @@ $(document).ready(function () {
 
   progressBar = new ProgressBarManager()
 
+  // Preferences logic
+
+  // window.api.handleGetPreferences(() => {
+  //   console.log('Main window handles request for current preferences')
+  //   window.api.
+  // })
+
+  // document.addEventListener('preferences_update', applyPreferences)
+
+  window.api.handleGiveCurrentPrefs((event, message) => {
+    console.log('They asked for current prefs')
+    window.api.takeCurrentPrefs(taxus.preferences || {})
+  })
+
+  window.api.handleTakeNewPrefs((event, prefs) => {
+    console.log('Receiving new preferences')
+    if (taxus.preferences)
+      taxus.apply_new_preferences(prefs)
+    window.api.newPrefsTaken()
+  })
+
   return
 
   // Edit
@@ -553,18 +569,6 @@ $(document).ready(function () {
 
   $('#remove-branch-color-action').on('click', removebranchcoloraction)
 
-  // Preferences logic
-
-  document.addEventListener('preferences_update', applyPreferences)
-
-  ipcRenderer.on('give_current_prefs', (event, message) => {
-    ipcRenderer.send('take_current_prefs', taxus.preferences || {})
-  })
-
-  ipcRenderer.on('take_new_prefs', (event, message) => {
-    if (taxus.preferences) { taxus.apply_new_preferences(message) }
-    ipcRenderer.send('new_preferences_taken')
-  })
 
   ipcRenderer.on('open_file', (event, message) => {
     let open_tree = function () {
