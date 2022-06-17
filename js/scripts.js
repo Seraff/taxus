@@ -168,11 +168,13 @@ async function openTreeAction (e) {
     }
 
     window.api.openFileDialog(options).then(path => {
-      progressBar.show()
-      taxus.load_tree_file(path, () => {
-        progressBar.hide()
-        progressBar.setNewComplexity(taxus.get_nodes().length)
-      })
+      if (path){
+        progressBar.show()
+        taxus.load_tree_file(path, () => {
+          progressBar.hide()
+          progressBar.setNewComplexity(taxus.get_nodes().length)
+        })
+      }
     })
   }
 
@@ -214,7 +216,9 @@ function openFastaAction () {
     }
 
     window.api.openFileDialog(options).then(path => {
-      taxus.load_fasta_file(path)
+      if (path){
+        taxus.load_fasta_file(path)
+      }
     })
   }
 
