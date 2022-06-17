@@ -106,11 +106,11 @@ ipcMain.handle('taxus:load_file', async (event, path) => {
 })
 
 ipcMain.handle('taxus:save_file_dialog', async (event, options) => {
-  const { canceled, filePaths } = await dialog.showSaveDialog(options)
+  const { canceled, filePath } = await dialog.showSaveDialog(options)
   if (canceled) {
     return
   } else {
-    return filePaths[0]
+    return filePath
   }
 })
 

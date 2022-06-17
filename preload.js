@@ -8,14 +8,6 @@ const {
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld(
     "api", {
-        // TODO: remove send/receive
-        send: (channel, data) => {
-            ipcRenderer.send(channel, data)
-        },
-        receive: (channel, func) => {
-            ipcRenderer.on(channel, (event, ...args) => func(...args))
-        },
-
         openFileDialog: (options) => ipcRenderer.invoke('taxus:open_file_dialog', options),
         loadFile: (path) => ipcRenderer.invoke('taxus:load_file', path),
         saveFileDialog: (options) => ipcRenderer.invoke('taxus:save_file_dialog', options),

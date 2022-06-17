@@ -197,13 +197,15 @@ function saveTreeAsAction () {
     defaultPath: taxus.tree_path }
 
   window.api.saveFileDialog(options).then(path => {
-    taxus.save_tree(path)
+    if (path){
+      taxus.save_tree(path)
 
-    let fasta_is_loaded = taxus.fasta_is_loaded()
-    let fasta_path = fasta_is_loaded && taxus.fasta.path
+      let fasta_is_loaded = taxus.fasta_is_loaded()
+      let fasta_path = fasta_is_loaded && taxus.fasta.path
 
-    taxus.load_tree_file(result.filePath)
-    if (fasta_is_loaded) { taxus.load_fasta_file(fasta_path, true) }
+      taxus.load_tree_file(result.filePath)
+      if (fasta_is_loaded) { taxus.load_fasta_file(fasta_path, true) }
+    }
   })
 }
 
@@ -236,14 +238,15 @@ function saveFastaAction() {
 }
 
 function saveFastaAsAction() {
-  let options = { title: 'Save fasta as...', defaultPath: taxus.fasta_out_path() }
+  let options = { title: 'Save fasta as...',
+                  defaultPath: taxus.fasta_out_path() }
 
-  dialog.showSaveDialog(options).then(result => {
-    if (result.canceled || result.filePath.length === 0) { return true }
-
-    taxus.save_fasta(result.filePath, function () {
-      taxus.load_fasta_file(result.filePath, true)
-    })
+  window.api.saveFileDialog(options).then(path => {
+    if (path){
+      taxus.save_fasta(path, function () {
+        taxus.load_fasta_file(path, true)
+      })
+    }
   })
 }
 
@@ -297,21 +300,17 @@ function restoreSelectedAction() {
 }
 
 function saveSelectionAsFastaAction() {
-  // TODO: make it properly
   let fasta = taxus.get_selected_leaves_fasta()
-
   if (!fasta) { return false }
 
   let options = { title: 'Save selection as fasta' }
 
-  dialog.showSaveDialog(options).then(result => {
-    if (result.canceled || result.filePath.length === 0) { return true }
-
-    fs.writeFile(result.filePath, fasta, function (err) {
-      if (err) {
-        return console.error(err)
-      }
-    })
+  window.api.saveFileDialog(options).then(path => {
+    if (path){
+      window.api.saveFile(path, fasta).then(() => {}, error => {
+        console.error(error)
+      })
+    }
   })
 }
 
