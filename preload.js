@@ -35,6 +35,12 @@ contextBridge.exposeInMainWorld(
         handleTakeNewPrefs: (callback) => ipcRenderer.on('taxus:take_new_prefs', callback),
         newPrefsTaken: () => ipcRenderer.send('taxus:new_prefs_taken'),
         closePrefWindow: () => ipcRenderer.send('taxus:close_pref_window'),
+
+        openAnnotationWindow: (data) => ipcRenderer.send('taxus:open_annotation_window', data),
+        handleTakeAnnotationData: (callback) => ipcRenderer.on('taxus:take_annotation_data', callback),
+        applyNewAnnotation: (data) => ipcRenderer.send('taxus:apply_new_annotation', data),
+        handleApplyNewAnnotation: (callback) => ipcRenderer.on('taxus:apply_new_annotation', callback),
+        closeAnnotationWindow: (data) => ipcRenderer.send('taxus:close_annotation_window', data),
     }
 );
 

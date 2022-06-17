@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Annotation</title>
+    <link rel="stylesheet" href="css/vendor/photon.min.css">
+
+    <style type="text/css">
+      .annotation-form {
+          padding: 10px;
+      }
+
+      .toolbar-header {
+          -webkit-app-region: drag;
+          padding: 8px;
+      }
+
+      .window {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+
+          background-color: #f5f5f4;
+      }
+
+      .form-control {
+        border-radius: 0px !important;
+        padding: 0px 5px !important;
+      }
+
+      .form-group label {
+        display: block !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="window">
+      <form class="annotation-form">
+        <input id="node-name" type="hidden" placeholder="">
+
+        <div class="form-group">
+          <label>Name</label>
+          <input id="annotation-name" type="text" class="form-control" placeholder="">
+        </div>
+      </form>
+
+      <footer class="toolbar toolbar-footer">
+        <div class="toolbar-actions">
+          <button id="cancel-button" type="button" class="btn btn-default">
+            Cancel
+          </button>
+
+          <button id="save-button" type="button" class="btn btn-primary pull-right">
+            Save
+          </button>
+        </div>
+      </footer>
+    </div>
+  <script src="node_modules/jquery/dist/jquery.js"></script>
+  <script src="node_modules/a-color-picker/dist/acolorpicker.js"></script>
+  <script src="js/color_picker.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+
+      window.api.handleTakeAnnotationData((event, data) => {
+        $('#node-name').val(data.name)
+        $('#annotation-name').val(data.name)
+      })
+
+      $('#cancel-button').on('click', () => {
+        window.api.closeAnnotationWindow()
+      })
+
+      $('#save-button').on('click', () => {
+        data = { 'node_name': $('#node-name').val(),
+                 'annotation': {
+                   'name': $('#annotation-name').val()
+                 }
+        }
+
+        window.api.applyNewAnnotation(data)
+        window.api.closeAnnotationWindow()
+      })
+
+    })
+  </script>
+  </body>
+</html>

@@ -5,6 +5,8 @@ const ProgressBar = require('electron-progressbar')
 const path = require('path')
 const fs = require('fs').promises
 
+var AnnotationWindow = require('./js/annotation_window.js')
+
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true
 
 var file_to_open = null
@@ -27,6 +29,7 @@ function createWindow () {
   win.menu = menu.build_menu()
   win.createWindow = createWindow
   win.preferencesWindow = null
+  win.annotationWindow = null
 
   win.loadFile(path.join(__dirname, 'index.html'))
 
@@ -146,6 +149,7 @@ ipcMain.on('taxus:hide_progress_bar', (event) => {
   }
 })
 
+// Preferences window communication
 
 ipcMain.on('taxus:give_current_prefs', (event) => {
   console.log('MAIN: give current preferences')
@@ -188,4 +192,30 @@ ipcMain.on('taxus:close_pref_window', (event, prefs) => {
 
   mainWin.preferencesWindow.window.close()
   mainWin.preferencesWindow = null
+})
+
+// Annotation window communication
+
+ipcMain.on('taxus:open_annotation_window', (event, data) => {
+  let mainWin = getSenderWindow(event)
+
+  if (!mainWin.annotationWindow){
+    let annotWin = new AnnotationWindow(mainWin, data)
+    mainWin.annotationWindow = annotWin
+  }
+})
+
+ipcMain.on('taxus:apply_new_annotation', (event, data) => {
+  let annotWin = getSenderWindow(event)
+  let mainWin = annotWin.getParentWindow()
+
+  mainWin.webContents.send('taxus:apply_new_annotation', data)
+})
+
+ipcMain.on('taxus:close_annotation_window', (event) => {
+  let annotWin = getSenderWindow(event)
+  let mainWin = annotWin.getParentWindow()
+
+  mainWin.annotationWindow.window.close()
+  mainWin.annotationWindow = null
 })

@@ -38,7 +38,7 @@ class FastaPane {
     })
 
     document.addEventListener('node_titles_changed', () => {
-      this.redraw_entries()
+      this.render()
     })
 
     $(document).on('click', '.fasta-pane-entry', (e) => {

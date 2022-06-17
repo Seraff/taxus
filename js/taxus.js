@@ -34,6 +34,10 @@ class Taxus {
     return this._nodes.filter(function (node) { return node.is_leaf() })
   }
 
+  getLeaveByName(name) {
+    return this.get_leaves().find((leave) => { return leave.name == name })
+  }
+
   get_leave_names() {
     return this.get_leaves().map(function (node) { return node.name })
   }

@@ -1,12 +1,14 @@
 const path = require('path')
 
 const { app, BrowserWindow, ipcMain } = require('electron')
+const { writeHeapSnapshot } = require('v8')
 
-class PreferencesWindow {
-  constructor () {
-    this.mainWindow = BrowserWindow.getFocusedWindow()
+class AnnotationWindow {
+  constructor (mainWindow, data) {
+    this.mainWindow = mainWindow
+    this.data = data
 
-    this.window = new BrowserWindow({ width: 300, height: 500,
+    this.window = new BrowserWindow({ width: 300, height: 300,
                                       modal: false,
                                       parent: this.mainWindow,
                                       maximizable: false,
@@ -16,15 +18,18 @@ class PreferencesWindow {
                                       alwaysOnTop: true,
       webPreferences: { preload: path.join(__dirname, '..', 'preload.js') }})
 
-    const htmlPath = path.join(__dirname, '../preferences.html')
+    const htmlPath = path.join(__dirname, '../annotation.html')
     this.window.loadFile(htmlPath)
+    console.log('HTML loaded')
 
     this.window.once('ready-to-show', () => {
       this.window.show()
+
+      this.window.webContents.send('taxus:take_annotation_data', this.data)
     })
 
     this.window.once('close', () => {
-      this.mainWindow.preferencesWindow = null
+      this.mainWindow.annotationWindow = null
     })
   }
 
@@ -33,4 +38,4 @@ class PreferencesWindow {
   }
 }
 
-module.exports = PreferencesWindow
+module.exports = AnnotationWindow

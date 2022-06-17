@@ -326,9 +326,8 @@ function annotateNodeAction() {
 
   let node = taxus.get_selection()[0]
   let header = node.fasta().header
-  $('#seq-title-input').val(header)
 
-  $('#annotate-dialog')[0].showModal()
+  window.api.openAnnotationWindow({'name': header})
 }
 
 function rerootAction() {
@@ -519,6 +518,20 @@ $(document).ready(function () {
 
   search_panel = new SearchPanel($('#search-panel'), taxus, fasta_pane)
 
+  // Annotation logic
+
+  window.api.handleApplyNewAnnotation((event, data) => {
+    console.log(data)
+    let name = data.node_name
+    let leave = taxus.getLeaveByName(name)
+
+    if (leave){
+      taxus.update_node_title(leave, data.annotation.name)
+      dispatchDocumentEvent('node_titles_changed')
+      dispatchDocumentEvent('tree_topology_changed')
+    }
+  })
+
   return
 
   // Edit
@@ -547,8 +560,6 @@ $(document).ready(function () {
     $('#universal-dialog')[0].close(false)
   })
 
-
-
   document.addEventListener('selection_modified', function (e) {
     let selection = taxus.get_selection()
 
@@ -573,7 +584,6 @@ $(document).ready(function () {
       picker.remove_color()
     }
   })
-
 
   ipcRenderer.on('open_file', (event, message) => {
     let open_tree = function () {
