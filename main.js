@@ -11,6 +11,7 @@ process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true
 
 var file_to_open = null
 var windows = new Set()
+var windowToCloseIds = new Set()
 
 function createWindow () {
   let win = new BrowserWindow({
@@ -35,6 +36,15 @@ function createWindow () {
 
   win.once('ready-to-show', () => {
     win.show()
+  })
+
+  win.on('close', (e) => {
+    if (windowToCloseIds.has(win.id)) {
+      windowToCloseIds.delete(win.id)
+    } else {
+      e.preventDefault()
+      win.webContents.send('taxus:close_window')
+    }
   })
 
   win.on('closed', () => {
@@ -218,4 +228,27 @@ ipcMain.on('taxus:close_annotation_window', (event) => {
 
   mainWin.annotationWindow.window.close()
   mainWin.annotationWindow = null
+})
+
+// Alert window
+
+ipcMain.handle('taxus:open_alert_window', async (event, options) => {
+  const { response } = await dialog.showMessageBox(null, options)
+  return response
+})
+
+
+ipcMain.on('taxus:close_window', (event) => {
+  let win = getSenderWindow(event)
+  windowToCloseIds.add(win.id)
+  win.close()
+})
+
+
+ipcMain.on('taxus:quit', (event) => {
+  // send to window request to close
+  windows.forEach((w) => {
+    w.focus()
+    w.webContents.send('taxus:close_window')
+  })
 })

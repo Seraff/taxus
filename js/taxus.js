@@ -155,7 +155,7 @@ class Taxus {
       this._tree = null
 
       console.error(err)
-      showAlert('Error', 'Unable to open tree: ' + err.message)
+      showSimpleError('Error', 'Unable to open tree: ' + err.message)
       return false
     }
 
@@ -279,18 +279,17 @@ class Taxus {
       if (nodes_with_own_fasta.length === nodes_without_fasta.length) {
         // ok, take fasta from nodes
         if (!quiet){
-          showAlert('Warning', 'Sequences for restoring removed taxa will be taken from Nexus file')
+          showSimpleWarning('Warning', 'Sequences for restoring removed taxa will be taken from Nexus file')
         }
       } else {
         // incostistency, cannot load the file
         let rows = []
-
         rows.push('')
         rows.push('Not found in fasta file:')
         nodes_without_fasta.forEach((node) => {
           rows.push(node.name)
         })
-        showLogAlert('File cannot be loaded', "The data doesn't match:", rows)
+        showSimpleError('File cannot be loaded', "The data doesn't match:\n" + rows.join('\n'))
 
         return false
       }

@@ -98,7 +98,16 @@ const template = [
           click: onClick
         },
         ]
-      }
+      },
+      {
+        type: 'separator'
+      },
+      {
+        id: "close",
+        label: "Close Window",
+        role: "close",
+        accelerator: "CmdOrCtrl+W"
+      },
     ]
   },
   {
@@ -326,7 +335,8 @@ if (process.platform === 'darwin') {
       {
         label: 'Quit',
         id: 'quit',
-        accelerator: 'Command+Q'
+        accelerator: 'Command+Q',
+        click: onClick
       },
     ]
   });
@@ -347,7 +357,8 @@ if (process.platform === 'darwin') {
 
   file_submenu.push({
                       label: 'Quit',
-                      id: 'quit'
+                      id: 'quit',
+                      click: onClick
                     })
 
   help_submenu = template[template.length - 1].submenu

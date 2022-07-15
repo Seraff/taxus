@@ -1,7 +1,6 @@
 const path = require('path')
 
 const { app, BrowserWindow, ipcMain } = require('electron')
-const { writeHeapSnapshot } = require('v8')
 
 class AnnotationWindow {
   constructor (mainWindow, data) {
@@ -20,7 +19,6 @@ class AnnotationWindow {
 
     const htmlPath = path.join(__dirname, '../annotation.html')
     this.window.loadFile(htmlPath)
-    console.log('HTML loaded')
 
     this.window.once('ready-to-show', () => {
       this.window.show()

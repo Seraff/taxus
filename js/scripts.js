@@ -28,6 +28,8 @@ function initControls() {
     .register('select_all', 'select-all', undefined)
     .register('toggle_selection_mode', 'toggle-selection-mode', undefined)
     .register('toggle_cladogram_view', 'toggle-cladogram-view', undefined)
+    .register('close', 'close', undefined)
+    .register('quit', 'quit', undefined)
     // Both menu and button
     .register('reroot', 'reroot', '#reroot-action')
     .register('rotate_branch', 'rotate-branch', '#rotate-branch-action')
@@ -62,6 +64,8 @@ function updateControls () {
   controls.disableAll()
 
   controls.enableItem('open_tree')
+  controls.enableItem('close')
+  controls.enableItem('quit')
 
   if (taxus.tree_is_loaded()) {
     controls.enableItem('preferences')
@@ -129,24 +133,6 @@ function updateControls () {
   window.api.updateMenu(menuStates)
 }
 
-function showAlert (title, body) {
-  $('#universal-dialog').find('.title').html(title)
-  $('#universal-dialog').find('.modal-body').html(body)
-  $('#universal-dialog')[0].showModal()
-}
-
-function showLogAlert (title, subtitle, rows) {
-  $('#universal-dialog').find('.title').html(title)
-
-  $('#universal-dialog').find('.modal-body').html('')
-  $('#universal-dialog').find('.modal-body').append(subtitle)
-  $('#universal-dialog').find('.modal-body').append('<div id="log_body" style="overflow-y: auto; max-height: 200px; border: none;"></div>')
-
-  rows.forEach(function (r) { $('#log_body').append(r + '</br>') })
-
-  $('#universal-dialog')[0].showModal()
-}
-
 function setWindowHeader (text = null) {
   let header = 'Taxus'
 
@@ -157,7 +143,6 @@ function setWindowHeader (text = null) {
 }
 
 async function openTreeAction (e) {
-
   let openTree = async function () {
     let options = {
       properties: ['openFile'],
@@ -384,10 +369,7 @@ function toggleCladogramViewAction() {
 }
 
 function quitAction() {
-  if (taxus.has_dirty_files()){
-    showUnsavedFileAlert((e) => app.remote.app.quit())
-  } else
-    app.remote.app.quit()
+  window.api.quit()
 }
 
 function zoomInAction() {
@@ -535,6 +517,14 @@ $(document).ready(function () {
     }
   })
 
+  window.api.handleCloseWindow(event => {
+    if (taxus.has_dirty_files()) {
+      showUnsavedFileAlert(() => {
+        window.api.closeWindow()
+      })
+    }
+  })
+
   return
 
   // Edit
@@ -544,23 +534,6 @@ $(document).ready(function () {
       copyAction()
       e.preventDefault()
     }
-  })
-
-  $('#annotation-dialog-cancel').on('click', function () {
-    $('#seq-title-input').val('')
-    $('#annotate-dialog')[0].close(false)
-  })
-
-  $('#annotation-dialog-save').on('click', function () {
-    let node = taxus.get_selection()[0]
-    taxus.update_node_title(node, $('#seq-title-input').val())
-    dispatchDocumentEvent('node_titles_changed')
-    $('#seq-title-input').val('')
-    $('#annotate-dialog')[0].close(false)
-  })
-
-  $('#universal-dialog-close').on('click', function () {
-    $('#universal-dialog')[0].close(false)
   })
 
   document.addEventListener('selection_modified', function (e) {
@@ -611,16 +584,6 @@ $(document).ready(function () {
 
   document.addEventListener('taxus_tree_header_update', (e) => {
     setWindowHeader(taxus.tree_title())
-  })
-
-  // Key bindings
-
-  document.addEventListener('keydown', (e) => {
-    if (e.keyCode === 13) {
-      $('dialog.modal-dialog:visible').each((i, el) => {
-        $(el).find('.enter-action').click()
-      })
-    }
   })
 
   // Windows/Linux tweaks

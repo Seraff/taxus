@@ -20,21 +20,39 @@ function dispatchDocumentEvent (name) {
   document.dispatchEvent(event)
 }
 
-function showUnsavedFileAlert(callback){
+function showSimpleAlert(type, text, detail) {
+  var options = {
+    type: type,
+    message: text,
+    detail: detail
+  }
+
+  window.api.openAlertWindow(options)
+}
+
+function showSimpleWarning(text, detail) {
+  showSimpleAlert('warning', text, detail)
+}
+
+function showSimpleError(text, detail) {
+  showSimpleAlert('error', text, detail)
+}
+
+async function showUnsavedFileAlert(ignoreCallback){
   var options = {
     type: 'question',
-    buttons: ['Cancel', 'Don\'t save'],
+    buttons: ['Don\'t save', 'Cancel'],
+    defaultId: 1,
     title: 'Question',
-    defaultId: 0,
     message: 'You have unsaved files',
     detail: 'All unsaved data will be lost',
   }
 
-  dialog.showMessageBox(null, options).then((resp) => {
-    if (resp.response === 1){
-      callback()
-    }
-  })
+  let resp = await window.api.openAlertWindow(options)
+
+  if (resp === 0) {
+    ignoreCallback()
+  }
 }
 
 function toCamel(str) {
