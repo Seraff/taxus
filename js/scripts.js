@@ -522,6 +522,8 @@ $(document).ready(function () {
       showUnsavedFileAlert(() => {
         window.api.closeWindow()
       })
+    } else {
+      window.api.closeWindow()
     }
   })
 
