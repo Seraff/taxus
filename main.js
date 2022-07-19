@@ -10,6 +10,7 @@ var AnnotationWindow = require('./js/annotation_window.js')
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true
 
 var file_to_open = null
+var app_just_started = true
 var windows = new Set()
 var windowToCloseIds = new Set()
 
@@ -52,33 +53,41 @@ function createWindow () {
     win = null
   })
 
-  ipcMain.on('scripts_loaded', (event) => {
-    console.log('Scripts loaded')
-    // if (file_to_open) {
-    //   win.webContents.send('open_file', file_to_open)
-    // }
-  })
-
   windows.add(win)
 
   return win
 }
 
 function sendFileOpen() {
+  let win = windows[0]
+
   if (app.isReady() && win && file_to_open) {
-    win.webContents.send('open_file', file_to_open)
+    win.webContents.send('taxus:open_file', file_to_open)
+    file_to_open = null
   }
 }
 
+ipcMain.on('taxus:window_is_ready', (event) => {
+  app_just_started = false
+
+  if (file_to_open) {
+    win = getSenderWindow(event)
+    win.webContents.send('taxus:open_file', file_to_open)
+    file_to_open = null
+  }
+})
+
 app.on('will-finish-launching', () => {
   app.on('open-file', (event, path) => {
+
     file_to_open = path
-    sendFileOpen()
+
+    if (!app_just_started)
+      createWindow()
   })
 
   if (process.platform !== 'darwin' && process.argv.length >= 2) {
     file_to_open = process.argv[1]
-    sendFileOpen()
   }
 })
 
@@ -162,8 +171,6 @@ ipcMain.on('taxus:hide_progress_bar', (event) => {
 // Preferences window communication
 
 ipcMain.on('taxus:give_current_prefs', (event) => {
-  console.log('MAIN: give current preferences')
-
   let prefWin = getSenderWindow(event)
   let mainWin = prefWin.getParentWindow()
 
@@ -172,8 +179,6 @@ ipcMain.on('taxus:give_current_prefs', (event) => {
 
 
 ipcMain.on('taxus:take_current_prefs', (event, prefs) => {
-  console.log('MAIN: take current preferences')
-
   let mainWin = getSenderWindow(event)
   let prefWin = mainWin.preferencesWindow
 
@@ -181,8 +186,6 @@ ipcMain.on('taxus:take_current_prefs', (event, prefs) => {
 })
 
 ipcMain.on('taxus:take_new_prefs', (event, prefs) => {
-  console.log('MAIN: take current preferences')
-
   let prefWin = getSenderWindow(event)
   let mainWin = prefWin.getParentWindow()
 

@@ -13,6 +13,10 @@ contextBridge.exposeInMainWorld(
         saveFileDialog: (options) => ipcRenderer.invoke('taxus:save_file_dialog', options),
         saveFile: (path, content) => ipcRenderer.invoke('taxus:save_file', path, content),
 
+        // OS: Open With -> Taxus
+        handleOpenFile: (callback) => ipcRenderer.on('taxus:open_file', callback),
+        windowIsReady: () => ipcRenderer.send('taxus:window_is_ready'),
+
         updateMenu: (states) => ipcRenderer.invoke('taxus:update_menu', states),
         onMenuClicked: (callback) => ipcRenderer.on('taxus:menu_clicked', callback),
 

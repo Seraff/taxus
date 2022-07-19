@@ -527,6 +527,19 @@ $(document).ready(function () {
     }
   })
 
+  // OS Open With -> Taxus
+  window.api.handleOpenFile((event, file_path) => {
+    if (file_path) {
+      progressBar.show()
+      taxus.load_tree_file(file_path, () => {
+        progressBar.hide()
+        progressBar.setNewComplexity(taxus.get_nodes().length)
+      })
+    }
+  })
+
+  window.api.windowIsReady()
+
   return
 
   // Edit
@@ -563,18 +576,6 @@ $(document).ready(function () {
     }
   })
 
-  ipcRenderer.on('open_file', (event, message) => {
-    let open_tree = function () {
-      taxus.load_tree_file(message)
-    }
-
-    if (taxus.tree_is_dirty || taxus.fasta_is_dirty){
-      showUnsavedFileAlert(open_tree)
-    } else {
-      open_tree()
-    }
-  })
-
   // Footer text
 
   document.addEventListener('new_tree_is_loaded', () => {
@@ -593,6 +594,4 @@ $(document).ready(function () {
   if (process.platform !== 'darwin') {
     $('#window-header').hide()
   }
-
-  ipcRenderer.send('scripts_loaded')
 })
