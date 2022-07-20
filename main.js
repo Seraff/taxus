@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog, Menu, clipboard } = require('electron')
 const menu = require('./js/menu.js')
 const electronLocalshortcut = require('electron-localshortcut')
 const ProgressBar = require('electron-progressbar')
@@ -231,6 +231,12 @@ ipcMain.on('taxus:close_annotation_window', (event) => {
 
   mainWin.annotationWindow.window.close()
   mainWin.annotationWindow = null
+})
+
+// Put text to clipboard
+
+ipcMain.on('taxus:copy_text', (event, text) => {
+  clipboard.writeText(text)
 })
 
 // Alert window

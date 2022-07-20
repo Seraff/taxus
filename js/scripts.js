@@ -235,15 +235,6 @@ function saveFastaAsAction() {
   })
 }
 
-function copyAction () {
-  if (!taxus.tree_is_loaded()){
-    return
-  }
-
-  let fasta = taxus.get_selected_leaves_fasta()
-  if (fasta) { clipboard.writeText(fasta) }
-}
-
 function toggleSelectionModeAction () {
   mode = modeSelector.active_button.data('mode')
   new_mode = mode == 'taxa' ? 'branch' : 'taxa'
@@ -540,16 +531,23 @@ $(document).ready(function () {
 
   window.api.windowIsReady()
 
-  return
+  // Copy selected fasta
+  document.addEventListener('copy', function (e) {
+    if (e.target.tagName == 'BODY') {
+      if (!taxus.tree_is_loaded()) {
+        return
+      }
 
-  // Edit
+      let fasta = taxus.get_selected_leaves_fasta()
+      if (fasta) { window.api.copyText(fasta) }
 
-  document.addEventListener('copy', function(e) {
-    if (e.target.tagName == 'BODY'){
-      copyAction()
       e.preventDefault()
     }
   })
+
+  return
+
+  // Edit
 
   document.addEventListener('selection_modified', function (e) {
     let selection = taxus.get_selection()

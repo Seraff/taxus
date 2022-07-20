@@ -134,7 +134,7 @@ const template = [
         accelerator: "CmdOrCtrl+A"
       },
       {
-        label: "Select All in Tree",
+        label: "Select All Nodes",
         id: 'select-all',
         accelerator: "CmdOrCtrl+Shift+A",
         click: onClick
