@@ -139,7 +139,7 @@ function setWindowHeader (text = null) {
   if (text) { header += ' — ' + text }
 
   $('h1#window-header').html(header)
-  // TODO header to backend
+  window.api.setTitle(header)
 }
 
 async function openTreeAction (e) {
@@ -545,10 +545,7 @@ $(document).ready(function () {
     }
   })
 
-  return
-
-  // Edit
-
+  // Color picker and branch selection
   document.addEventListener('selection_modified', function (e) {
     let selection = taxus.get_selection()
 
@@ -589,7 +586,7 @@ $(document).ready(function () {
 
   // Windows/Linux tweaks
 
-  if (process.platform !== 'darwin') {
+  if (window.api.currentPlatform() !== 'darwin') {
     $('#window-header').hide()
   }
 })

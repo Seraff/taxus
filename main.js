@@ -261,3 +261,9 @@ ipcMain.on('taxus:quit', (event) => {
     w.webContents.send('taxus:close_window')
   })
 })
+
+
+ipcMain.on('taxus:set_title', (event, text) => {
+  let win = getSenderWindow(event)
+  win.setTitle(text)
+})

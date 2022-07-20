@@ -8,6 +8,8 @@ const {
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld(
     "api", {
+        setTitle: (text) => ipcRenderer.send('taxus:set_title', text),
+
         openFileDialog: (options) => ipcRenderer.invoke('taxus:open_file_dialog', options),
         loadFile: (path) => ipcRenderer.invoke('taxus:load_file', path),
         saveFileDialog: (options) => ipcRenderer.invoke('taxus:save_file_dialog', options),
@@ -45,6 +47,8 @@ contextBridge.exposeInMainWorld(
         closeWindow: () => ipcRenderer.send('taxus:close_window'),
         handleCloseWindow: (callback) => ipcRenderer.on('taxus:close_window', callback),
         quit: () => ipcRenderer.send('taxus:quit'),
+
+        currentPlatform: () => process.platform
     }
 );
 
