@@ -18,105 +18,105 @@ class Taxus {
     this._tree = null
   }
 
-  get_tree() {
+  getTree() {
     return this._tree
   }
 
-  tree_is_loaded() {
+  treeIsLoaded() {
     return this._tree != null
   }
 
-  get_nodes() {
+  getNodes() {
     return this._nodes
   }
 
-  get_leaves() {
+  getLeaves() {
     return this._nodes.filter(function (node) { return node.is_leaf() })
   }
 
   getLeaveByName(name) {
-    return this.get_leaves().find((leave) => { return leave.name == name })
+    return this.getLeaves().find((leave) => { return leave.name == name })
   }
 
-  get_leave_names() {
-    return this.get_leaves().map(function (node) { return node.name })
+  getLeaveNames() {
+    return this.getLeaves().map(function (node) { return node.name })
   }
 
-  nodes_are_loaded() {
+  nodesAreLoaded() {
     return this._nodes.length > 0
   }
 
-  get_selection() {
-    return this.get_tree().get_selection()
+  getSelection() {
+    return this.getTree().get_selection()
   }
 
-  get_selected_leaves() {
-    return this.get_selection().filter(function (node) { return node.is_leaf() })
+  getSelectedLeaves() {
+    return this.getSelection().filter(function (node) { return node.is_leaf() })
   }
 
-  get_selected_internals() {
-    return this.get_selection().filter(function (node) { return node.is_internal() })
+  getSelectedInternals() {
+    return this.getSelection().filter(function (node) { return node.is_internal() })
   }
 
-  get_marked_leaves() {
-    return this.get_leaves().filter(function (node) { return node.is_marked() })
+  getMarkedLeaves() {
+    return this.getLeaves().filter(function (node) { return node.is_marked() })
   }
 
-  get_marked_leaves() {
-    return this.get_leaves().filter(function (node) { return node.is_marked() })
+  getMarkedLeaves() {
+    return this.getLeaves().filter(function (node) { return node.is_marked() })
   }
 
-  get_marked_leaf_names() {
-    return this.get_leaves().filter(function (node) { return node.is_marked() }).map(function (node) { return node.name })
+  getMarkedLeafNames() {
+    return this.getLeaves().filter(function (node) { return node.is_marked() }).map(function (node) { return node.name })
   }
 
-  is_one_leaf_selected() {
-    return this.get_selected_leaves().length === 1
+  isOneLeafSelected() {
+    return this.getSelectedLeaves().length === 1
   }
 
   // by design zero or only one internal can be selected
-  is_one_internal_selected() {
-    return this.get_selected_internals().length === 1
+  isOneInternalSelected() {
+    return this.getSelectedInternals().length === 1
   }
 
-  is_any_interlal_selected() {
-    return this.get_selected_internals().length > 0
+  isAnyInterlalSelected() {
+    return this.getSelectedInternals().length > 0
   }
 
-  is_one_selected() {
-    return this.is_one_internal_selected() || this.is_one_leaf_selected()
+  isOneSelected() {
+    return this.isOneInternalSelected() || this.isOneLeafSelected()
   }
 
-  select_none() {
-    this.get_tree().modify_selection(function (n) { return false })
+  selectNone() {
+    this.getTree().modify_selection(function (n) { return false })
   }
 
-  select_all_leaves() {
-    let all = this.get_leaves()
-    this.get_tree().modify_selection(function (n) { return all.includes(n.target) })
+  selectAllLeaves() {
+    let all = this.getLeaves()
+    this.getTree().modify_selection(function (n) { return all.includes(n.target) })
   }
 
-  select_all() {
-    this.get_tree().modify_selection(function (n) { return this._nodes.includes(n.target) })
+  selectAll() {
+    this.getTree().modify_selection(function (n) { return this._nodes.includes(n.target) })
   }
 
-  select_specific(nodes) {
-    this.get_tree().modify_selection(function (n) { return nodes.includes(n.target) })
+  selectSpecific(nodes) {
+    this.getTree().modify_selection(function (n) { return nodes.includes(n.target) })
   }
 
   selectDescendants() {
-    let nodes = this.get_selection()
+    let nodes = this.getSelection()
     let to_select = nodes
 
     nodes.forEach((node) => {
-      let descs = this.get_tree().select_all_descendants(node, true, true)
+      let descs = this.getTree().select_all_descendants(node, true, true)
       to_select = to_select.concat(descs)
     })
 
-    this.get_tree().modify_selection(function (n) { return to_select.includes(n.target) })
+    this.getTree().modify_selection(function (n) { return to_select.includes(n.target) })
   }
 
-  init_phylotree(str) {
+  initPhylotree(str) {
     this._tree = d3.layout
       .phylotree()
       .svg(d3.select('#tree_display'))
@@ -164,7 +164,7 @@ class Taxus {
     d3.select('.phylotree-container').attr('align', 'center')
 
     let onSelectionModified = () => {
-      this.dispatch_state_update()
+      this.dispatchStateUpdate()
     }
 
     if (!document.taxus_selection_modified_event_set) {
@@ -173,18 +173,18 @@ class Taxus {
     document.taxus_selection_modified_event_set = true
 
     this.fastaMapping = null
-    this.dispatch_state_update()
+    this.dispatchStateUpdate()
 
     return true
   }
 
-  load_tree_file(path, callback=undefined) {
+  loadTreeFile(path, callback=undefined) {
     window.api.loadFile(path).then( content => {
-      this.load_tree_string(content)
+      this.loadTreeString(content)
       this.tree_path = path
 
-      this.make_tree_clean()
-      this.make_fasta_clean()
+      this.makeTreeClean()
+      this.makeFastaClean()
 
       if (callback)
         callback()
@@ -194,47 +194,47 @@ class Taxus {
     })
   }
 
-  load_tree_string(content) {
-    this.close_fasta()
+  loadTreeString(content) {
+    this.closeFasta()
 
-    if (this.init_phylotree(content)) {
+    if (this.initPhylotree(content)) {
       this.preferences = new Preferences()
-      this.reinit_nodes()
+      this.reinitNodes()
 
-      this.apply_metadata_from_nexus()
-      this.apply_taxa_colors_from_figtree()
-      this.redraw_features()
+      this.applyMetadataFromNexus()
+      this.applyTaxaColorsFromFigtree()
+      this.redrawFeatures()
 
-      this.get_tree().update() // for initial node styling.
+      this.getTree().update() // for initial node styling.
       dispatchDocumentEvent('new_tree_is_loaded')
     }
   }
 
-  save_tree(path = null) {
-    if (!this.tree_is_loaded())
+  saveTree(path = null) {
+    if (!this.treeIsLoaded())
       return false
 
     if (!path)
       path = this.tree_path
 
-    if (this.get_tree().is_nexus())
-      this.get_tree().apply_taxus_metadata(this.metadata_from_current_state())
+    if (this.getTree().is_nexus())
+      this.getTree().apply_taxus_metadata(this.metadataFromCurrentState())
 
-    let data = this.get_tree().output_tree()
+    let data = this.getTree().output_tree()
 
     window.api.saveFile(path, data).then(() => {
-      this.make_tree_clean()
+      this.makeTreeClean()
     }, error => {
       console.error(error)
     })
   }
 
-  save_fasta(path = null, success_callback = null) {
-    if (!this.fasta_is_loaded()) { return false }
+  saveFasta(path = null, success_callback = null) {
+    if (!this.fastaIsLoaded()) { return false }
 
-    if (!path) { path = this.fasta_out_path() }
+    if (!path) { path = this.fastaOutPath() }
 
-    let content = this.output_fasta()
+    let content = this.outputFasta()
 
     window.api.saveFile(path, content).then(() => {
       if (success_callback)
@@ -244,31 +244,31 @@ class Taxus {
     })
   }
 
-  load_fasta_file(path, quiet = false) {
-    this.close_fasta()
+  loadFastaFile(path, quiet = false) {
+    this.closeFasta()
 
     let fasta_rep = new FastaRepresentation()
 
     fasta_rep.read_from_file(path, () => {
-      if (this.apply_fasta(fasta_rep, quiet)) {
+      if (this.applyFasta(fasta_rep, quiet)) {
         this.fasta_path = path
         dispatchDocumentEvent('new_fasta_applied')
       }
 
-      this.make_fasta_clean()
-      this.redraw_features()
+      this.makeFastaClean()
+      this.redrawFeatures()
     })
   }
 
-  fasta_out_path() {
-    if (this.fasta_is_loaded()) {
+  fastaOutPath() {
+    if (this.fastaIsLoaded()) {
       let path = this.fasta_path
       return path_is_taxusized(path) ? path : taxusize_path(path)
     }
   }
 
-  apply_fasta(fasta_rep, quiet = false) {
-    let fastaMapping = new FastaMapping(this.get_leaves(), fasta_rep.getSeqs())
+  applyFasta(fasta_rep, quiet = false) {
+    let fastaMapping = new FastaMapping(this.getLeaves(), fasta_rep.getSeqs())
 
     let nodes_without_fasta = fastaMapping.nodesWithoutFasta()
 
@@ -297,12 +297,12 @@ class Taxus {
 
     this.fastaMapping = fastaMapping
 
-    this.dispatch_state_update()
-    this.get_tree().refresh()
+    this.dispatchStateUpdate()
+    this.getTree().refresh()
     return true
   }
 
-  output_fasta() {
+  outputFasta() {
     let content = ''
 
     this.fastaMapping.eachMapping((m) => {
@@ -317,19 +317,19 @@ class Taxus {
     return content
   }
 
-  close_fasta() {
+  closeFasta() {
     this.fastaMapping = null
     dispatchDocumentEvent('fasta_closed')
   }
 
   // wrap phylotree nodes with taxus nodes
   // prepare branches
-  reinit_nodes() {
-    if (this.tree_is_loaded()) {
+  reinitNodes() {
+    if (this.treeIsLoaded()) {
       this._nodes = this._tree.get_nodes().map((node) => { return Node(this, node) })
 
       this._branches = []
-      this.get_tree().get_svg().selectAll('.branch').each((b) => { this._branches.push(b) })
+      this.getTree().get_svg().selectAll('.branch').each((b) => { this._branches.push(b) })
 
       this._branches.forEach((b) => {
         b.target.prev_branch = b
@@ -338,12 +338,12 @@ class Taxus {
     }
   }
 
-  fasta_is_loaded() {
+  fastaIsLoaded() {
     return this.fastaMapping != null
   }
 
-  get_selected_leaves_fasta() {
-    let selected = this.get_selected_leaves()
+  getSelectedLeavesFasta() {
+    let selected = this.getSelectedLeaves()
     let result = ""
 
     selected.forEach((e) => {
@@ -355,18 +355,18 @@ class Taxus {
     return(result == "" ? null : result)
   }
 
-  dispatch_state_update() {
+  dispatchStateUpdate() {
     dispatchDocumentEvent('taxus_state_update')
   }
 
-  each_leaf(f) {
-    this.get_leaves().forEach(function (leaf) {
+  eachLeaf(f) {
+    this.getLeaves().forEach(function (leaf) {
       f(leaf)
     })
   }
 
-  update_node_title(node, title) {
-    if (!this.fasta_is_loaded()) { return null }
+  updateNodeTitle(node, title) {
+    if (!this.fastaIsLoaded()) { return null }
 
     let new_id = FastaRepresentation.extract_id(title)
     let fasta = node.fasta()
@@ -377,46 +377,46 @@ class Taxus {
 
     this.fastaMapping.buildIndex()
 
-    this.get_tree().safe_update()
+    this.getTree().safe_update()
 
-    this.make_tree_dirty()
-    this.make_fasta_dirty()
+    this.makeTreeDirty()
+    this.makeFastaDirty()
 
-    this.redraw_features()
+    this.redrawFeatures()
   }
 
   rerootToSelectedNode() {
-    if (!this.is_one_selected()) {
+    if (!this.isOneSelected()) {
       return false
     }
 
-    let selection = this.get_selection()
+    let selection = this.getSelection()
     let node = selection[0]
 
-    this.get_tree().reroot(node)
-    this.get_tree().safe_update()
-    this.make_tree_dirty()
-    this.reinit_nodes()
+    this.getTree().reroot(node)
+    this.getTree().safe_update()
+    this.makeTreeDirty()
+    this.reinitNodes()
     dispatchDocumentEvent('tree_topology_changed')
   }
 
   rotateSelectedBranch() {
-    if (!this.is_one_internal_selected()) {
+    if (!this.isOneInternalSelected()) {
       return false
     }
 
-    let selection = this.get_selection()
+    let selection = this.getSelection()
     let node = selection[0]
 
-    this.get_tree().rotate_branch(node)
-    this.reinit_nodes()
+    this.getTree().rotate_branch(node)
+    this.reinitNodes()
 
-    this.make_tree_dirty()
+    this.makeTreeDirty()
     dispatchDocumentEvent('tree_topology_changed')
   }
 
-  set_selected_nodes_annotation(annotation) {
-    this.get_selection().forEach(function (node) {
+  setSelectedNodesAnnotation(annotation) {
+    this.getSelection().forEach(function (node) {
       Object.keys(annotation).forEach(function (key) {
         let value = annotation[key]
         if (value){
@@ -427,23 +427,23 @@ class Taxus {
       })
     })
 
-    this.make_tree_dirty()
+    this.makeTreeDirty()
   }
 
   // Nexus metdata stuff
 
-  metadata_from_nexus() {
-    return this.get_tree().nexus_to_taxus_metadata()
+  metadataFromNexus() {
+    return this.getTree().nexus_to_taxus_metadata()
   }
 
   // Make metadata from current tree
 
-  metadata_from_current_state() {
+  metadataFromCurrentState() {
     let result = {}
 
-    if (!this.get_tree().is_nexus()) { return result }
+    if (!this.getTree().is_nexus()) { return result }
 
-    let our_removed_seqs = this.get_marked_leaves().map(function (e) { return e.fasta() })
+    let our_removed_seqs = this.getMarkedLeaves().map(function (e) { return e.fasta() })
 
     if (our_removed_seqs.length > 0) {
       result.removed_seqs = our_removed_seqs.map(function (e) { return e.to_fasta() }).join('')
@@ -457,8 +457,8 @@ class Taxus {
   }
 
   // Extract metadata from nexus and apply to current tree
-  apply_metadata_from_nexus() {
-    let metadata = this.metadata_from_nexus()
+  applyMetadataFromNexus() {
+    let metadata = this.metadataFromNexus()
 
     if (!metadata) { return false }
 
@@ -466,7 +466,7 @@ class Taxus {
       let removed_fasta_rep = new FastaRepresentation()
 
       removed_fasta_rep.read_from_str(metadata.removed_seqs)
-      this.get_marked_leaves().forEach(function (leaf) {
+      this.getMarkedLeaves().forEach(function (leaf) {
         leaf.apply_own_fasta(removed_fasta_rep.sequences[leaf.name])
       })
     }
@@ -475,13 +475,13 @@ class Taxus {
   }
 
   // Workaround for FigTree files: get colors of taxa from taxa block
-  apply_taxa_colors_from_figtree() {
-    let figtree_data = this.get_tree().taxlabels_data()
+  applyTaxaColorsFromFigtree() {
+    let figtree_data = this.getTree().taxlabels_data()
 
     if (Object.keys(figtree_data).length === 0)
       return true
 
-    this.get_leaves().forEach(function(leave){
+    this.getLeaves().forEach(function(leave){
       let data = figtree_data[leave.name]
       if (data !== undefined && data.constructor === Object)
         leave.add_annotation(data)
@@ -490,33 +490,31 @@ class Taxus {
 
   // Dirty tree/fasta functionality
 
-  make_tree_dirty() {
+  makeTreeDirty() {
     this.tree_is_dirty = true
     dispatchDocumentEvent('taxus_tree_header_update')
   }
 
-  make_tree_clean() {
-    console.log('make_tree_clean')
-    console.log(this)
+  makeTreeClean() {
     this.tree_is_dirty = false
     dispatchDocumentEvent('taxus_tree_header_update')
   }
 
-  make_fasta_dirty() {
+  makeFastaDirty() {
     this.fasta_is_dirty = true
     dispatchDocumentEvent('fasta_clean_status_changed')
   }
 
-  make_fasta_clean() {
+  makeFastaClean() {
     this.fasta_is_dirty = false
     dispatchDocumentEvent('fasta_clean_status_changed')
   }
 
-  has_dirty_files() {
+  hasDirtyFiles() {
     return (this.tree_is_dirty || this.fasta_is_dirty)
   }
 
-  tree_title() {
+  treeTitle() {
     let title = this.tree_path.replace(/^.*[\\\/]/, '')
     if (this.tree_is_dirty) { title += "*" }
 
@@ -525,23 +523,23 @@ class Taxus {
 
   // Preferences
 
-  apply_new_preferences(prefs) {
+  applyNewPreferences(prefs) {
     this.preferences.applyToCurrent(prefs)
-    this.make_tree_dirty()
-    this.get_tree().safe_update()
-    this.redraw_features()
+    this.makeTreeDirty()
+    this.getTree().safe_update()
+    this.redrawFeatures()
   }
 
   // Features
 
-  redraw_features(argument) {
-    this.get_leaves().forEach((n) => { n.redraw_features() })
+  redrawFeatures(argument) {
+    this.getLeaves().forEach((n) => { n.redraw_features() })
   }
 
   // Cladogram mode
 
   isCladogramView() {
-    return this.get_tree().cladogram
+    return this.getTree().cladogram
   }
 
   setCladogramView(is_cladogram) {
@@ -549,14 +547,14 @@ class Taxus {
       return false
     }
 
-    this.get_tree().setCladogramView(is_cladogram)
-    this.get_tree().safe_update()
-    this.reinit_nodes()
+    this.getTree().setCladogramView(is_cladogram)
+    this.getTree().safe_update()
+    this.reinitNodes()
     dispatchDocumentEvent('tree_topology_changed')
   }
 
   toggleCladogramView() {
-    let new_mode = this.get_tree().cladogram ? false : true
+    let new_mode = this.getTree().cladogram ? false : true
     this.setCladogramView(new_mode)
   }
 }

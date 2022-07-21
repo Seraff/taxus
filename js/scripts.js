@@ -67,7 +67,7 @@ function updateControls () {
   controls.enableItem('close')
   controls.enableItem('quit')
 
-  if (taxus.tree_is_loaded()) {
+  if (taxus.treeIsLoaded()) {
     controls.enableItem('preferences')
     controls.enableItem('save_tree')
     controls.enableItem('save_tree_as')
@@ -90,41 +90,41 @@ function updateControls () {
     controls.enableItem('vertical_expand')
 
 
-    if (taxus.fasta_is_loaded() && taxus.is_one_leaf_selected()) {
+    if (taxus.fastaIsLoaded() && taxus.isOneLeafSelected()) {
       controls.enableItem('annotate_node')
     }
 
-    if (taxus.is_one_selected()) {
+    if (taxus.isOneSelected()) {
       controls.enableItem('reroot')
     }
 
-    if (taxus.is_one_internal_selected()) {
+    if (taxus.isOneInternalSelected()) {
       controls.enableItem('rotate_branch')
     }
 
-    if (taxus.is_any_interlal_selected()) {
+    if (taxus.isAnyInterlalSelected()) {
       controls.enableItem('select_descendants')
     }
 
-    if (taxus.get_selection().length > 0) {
+    if (taxus.getSelection().length > 0) {
       controls.enableItem('change_branch_color')
       controls.enableItem('remove_branch_color')
     }
 
-    if (taxus.fasta_is_loaded() && taxus.get_selected_leaves().length > 0) {
+    if (taxus.fastaIsLoaded() && taxus.getSelectedLeaves().length > 0) {
       controls.enableItem('remove_selected')
       controls.enableItem('remove_unselected')
       controls.enableItem('restore_selected')
     }
 
-    if (taxus.fasta_is_loaded()) {
+    if (taxus.fastaIsLoaded()) {
       controls.enableItem('save_fasta')
       controls.enableItem('save_fasta_as')
 
       controls.enableItem('set_search_mode_to_fasta')
     }
 
-    if (taxus.get_selected_leaves_fasta()){
+    if (taxus.getSelectedLeavesFasta()){
       controls.enableItem('save_selection_as_fasta')
     }
   }
@@ -155,9 +155,9 @@ async function openTreeAction (e) {
     window.api.openFileDialog(options).then(path => {
       if (path){
         progressBar.show()
-        taxus.load_tree_file(path, () => {
+        taxus.loadTreeFile(path, () => {
           progressBar.hide()
-          progressBar.setNewComplexity(taxus.get_nodes().length)
+          progressBar.setNewComplexity(taxus.getNodes().length)
         })
       }
     })
@@ -173,7 +173,7 @@ async function openTreeAction (e) {
 }
 
 function saveTreeAction () {
-  taxus.save_tree()
+  taxus.saveTree()
 }
 
 function saveTreeAsAction () {
@@ -183,13 +183,13 @@ function saveTreeAsAction () {
 
   window.api.saveFileDialog(options).then(path => {
     if (path){
-      taxus.save_tree(path)
+      taxus.saveTree(path)
 
-      let fasta_is_loaded = taxus.fasta_is_loaded()
+      let fasta_is_loaded = taxus.fastaIsLoaded()
       let fasta_path = fasta_is_loaded && taxus.fasta.path
 
-      taxus.load_tree_file(result.filePath)
-      if (fasta_is_loaded) { taxus.load_fasta_file(fasta_path, true) }
+      taxus.loadTreeFile(result.filePath)
+      if (fasta_is_loaded) { taxus.loadFastaFile(fasta_path, true) }
     }
   })
 }
@@ -204,7 +204,7 @@ function openFastaAction () {
 
     window.api.openFileDialog(options).then(path => {
       if (path){
-        taxus.load_fasta_file(path)
+        taxus.loadFastaFile(path)
       }
     })
   }
@@ -217,19 +217,19 @@ function openFastaAction () {
 
 function saveFastaAction() {
   console.log('save fasta action in scripts.js')
-  taxus.save_fasta(null, function () {
-    taxus.load_fasta_file(taxus.fasta_out_path(), true)
+  taxus.saveFasta(null, function () {
+    taxus.loadFastaFile(taxus.fastaOutPath(), true)
   })
 }
 
 function saveFastaAsAction() {
   let options = { title: 'Save fasta as...',
-                  defaultPath: taxus.fasta_out_path() }
+                  defaultPath: taxus.fastaOutPath() }
 
   window.api.saveFileDialog(options).then(path => {
     if (path){
-      taxus.save_fasta(path, function () {
-        taxus.load_fasta_file(path, true)
+      taxus.saveFasta(path, function () {
+        taxus.loadFastaFile(path, true)
       })
     }
   })
@@ -250,33 +250,33 @@ function setModeToBranchAction() {
 }
 
 function removeSelectedAction() {
-  taxus.get_selection().forEach(function (n) { n.mark() })
-  taxus.get_tree().refresh()
-  taxus.select_none()
+  taxus.getSelection().forEach(function (n) { n.mark() })
+  taxus.getTree().refresh()
+  taxus.selectNone()
   dispatchDocumentEvent('node_mark_status_changed')
 }
 
 function removeUnselectedAction() {
-  let selected = taxus.get_selection()
+  let selected = taxus.getSelection()
 
-  taxus.get_leaves().forEach(function (l) {
+  taxus.getLeaves().forEach(function (l) {
     if (!selected.includes(l)) { l.mark() }
   })
 
-  taxus.get_tree().refresh()
-  taxus.select_none()
+  taxus.getTree().refresh()
+  taxus.selectNone()
   dispatchDocumentEvent('node_mark_status_changed')
 }
 
 function restoreSelectedAction() {
-  taxus.get_selection().forEach(function (n) { n.unmark() })
-  taxus.get_tree().refresh()
-  taxus.select_none()
+  taxus.getSelection().forEach(function (n) { n.unmark() })
+  taxus.getTree().refresh()
+  taxus.selectNone()
   dispatchDocumentEvent('node_mark_status_changed')
 }
 
 function saveSelectionAsFastaAction() {
-  let fasta = taxus.get_selected_leaves_fasta()
+  let fasta = taxus.getSelectedLeavesFasta()
   if (!fasta) { return false }
 
   let options = { title: 'Save selection as fasta' }
@@ -301,9 +301,9 @@ function showFastaAction() {
 }
 
 function annotateNodeAction() {
-  if (!taxus.fasta_is_loaded() || taxus.get_selection().length != 1) { return false }
+  if (!taxus.fastaIsLoaded() || taxus.getSelection().length != 1) { return false }
 
-  let node = taxus.get_selection()[0]
+  let node = taxus.getSelection()[0]
   let header = node.fasta().header
 
   window.api.openAnnotationWindow({'name': header})
@@ -326,13 +326,13 @@ function selectDescendantsAction() {
 }
 
 function exportToPngAction() {
-  bbox = taxus.get_tree().phylotree_navigator.getTreeScreenBBox()
+  bbox = taxus.getTree().phylotree_navigator.getTreeScreenBBox()
   options = { fonts: [], left: bbox.x, top: bbox.y, height: bbox.height, width: bbox.width }
   svgToPng.saveSvgAsPng(d3.select('svg#tree_display').node(), 'tree.png', options)
 }
 
 function exportToSvgAction() {
-  bbox = taxus.get_tree().phylotree_navigator.getTreeScreenBBox()
+  bbox = taxus.getTree().phylotree_navigator.getTreeScreenBBox()
   options = { fonts: [], left: bbox.x, top: bbox.y, height: bbox.height, width: bbox.width }
   svgToPng.saveSvg(d3.select('svg#tree_display').node(), 'tree.svg', options)
 }
@@ -340,16 +340,16 @@ function exportToSvgAction() {
 function changeBranchColorAction() {}
 
 function removeBranchColorAction() {
-  taxus.set_selected_nodes_annotation({ '!color': undefined })
-  taxus.get_tree().dispatch_selection_modified_event() // for picker to reset color
+  taxus.setSelectedNodesAnnotation({ '!color': undefined })
+  taxus.getTree().dispatch_selection_modified_event() // for picker to reset color
 }
 
 function selectAllAction() {
   let mode = getMode()
   if (mode === 'taxa'){
-    taxus.select_all_leaves()
+    taxus.selectAllLeaves()
   } else if (mode === 'branch') {
-    taxus.select_all()
+    taxus.selectAll()
   }
 }
 
@@ -365,36 +365,36 @@ function quitAction() {
 
 function zoomInAction() {
   progressBar.withProgressBarAttempt(() => {
-    taxus.get_tree().zoomIn()
+    taxus.getTree().zoomIn()
   })
 }
 
 function zoomOutAction() {
   progressBar.withProgressBarAttempt(() => {
-    taxus.get_tree().zoomOut()
+    taxus.getTree().zoomOut()
   })
 }
 
 function horizontalContractAction() {
-  func = taxus.get_tree().spacing_y
+  func = taxus.getTree().spacing_y
   amount = -10
   changeScale(func, amount)
 }
 
 function horizontalExpandAction() {
-  func = taxus.get_tree().spacing_y
+  func = taxus.getTree().spacing_y
   amount = 10
   changeScale(func, amount)
 }
 
 function verticalContractAction() {
-  func = taxus.get_tree().spacing_x
+  func = taxus.getTree().spacing_x
   amount = -10
   changeScale(func, amount)
 }
 
 function verticalExpandAction() {
-  func = taxus.get_tree().spacing_x
+  func = taxus.getTree().spacing_x
   amount = 10
   changeScale(func, amount)
 }
@@ -412,8 +412,8 @@ function getMode() {
 }
 
 function setMode(new_mode) {
-  if (taxus.tree_is_loaded())
-    taxus.get_tree().set_selection_mode(new_mode)
+  if (taxus.treeIsLoaded())
+    taxus.getTree().set_selection_mode(new_mode)
 
   let btn = modeSelector.buttons.filter((i, b) => {
     return $(b).data('mode') == new_mode
@@ -429,13 +429,13 @@ function resetSelectionMode() {
 function changeScale(func, amount){
   progressBar.withProgressBarAttempt(() => {
     func(func() + amount).safe_update()
-    taxus.get_tree().redraw_scale_bar()
+    taxus.getTree().redraw_scale_bar()
     dispatchDocumentEvent('tree_topology_changed')
   })
 }
 
 function printTaxaCount () {
-  cnt = taxus.get_leaves().length
+  cnt = taxus.getLeaves().length
   printMetaInfo(cnt + ' taxa')
 }
 
@@ -479,7 +479,7 @@ $(document).ready(function () {
   window.api.handleTakeNewPrefs((event, prefs) => {
     console.log('Receiving new preferences')
     if (taxus.preferences)
-      taxus.apply_new_preferences(prefs)
+      taxus.applyNewPreferences(prefs)
     window.api.newPrefsTaken()
   })
 
@@ -487,7 +487,7 @@ $(document).ready(function () {
 
   let picker = new ColorPicker('#branch-color-picker', '#change-branch-color-action', ['#change-branch-color-box'])
   picker.add_color_change_callback(function (color) {
-    taxus.set_selected_nodes_annotation({ "!color": color })
+    taxus.setSelectedNodesAnnotation({ "!color": color })
   })
 
   // Search panel logic
@@ -502,14 +502,14 @@ $(document).ready(function () {
     let leave = taxus.getLeaveByName(name)
 
     if (leave){
-      taxus.update_node_title(leave, data.annotation.name)
+      taxus.updateNodeTitle(leave, data.annotation.name)
       dispatchDocumentEvent('node_titles_changed')
       dispatchDocumentEvent('tree_topology_changed')
     }
   })
 
   window.api.handleCloseWindow(event => {
-    if (taxus.has_dirty_files()) {
+    if (taxus.hasDirtyFiles()) {
       showUnsavedFileAlert(() => {
         window.api.closeWindow()
       })
@@ -522,9 +522,9 @@ $(document).ready(function () {
   window.api.handleOpenFile((event, file_path) => {
     if (file_path) {
       progressBar.show()
-      taxus.load_tree_file(file_path, () => {
+      taxus.loadTreeFile(file_path, () => {
         progressBar.hide()
-        progressBar.setNewComplexity(taxus.get_nodes().length)
+        progressBar.setNewComplexity(taxus.getNodes().length)
       })
     }
   })
@@ -534,11 +534,11 @@ $(document).ready(function () {
   // Copy selected fasta
   document.addEventListener('copy', function (e) {
     if (e.target.tagName == 'BODY') {
-      if (!taxus.tree_is_loaded()) {
+      if (!taxus.treeIsLoaded()) {
         return
       }
 
-      let fasta = taxus.get_selected_leaves_fasta()
+      let fasta = taxus.getSelectedLeavesFasta()
       if (fasta) { window.api.copyText(fasta) }
 
       e.preventDefault()
@@ -547,7 +547,7 @@ $(document).ready(function () {
 
   // Color picker and branch selection
   document.addEventListener('selection_modified', function (e) {
-    let selection = taxus.get_selection()
+    let selection = taxus.getSelection()
 
     if (selection.length === 1) {
       let color = selection[0].parsed_annotation['!color']
@@ -581,7 +581,7 @@ $(document).ready(function () {
   // Header update logic
 
   document.addEventListener('taxus_tree_header_update', (e) => {
-    setWindowHeader(taxus.tree_title())
+    setWindowHeader(taxus.treeTitle())
   })
 
   // Windows/Linux tweaks

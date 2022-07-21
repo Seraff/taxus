@@ -752,7 +752,7 @@ end;
     node.children = new_children
 
     phylotree.update_layout(phylotree.get_nodes()[0], true)
-    taxus.get_tree().safe_update()
+    taxus.getTree().safe_update()
   }
 
   // Modifying tree in cladogram view workarounds

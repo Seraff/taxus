@@ -44,7 +44,7 @@ class FastaPane {
     $(document).on('click', '.fasta-pane-entry', (e) => {
       var alias = $(e.target).parent('.fasta-pane-entry').attr('id')
       var node = this.entries_by_alias[alias].node
-      taxus.select_specific([node])
+      taxus.selectSpecific([node])
     })
   }
 

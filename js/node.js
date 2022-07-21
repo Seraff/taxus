@@ -24,7 +24,7 @@ function Node(taxus, phylotree_node){
   }
 
   node.applied_fasta = function () {
-    if (node.taxus.fasta_is_loaded()) {
+    if (node.taxus.fastaIsLoaded()) {
       return node.taxus.fastaMapping.getFastaForNode(node)
     }
   }
@@ -44,14 +44,14 @@ function Node(taxus, phylotree_node){
   node.mark = function(){
     node.add_annotation({ '!taxus_marked': true })
     node.own_fasta = node.fasta()
-    node.taxus.make_tree_dirty()
-    node.taxus.make_fasta_dirty()
+    node.taxus.makeTreeDirty()
+    node.taxus.makeFastaDirty()
   }
 
   node.unmark = function(){
     node.remove_annotation("!taxus_marked")
-    node.taxus.make_tree_dirty()
-    node.taxus.make_fasta_dirty()
+    node.taxus.makeTreeDirty()
+    node.taxus.makeFastaDirty()
   }
 
   node.is_marked = function(){

@@ -142,7 +142,7 @@ class SearchPanel {
       }
 
       if (this.isTreeMode()) {
-        this.found_items = this.taxus.get_leaves().filter((e) => {
+        this.found_items = this.taxus.getLeaves().filter((e) => {
           var str = case_sensitive ? e.name : e.name.toLocaleLowerCase()
           return str.includes(query)
         })
@@ -199,9 +199,9 @@ class SearchPanel {
     }
 
     if (this.isTreeMode()){
-      this.taxus.select_specific(this.found_items)
+      this.taxus.selectSpecific(this.found_items)
     } else {
-      this.taxus.select_specific(this.found_items.map((i) => { return i.node }))
+      this.taxus.selectSpecific(this.found_items.map((i) => { return i.node }))
     }
   }
 
@@ -233,7 +233,7 @@ class SearchPanel {
     var node = this.found_items[this.current_nav_item_index]
 
     if (this.isTreeMode()) {
-      this.taxus.get_tree().moveToNode(node)
+      this.taxus.getTree().moveToNode(node)
     } else {
       this.fasta_pane.scrollTo({ entry: node })
     }
