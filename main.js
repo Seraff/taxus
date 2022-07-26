@@ -15,12 +15,14 @@ var windows = new Set()
 var windowToCloseIds = new Set()
 
 function createWindow () {
+  let hide_title_bar = process.platform == 'darwin'
+
   let win = new BrowserWindow({
     width: 800,
     height: 600,
     minWidth: 740,
     minHeight: 400,
-    titleBarStyle: "hidden",
+    titleBarStyle: hide_title_bar ? "hidden" : undefined,
     acceptFirstMouse: true,
     show: false,
     webPreferences: {
