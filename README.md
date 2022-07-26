@@ -5,11 +5,11 @@ Nexus + Fasta = Taxus ❤️
 https://taxus.readthedocs.io/en/latest/
 
 # The latest release
-[Taxus for Mac (x64)](https://github.com/Seraff/taxus/releases/download/v0.1.6-alpha/sequoia-0.1.6-alpha.dmg)
+[Taxus for Mac (x64)](https://github.com/Seraff/taxus/releases/download/v0.3.1-alpha/taxus-0.3.1-alpha.dmg)
 
-[Taxus for Linux (x64)](https://github.com/Seraff/taxus/releases/download/v0.1.6-alpha/sequoia-0.1.6-alpha.AppImage)
+[Taxus for Linux (x64)](https://github.com/Seraff/taxus/releases/download/v0.3.1-alpha/taxus-0.3.1-alpha.AppImage)
 
-[Taxus for Windows (x64)](https://github.com/Seraff/taxus/releases/download/v0.1.6-alpha/sequoia.Setup.0.1.6-alpha.exe)
+[Taxus for Windows (x64)](https://github.com/Seraff/taxus/releases/download/v0.3.1-alpha/taxus.Setup.0.3.1-alpha.exe)
 
 
 # Poster (deprecated)
