@@ -13,7 +13,7 @@ class AlignmentCoverageFeature {
   }
 
   render () {
-    if (!this.node.is_leaf() || !this.node.fasta_is_loaded()) {
+    if (!this.node.isLeaf() || !this.node.fastaIsLoaded()) {
       return false
     }
 
@@ -49,7 +49,7 @@ class AlignmentCoverageFeature {
   }
 
   getPct () {
-    if (this.node.fasta_is_loaded()) {
+    if (this.node.fastaIsLoaded()) {
       var seq = this.node.fasta().sequence
       var len = seq.length
 

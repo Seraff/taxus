@@ -196,7 +196,7 @@ end;
   }
 
   phylotree.moveToNode = function(node) {
-    node.get_html_element().scrollIntoView()
+    node.getHtmlElement().scrollIntoView()
 
     phylotree.move('N', 20)
     phylotree.move('W', 20)
@@ -594,7 +594,7 @@ end;
     var func = function (metadata_json) {
 
       phylotree.get_nodes().forEach(function(n){
-        n.build_annotation()
+        n.buildAnnotation()
       })
 
       var result = null
@@ -739,11 +739,11 @@ end;
   // Rotate branch feature
 
   phylotree.get_root = function () {
-    return phylotree.get_nodes().find(function (n) { return n.is_root() })
+    return phylotree.get_nodes().find(function (n) { return n.isRoot() })
   }
 
   phylotree.rotate_branch = function (node) {
-    if (node.is_leaf()) {
+    if (node.isLeaf()) {
       return false
     }
 

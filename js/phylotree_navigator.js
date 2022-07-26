@@ -64,7 +64,7 @@ class PhylotreeNavigator {
   }
 
   panToLeaf (node) {
-    if (!node.is_leaf()) {
+    if (!node.isLeaf()) {
       return false
     }
 

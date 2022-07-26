@@ -20,59 +20,59 @@ function Node(taxus, phylotree_node){
   }
 
   node.fasta = function () {
-    return node.applied_fasta() || node.own_fasta
+    return node.appliedFasta() || node.own_fasta
   }
 
-  node.applied_fasta = function () {
+  node.appliedFasta = function () {
     if (node.taxus.fastaIsLoaded()) {
       return node.taxus.fastaMapping.getFastaForNode(node)
     }
   }
 
-  node.is_leaf = function(){
+  node.isLeaf = function(){
     return d3.layout.phylotree.is_leafnode(node)
   }
 
-  node.is_internal = function(){
-    return !node.is_leaf()
+  node.isInternal = function(){
+    return !node.isLeaf()
   }
 
-  node.is_root = function () {
+  node.isRoot = function () {
     return node.parent === undefined
   }
 
   node.mark = function(){
-    node.add_annotation({ '!taxus_marked': true })
+    node.addAnnotation({ '!taxus_marked': true })
     node.own_fasta = node.fasta()
     node.taxus.makeTreeDirty()
     node.taxus.makeFastaDirty()
   }
 
   node.unmark = function(){
-    node.remove_annotation("!taxus_marked")
+    node.removeAnnotation("!taxus_marked")
     node.taxus.makeTreeDirty()
     node.taxus.makeFastaDirty()
   }
 
-  node.is_marked = function(){
+  node.isMarked = function(){
     return node.parsed_annotation['!taxus_marked'] && node.parsed_annotation['!taxus_marked'] == true
   }
 
   node.style = function(dom_element){
     node.styler.style()
 
-    if (node.is_leaf()){
-      node.styler.style_leaf(dom_element)
+    if (node.isLeaf()){
+      node.styler.styleLeaf(dom_element)
     } else {
       if (node.taxus.preferences.preferences.displayBootstrap === 'true'){
-        node.add_tip_to_node(node.bootstrap())
+        node.addTipToNode(node.bootstrap())
       } else {
-        node.remove_node_tip()
+        node.removeNodeTip()
       }
     }
   }
 
-  node.apply_own_fasta = function(fasta){
+  node.applyOwnFasta = function(fasta){
     if (fasta.id === node.name){
       node.own_fasta = fasta
     } else {
@@ -80,12 +80,12 @@ function Node(taxus, phylotree_node){
     }
   }
 
-  node.fasta_is_loaded = function(){
+  node.fastaIsLoaded = function(){
     return node.fasta() != null
   }
 
-  node.raw_fasta_entry = function(){
-    if (!node.fasta_is_loaded())
+  node.rawFastaEntry = function(){
+    if (!node.fastaIsLoaded())
       return null
 
     content = '>' + node.fasta().id + '\n'
@@ -95,13 +95,13 @@ function Node(taxus, phylotree_node){
   }
 
   node.bootstrap = function(){
-    if (node.is_internal()){
+    if (node.isInternal()){
       return parseFloat(node.name)
     }
   }
 
-  node.add_tip_to_node = function(text){
-    if (node.is_leaf() || (!text && text !== 0)){
+  node.addTipToNode = function(text){
+    if (node.isLeaf() || (!text && text !== 0)){
       return
     }
 
@@ -114,19 +114,19 @@ function Node(taxus, phylotree_node){
                .attr("alignment-baseline", "middle")
   }
 
-  node.remove_node_tip = function () {
+  node.removeNodeTip = function () {
     d3.select(node.container).select('.node-tip').remove()
   }
 
-  node.get_html_element = function(){
-    return node.is_leaf() ? node.container : node.prev_branch.get_element().node()
+  node.getHtmlElement = function(){
+    return node.isLeaf() ? node.container : node.prev_branch.get_element().node()
   }
 
   node.getBBox = function(){
-    var bbox = node.get_html_element().getBBox()
+    var bbox = node.getHtmlElement().getBBox()
 
-    if (node.is_leaf()){
-      transform = d3.transform(d3.select(node.get_html_element()).attr('transform'))
+    if (node.isLeaf()){
+      transform = d3.transform(d3.select(node.getHtmlElement()).attr('transform'))
       bbox.x = bbox.x + transform.translate[0]
       bbox.y = bbox.y + transform.translate[1]
     }
@@ -134,7 +134,7 @@ function Node(taxus, phylotree_node){
     return bbox
   }
 
-  node.parse_annotation = function(){
+  node.parseAnnotation = function(){
     var result = {}
 
     if (!node.annotation){
@@ -159,7 +159,7 @@ function Node(taxus, phylotree_node){
     node.parsed_annotation = result
   }
 
-  node.build_annotation = function(){
+  node.buildAnnotation = function(){
     var annotations = []
     Object.keys(node.parsed_annotation).forEach(function(k){
       annotations.push(k + "=" + node.parsed_annotation[k])
@@ -168,15 +168,15 @@ function Node(taxus, phylotree_node){
     node.annotation = (annotations.length > 0) ? ("&" + annotations.join(',')) : ""
   }
 
-  node.add_annotation = function(annotation){
+  node.addAnnotation = function(annotation){
     Object.keys(annotation).forEach(function(k){
       node.parsed_annotation[k] = annotation[k]
     })
 
-    node.build_annotation()
+    node.buildAnnotation()
   }
 
-  node.remove_annotation = function(keys){
+  node.removeAnnotation = function(keys){
     if (typeof(keys) != Array)
       keys = [keys]
 
@@ -184,23 +184,23 @@ function Node(taxus, phylotree_node){
       delete node.parsed_annotation[k]
     })
 
-    node.build_annotation()
+    node.buildAnnotation()
   }
 
-  node.init_features = function () {
-    if (!node.is_leaf()) { return false }
+  node.initFeatures = function () {
+    if (!node.isLeaf()) { return false }
 
     node.features.push(new AlignmentCoverageFeature(node))
   }
 
   node.redraw_features = function () {
-    if (!node.is_leaf()) { return false }
+    if (!node.isLeaf()) { return false }
 
     node.features.forEach((f) => { f.redraw() })
   }
 
-  node.init_features()
-  node.parse_annotation()
+  node.initFeatures()
+  node.parseAnnotation()
 
   node.styler = new NodeStyler(node)
 

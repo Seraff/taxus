@@ -1,5 +1,5 @@
 class NodeStyler {
-  constructor (node) {
+  constructor(node) {
     this.node = node
     this.preferences = node.taxus.preferences
     this.drawn_shapes = []
@@ -8,20 +8,20 @@ class NodeStyler {
     this.initHighlight()
   }
 
-  style_leaf (dom_element) {
+  styleLeaf(dom_element) {
     this.setFontFamily(this.preferences.getPreference('taxaFontFamily'))
     this.setFontSize(this.preferences.getPreference('taxaFontSize'))
     this.setFontWeight(this.preferences.getPreference('taxaFontBold'))
     this.setFontStyle(this.preferences.getPreference('taxaFontItalic'))
     this.setFontUnderline(this.preferences.getPreference('taxaFontUnderline'))
 
-    if (this.node.is_marked() == true){
+    if (this.node.isMarked() == true){
       this.setFontWeight(true)
       this.setColor('#e6550d')
     }
   }
 
-  style () {
+  style() {
     this.setColor(this.defaultColor())
     this.setWidth()
 
@@ -32,86 +32,86 @@ class NodeStyler {
     }
   }
 
-  setFontFamily (value) {
-    if (this.node.is_leaf()){
+  setFontFamily(value) {
+    if (this.node.isLeaf()){
       var text = this.getLeafTextElement()
       text.style.fontFamily = value
     }
   }
 
-  setFontSize (value) {
-    if (this.node.is_leaf()){
+  setFontSize(value) {
+    if (this.node.isLeaf()){
       var text = this.getLeafTextElement()
       text.style.fontSize = value + 'px'
     }
   }
 
-  setFontWeight (is_bold) {
-    if (this.node.is_leaf()){
+  setFontWeight(is_bold) {
+    if (this.node.isLeaf()){
       var text = this.getLeafTextElement()
       text.style.fontWeight = is_bold ? 'bold' : 'normal'
     }
   }
 
-  setFontStyle (is_italic) {
-    if (this.node.is_leaf()){
+  setFontStyle(is_italic) {
+    if (this.node.isLeaf()){
       var text = this.getLeafTextElement()
       text.style.fontStyle = is_italic ? 'italic' : 'normal'
     }
   }
 
-  setFontUnderline (is_underlined) {
-    if (this.node.is_leaf()){
+  setFontUnderline(is_underlined) {
+    if (this.node.isLeaf()){
       var text = this.getLeafTextElement()
       text.style.textDecoration = is_underlined ? 'underline' : ''
     }
   }
 
-  setColor (value){
+  setColor(value){
     if (this.node.prev_branch){
       $(this.node.prev_branch.get_element()[0]).css('stroke', value)
 
-      if (this.node.is_leaf()){
-        $(this.node.get_html_element()).css('fill', value)
+      if (this.node.isLeaf()){
+        $(this.node.getHtmlElement()).css('fill', value)
       }
     }
   }
 
-  setWidth () {
+  setWidth() {
     if (this.node.prev_branch) {
       var value = this.node.taxus.preferences.getPreference('branchWidth')
       $(this.node.prev_branch.get_element()[0]).css('stroke-width', value + 'px')
     }
   }
 
-  highlight () {
+  highlight() {
     if (this.highlight_rect) {
       this.highlight_rect.style('display', 'block')
     }
   }
 
-  unhighlight () {
+  unhighlight() {
     if (this.highlight_rect) {
       this.highlight_rect.style('display', 'none')
     }
   }
 
-  setHighlightColor (color) {
+  setHighlightColor(color) {
     if (this.highlight_rect) {
       this.highlight_rect.style('fill', color)
     }
   }
 
-  defaultColor () {
+  defaultColor() {
     return this.node.taxus.preferences.getPreference('branchColor')
   }
 
-  getLeafTextElement () {
-    return this.node.get_html_element().getElementsByTagName('text')[0]
+  getLeafTextElement() {
+    return this.node.getHtmlElement().getElementsByTagName('text')[0]
   }
 
-  initHighlight () {
-    if (!this.node.is_leaf()) {
+  initHighlight() {
+    if (!this.node.isLeaf()) {
       return false
     }
 

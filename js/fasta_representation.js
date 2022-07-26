@@ -12,21 +12,21 @@ class FastaRepresentation {
     this.out_path = null
   }
 
-  read_from_file(path, callback){
+  readFromFile(path, callback){
     window.api.loadFile(path).then(content => {
-      this.read_from_str(content)
+      this.readFromStr(content)
       this.path = path
-      this.out_path = path_is_taxusized(path) ? path : taxusize_path(path)
+      this.out_path = pathIsTaxusized(path) ? path : taxusizePath(path)
       callback()
     }, error => {
       console.error(error)
     })
   }
 
-  read_from_str(str){
+  readFromStr(str){
     this.sequences = {}
 
-    var json = FastaRepresentation.fasta_to_json(str)
+    var json = FastaRepresentation.fastaToJson(str)
 
     json.forEach((el) => {
       var entry = new FastaEntry(el)
@@ -39,7 +39,7 @@ class FastaRepresentation {
   // Checks if fasta is compatible for the names provided
   // returns true if fasta is compatible with tree
   // returns object { not_in_fasta: [...], not_in_tree: [...] } if problems found
-  check_consistency(leave_ids){
+  checkConsistency(leave_ids){
     var result = { not_in_tree: [], not_in_fasta: [] }
 
     // TODO smells bad!
@@ -60,7 +60,7 @@ class FastaRepresentation {
     return result
   }
 
-  each_sequence(f){
+  eachSequence(f){
     for (var k in this.sequences){
       if (hasOwnProperty(this.sequences, k)) {
         f(this.sequences[k])
@@ -80,7 +80,7 @@ class FastaRepresentation {
     return title.split(/\s/)[0]
   }
 
-  static fasta_to_json(fasta_str) {
+  static fastaToJson(fasta_str) {
     var json = []
 
     var fasta = fasta_str.split('>')
@@ -110,7 +110,7 @@ class FastaEntry {
     this.sequence = json.sequence
   }
 
-  to_fasta(){
+  toFasta(){
     var content = '>' + this.header + '\n'
     content += this.sequence + '\n'
     return content

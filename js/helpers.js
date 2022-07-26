@@ -2,12 +2,12 @@ function sleep (time) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
 
-function taxusize_path (pth) {
+function taxusizePath (pth) {
   var parsed = window.modules.path.parse(pth)
   return parsed.dir + window.modules.path.sep + parsed.name + ".taxus" + parsed.ext
 }
 
-function path_is_taxusized (pth) {
+function pathIsTaxusized (pth) {
   return window.modules.path.parse(pth).name.match(/\.taxus$/) != null
 }
 

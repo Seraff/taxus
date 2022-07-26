@@ -2481,7 +2481,7 @@ const parseString = window.modules.xml2js.parseString;
           edge_styler(edge_dom, e.prev_branch);
         }
 
-        var dom = e.get_html_element()
+        var dom = e.getHtmlElement()
         var d3_dom = d3.select(dom)
         if (d3.layout.phylotree.is_leafnode(e)) {
           d3_dom.attr("class", phylotree.reclass_node)

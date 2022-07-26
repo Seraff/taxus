@@ -12,10 +12,10 @@ class FastaPane {
     this.entries_by_name = {}
     this.entries_by_alias = {}
 
-    this.show_no_fasta()
+    this.showNoFasta()
 
     document.addEventListener('fasta_clean_status_changed', (e) => {
-      this.update_title()
+      this.updateTitle()
     })
 
     document.addEventListener('new_fasta_applied', () => {
@@ -26,15 +26,15 @@ class FastaPane {
     document.addEventListener('fasta_closed', () => {
       this.fasta_is_loaded = false
       this.title = null
-      this.show_no_fasta()
+      this.showNoFasta()
     })
 
     document.addEventListener('selection_modified', () => {
-      this.redraw_entries()
+      this.redrawEntries()
     })
 
     document.addEventListener('node_mark_status_changed', () => {
-      this.redraw_entries()
+      this.redrawEntries()
     })
 
     document.addEventListener('node_titles_changed', () => {
@@ -84,17 +84,17 @@ class FastaPane {
     this.fasta_is_loaded = true
   }
 
-  show_no_fasta () {
+  showNoFasta() {
     this.$fasta_pane.html('<b class="ui-text">Fasta is not loaded...</b>')
   }
 
-  redraw_entries () {
+  redrawEntries() {
     this.entries.forEach((entry) => {
       entry.redraw()
     })
   }
 
-  update_title () {
+  updateTitle() {
     if (this.fasta_is_loaded) {
       var title_el = document.getElementById('fasta-title')
       title_el.innerHTML = this.title
@@ -105,7 +105,7 @@ class FastaPane {
     }
   }
 
-  scrollTo (object = {}) {
+  scrollTo(object = {}) {
     var element = null
 
     if (object.name !== undefined) {
@@ -168,7 +168,7 @@ class FastaPaneEntry {
       this.unselect()
     }
 
-    if (this.hasNode() && this.node.is_marked() === true){
+    if (this.hasNode() && this.node.isMarked() === true){
       this.hide()
     } else {
       this.unhide()
@@ -192,7 +192,7 @@ class FastaPaneEntry {
   }
 
   isHidden() {
-    return this.hasNode() && this.node.is_marked()
+    return this.hasNode() && this.node.isMarked()
   }
 
   hasNode() {

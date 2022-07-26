@@ -31,7 +31,7 @@ class Taxus {
   }
 
   getLeaves() {
-    return this._nodes.filter(function (node) { return node.is_leaf() })
+    return this._nodes.filter(function (node) { return node.isLeaf() })
   }
 
   getLeaveByName(name) {
@@ -51,23 +51,23 @@ class Taxus {
   }
 
   getSelectedLeaves() {
-    return this.getSelection().filter(function (node) { return node.is_leaf() })
+    return this.getSelection().filter(function (node) { return node.isLeaf() })
   }
 
   getSelectedInternals() {
-    return this.getSelection().filter(function (node) { return node.is_internal() })
+    return this.getSelection().filter(function (node) { return node.isInternal() })
   }
 
   getMarkedLeaves() {
-    return this.getLeaves().filter(function (node) { return node.is_marked() })
+    return this.getLeaves().filter(function (node) { return node.isMarked() })
   }
 
   getMarkedLeaves() {
-    return this.getLeaves().filter(function (node) { return node.is_marked() })
+    return this.getLeaves().filter(function (node) { return node.isMarked() })
   }
 
   getMarkedLeafNames() {
-    return this.getLeaves().filter(function (node) { return node.is_marked() }).map(function (node) { return node.name })
+    return this.getLeaves().filter(function (node) { return node.isMarked() }).map(function (node) { return node.name })
   }
 
   isOneLeafSelected() {
@@ -249,7 +249,7 @@ class Taxus {
 
     let fasta_rep = new FastaRepresentation()
 
-    fasta_rep.read_from_file(path, () => {
+    fasta_rep.readFromFile(path, () => {
       if (this.applyFasta(fasta_rep, quiet)) {
         this.fasta_path = path
         dispatchDocumentEvent('new_fasta_applied')
@@ -263,7 +263,7 @@ class Taxus {
   fastaOutPath() {
     if (this.fastaIsLoaded()) {
       let path = this.fasta_path
-      return path_is_taxusized(path) ? path : taxusize_path(path)
+      return pathIsTaxusized(path) ? path : taxusizePath(path)
     }
   }
 
@@ -307,11 +307,11 @@ class Taxus {
 
     this.fastaMapping.eachMapping((m) => {
       // only fasta from entries where node is not marked or doesn't exist
-      if (m.node !== null && m.node.is_marked()) {
+      if (m.node !== null && m.node.isMarked()) {
         return
       }
       let fasta = m.fasta || m.node.fasta()
-      content += fasta.to_fasta()
+      content += fasta.toFasta()
     })
 
     return content
@@ -347,8 +347,8 @@ class Taxus {
     let result = ""
 
     selected.forEach((e) => {
-      if (e.raw_fasta_entry()) {
-        result += e.raw_fasta_entry()
+      if (e.rawFastaEntry()) {
+        result += e.rawFastaEntry()
       }
     })
 
@@ -446,7 +446,7 @@ class Taxus {
     let our_removed_seqs = this.getMarkedLeaves().map(function (e) { return e.fasta() })
 
     if (our_removed_seqs.length > 0) {
-      result.removed_seqs = our_removed_seqs.map(function (e) { return e.to_fasta() }).join('')
+      result.removed_seqs = our_removed_seqs.map(function (e) { return e.toFasta() }).join('')
     }
 
     // Apply preferences
@@ -465,9 +465,9 @@ class Taxus {
     if (hasOwnProperty(metadata, 'removed_seqs')) {
       let removed_fasta_rep = new FastaRepresentation()
 
-      removed_fasta_rep.read_from_str(metadata.removed_seqs)
+      removed_fasta_rep.readFromStr(metadata.removed_seqs)
       this.getMarkedLeaves().forEach(function (leaf) {
-        leaf.apply_own_fasta(removed_fasta_rep.sequences[leaf.name])
+        leaf.applyOwnFasta(removed_fasta_rep.sequences[leaf.name])
       })
     }
 
@@ -484,7 +484,7 @@ class Taxus {
     this.getLeaves().forEach(function(leave){
       let data = figtree_data[leave.name]
       if (data !== undefined && data.constructor === Object)
-        leave.add_annotation(data)
+        leave.addAnnotation(data)
     })
   }
 
