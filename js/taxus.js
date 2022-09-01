@@ -1,5 +1,6 @@
 class Taxus {
-  static TREE_EXT = ['tre', 'tree', 'nexus', 'nex', 'nxs', 'newick', 'txt']
+  static TREE_EXT = ['tre', 'tree', 'nexus', 'nex', 'nxs',
+                     'newick', 'txt', 'treefile', 'contree']
   static FASTA_EXT = ['fa', 'fas', 'fasta', 'fna', 'faa', 'ffn', 'frn']
 
   constructor(){

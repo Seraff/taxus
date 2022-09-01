@@ -66,6 +66,16 @@
         "name": "Tree file",
         "ext": "newick",
         "role": "Editor"
+      },
+      {
+        "name": "Tree file",
+        "ext": "treefile",
+        "role": "Editor"
+      },
+      {
+        "name": "Tree file",
+        "ext": "contree",
+        "role": "Editor"
       }
     ]
   },
