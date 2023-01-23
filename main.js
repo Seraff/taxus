@@ -3,7 +3,7 @@ const menu = require('./js/menu.js')
 const electronLocalshortcut = require('electron-localshortcut')
 const ProgressBar = require('electron-progressbar')
 const path = require('path')
-const fs = require('fs').promises
+const fs = require('fs')
 
 var AnnotationWindow = require('./js/annotation_window.js')
 
@@ -75,6 +75,7 @@ ipcMain.on('taxus:window_is_ready', (event) => {
   if (file_to_open) {
     win = getSenderWindow(event)
     win.webContents.send('taxus:open_file', file_to_open)
+
     file_to_open = null
   }
 })
@@ -89,7 +90,9 @@ app.on('will-finish-launching', () => {
   })
 
   if (process.platform !== 'darwin' && process.argv.length >= 2) {
-    file_to_open = process.argv[1]
+    if (fs.statSync(process.argv[1]).isFile()){
+      file_to_open = process.argv[1]
+    }
   }
 })
 
@@ -123,7 +126,7 @@ ipcMain.handle('taxus:open_file_dialog', async (event, options) => {
 })
 
 ipcMain.handle('taxus:load_file', async (event, path) => {
-  return await fs.readFile(path, 'utf8')
+  return await fs.promises.readFile(path, 'utf8')
 })
 
 ipcMain.handle('taxus:save_file_dialog', async (event, options) => {
@@ -136,7 +139,7 @@ ipcMain.handle('taxus:save_file_dialog', async (event, options) => {
 })
 
 ipcMain.handle('taxus:save_file', async (event, path, content) => {
-  return await fs.writeFile(path, content)
+  return await fs.promises.writeFile(path, content)
 })
 
 ipcMain.handle('taxus:update_menu', async (event, states) => {
