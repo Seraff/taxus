@@ -1,5 +1,3 @@
-const { forEach } = require("underscore")
-
 const pako = window.modules.pako
 // require('path-data-polyfill')
 

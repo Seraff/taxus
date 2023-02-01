@@ -557,10 +557,16 @@ function parseNexus(str)
           case 'taxlabels':
             // nx.SkipCommand();
             var labels = [];
+
             var t = nx.GetToken();
 
             while (t != TokenTypes.SemiColon) {
-              labels.push(nx.buffer)
+              if (t === TokenTypes.Comment) {
+                labels[labels.length-1] += nx.buffer;
+              } else {
+                labels.push(nx.buffer);
+              }
+
               t = nx.GetToken();
             }
 
@@ -819,4 +825,37 @@ function parseNexus(str)
   nexus.status = nx.error;
 
   return nexus;
+}
+
+
+function taxusToNexus(taxus) {
+  nexus = {}
+
+  nexus.status = 0
+  nexus.taxablock = {}
+  nexus.taxablock.taxlabels = []
+
+  let leaves = taxus.getLeaves().sort()
+
+  leaves.forEach((l) => {
+    nexus.taxablock.taxlabels.push(l.name)
+  })
+
+  nexus.treesblock = {}
+  nexus.treesblock.trees = []
+
+  let tree = {}
+  tree.label = 'tree'
+  tree.newick = taxus.getTree().to_taxus_newick(true)
+  nexus.treesblock.trees.push(tree)
+
+  nexus.taxus = taxus.metadataFromCurrentState()
+
+  return nexus
+
+}
+
+
+function nexusToString(nexus) {
+
 }
