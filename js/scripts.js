@@ -30,6 +30,9 @@ function initControls() {
     .register('toggle_cladogram_view', 'toggle-cladogram-view', undefined)
     .register('close', 'close', undefined)
     .register('quit', 'quit', undefined)
+    .register('order_ascending', 'order-ascending', undefined)
+    .register('order_descending', 'order-descending', undefined)
+    .register('order_original', 'order-original', undefined)
     // Both menu and button
     .register('reroot', 'reroot', '#reroot-action')
     .register('rotate_branch', 'rotate-branch', '#rotate-branch-action')
@@ -88,6 +91,10 @@ function updateControls () {
     controls.enableItem('horizontal_expand')
     controls.enableItem('vertical_contract')
     controls.enableItem('vertical_expand')
+
+    controls.enableItem('order_ascending')
+    controls.enableItem('order_descending')
+    controls.enableItem('order_original')
 
 
     if (taxus.fastaIsLoaded() && taxus.isOneLeafSelected()) {
@@ -401,6 +408,18 @@ function verticalExpandAction() {
 
 function findAction() {
   search_panel.toggle()
+}
+
+function orderAscendingAction(){
+  taxus.getTree().order_nodes('ASC')
+}
+
+function orderDescendingAction(){
+  taxus.getTree().order_nodes('DESC')
+}
+
+function orderOriginalAction(){
+  taxus.getTree().order_nodes('ORIGINAL')
 }
 
 function getMode() {

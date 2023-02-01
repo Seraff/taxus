@@ -175,6 +175,27 @@ const template = [
         click: onClick
       },
       {
+        type: 'separator'
+      },
+      {
+        id: "order-ascending",
+        label: 'Order Nodes Ascending',
+        click: onClick
+      },
+      {
+        id: "order-descending",
+        label: 'Order Nodes Descending',
+        click: onClick
+      },
+      {
+        id: "order-original",
+        label: 'Restore Original Node Order',
+        click: onClick
+      },
+      {
+        type: 'separator'
+      },
+      {
         id: "remove-selected",
         label: 'Delete Selected',
         accelerator: 'CmdOrCtrl+D',

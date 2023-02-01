@@ -1,3 +1,5 @@
+const { forEach } = require("underscore")
+
 const pako = window.modules.pako
 // require('path-data-polyfill')
 
@@ -754,6 +756,48 @@ end;
     phylotree.update_layout(phylotree.get_nodes()[0], true)
     taxus.getTree().safe_update()
   }
+
+  // Order nodes feature
+
+  phylotree.order_nodes = function (order) {
+    if (!['ASC', 'DESC', 'ORIGINAL'].includes(order)){
+      return false
+    }
+
+    let root = phylotree.get_root()
+
+    let sort_nodes = function(parent){
+      let children = parent.children ? parent.children : []
+
+      if (children.length === 0) {
+        return true
+      } else {
+        let unsorted = parent.children
+
+        let sorted = unsorted.sort((a, b) => {
+          let a_len = phylotree.descendants(a).length
+          let b_len = phylotree.descendants(b).length
+
+          if (order === 'ASC')
+            return a_len - b_len
+          else if (order === 'DESC')
+            return b_len - a_len
+          else if (order === 'ORIGINAL')
+            return a.original_child_order - b.original_child_order
+        })
+
+        parent.children = sorted
+      }
+
+      parent.children.forEach((e) => { sort_nodes(e) })
+    }
+
+    sort_nodes(root)
+
+    phylotree.update_layout(phylotree.get_nodes()[0], true)
+    taxus.getTree().safe_update()
+  }
+
 
   // Modifying tree in cladogram view workarounds
 
