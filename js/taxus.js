@@ -117,7 +117,7 @@ class Taxus {
     this.getTree().modify_selection(function (n) { return to_select.includes(n.target) })
   }
 
-  initPhylotree(str) {
+  initPhylotree(nexus) {
     this._tree = d3.layout
       .phylotree()
       .svg(d3.select('#tree_display'))
@@ -150,7 +150,10 @@ class Taxus {
     this._tree.style_nodes(nodeStyler)
 
     try {
-      this._tree.read_tree(str)
+      let nwkStr = nexus.treesblock.trees[0].newick
+      let nwk = d3.layout.newick_parser(nwkStr)
+      this._tree(nwk)
+      this.nexus = nexus
     } catch (err) {
       this._tree.unbindTaxusEvents()
       this._tree = null
@@ -174,36 +177,74 @@ class Taxus {
     document.taxus_selection_modified_event_set = true
 
     this.fastaMapping = null
+
+    // extract additional annotation from taxablock
+    if (nexus.taxablock !== undefined) {
+      let leaves = {}
+      this._tree.get_nodes().forEach((n) => {
+        if (n.name !== '' && n.name !== 'root'){
+          leaves[n.name] = n
+        }
+      })
+
+      let labels = nexus.taxablock.taxlabels
+      labels.forEach((l) => {
+        let match = l.match(/^(?<name>.+?)\s*(?<annotation>\[.+\])?$/)
+        if (match !== null) {
+          if (match.groups.name in leaves && match.groups.annotation !== undefined) {
+            let annotation = match.groups.annotation.replace('[', '').replace(']', '')
+            leaves[match.groups.name].taxablock_annotation = annotation
+          }
+        }
+      })
+    }
+
     this.dispatchStateUpdate()
 
     return true
   }
 
-  loadTreeFile(path, callback=undefined) {
+  loadTreeFile(path, callbacks) {
     window.api.loadFile(path).then( content => {
-      this.loadTreeString(content)
-      this.tree_path = path
+      try {
+        this.loadTreeString(content)
+        this.tree_path = path
 
-      this.makeTreeClean()
-      this.makeFastaClean()
+        this.makeTreeClean()
+        this.makeFastaClean()
 
-      if (callback)
-        callback()
+        if (callbacks.success)
+          callbacks.success()
 
+      } catch (e) {
+        showSimpleError(e)
+      }
     }, error => {
       console.error(error)
+    }).finally(() => {
+      if (callbacks.after)
+        callbacks.after()
     })
   }
 
   loadTreeString(content) {
     this.closeFasta()
 
-    if (this.initPhylotree(content)) {
+    let nexus = null
+
+    if (content.startsWith('#NEXUS')) {
+      nexus = parseNexus(content)
+    } else if (content[0] == '(') {
+      nexus = nexusFromNewick(content)
+    } else {
+      throw "Wrong Input File Format";
+    }
+
+    if (this.initPhylotree(nexus)) {
       this.preferences = new Preferences()
       this.reinitNodes()
 
       this.applyMetadataFromNexus()
-      this.applyTaxaColorsFromFigtree()
       this.redrawFeatures()
 
       this.getTree().update() // for initial node styling.
@@ -218,10 +259,8 @@ class Taxus {
     if (!path)
       path = this.tree_path
 
-    if (this.getTree().is_nexus())
-      this.getTree().apply_taxus_metadata(this.metadataFromCurrentState())
-
-    let data = this.getTree().output_tree()
+    let nexus = taxusToNexus(this)
+    let data = nexusToString(nexus)
 
     window.api.saveFile(path, data).then(() => {
       this.makeTreeClean()
@@ -327,7 +366,9 @@ class Taxus {
   // prepare branches
   reinitNodes() {
     if (this.treeIsLoaded()) {
-      this._nodes = this._tree.get_nodes().map((node) => { return Node(this, node) })
+      this._nodes = this._tree.get_nodes().map((node) => {
+        return Node(this, node)
+      })
 
       this._branches = []
       this.getTree().get_svg().selectAll('.branch').each((b) => { this._branches.push(b) })
@@ -416,14 +457,14 @@ class Taxus {
     dispatchDocumentEvent('tree_topology_changed')
   }
 
-  setSelectedNodesAnnotation(annotation) {
+  setSelectedNodesAnnotation(annotation, annotation_attribute ='parsed_annotation') {
     this.getSelection().forEach(function (node) {
       Object.keys(annotation).forEach(function (key) {
         let value = annotation[key]
         if (value){
-          node.parsed_annotation[key] = annotation[key]
-        } else if (node.parsed_annotation[key]) {
-          delete node.parsed_annotation[key]
+          node[annotation_attribute][key] = annotation[key]
+        } else if (node[annotation_attribute][key]) {
+          delete node[annotation_attribute][key]
         }
       })
     })
@@ -434,15 +475,20 @@ class Taxus {
   // Nexus metdata stuff
 
   metadataFromNexus() {
-    return this.getTree().nexus_to_taxus_metadata()
+    let result = this.nexus.taxus
+
+    if (result !== undefined && 'removed_seqs' in result) {
+      let encoded = result.removed_seqs
+      result['removed_seqs'] = pako.inflate(atob(encoded), { to: 'string' })
+    }
+
+    return result
   }
 
   // Make metadata from current tree
 
   metadataFromCurrentState() {
     let result = {}
-
-    if (!this.getTree().is_nexus()) { return result }
 
     let our_removed_seqs = this.getMarkedLeaves().map(function (e) { return e.fasta() })
 
@@ -473,20 +519,6 @@ class Taxus {
     }
 
     this.preferences.applyToDefaults(metadata)
-  }
-
-  // Workaround for FigTree files: get colors of taxa from taxa block
-  applyTaxaColorsFromFigtree() {
-    let figtree_data = this.getTree().taxlabels_data()
-
-    if (Object.keys(figtree_data).length === 0)
-      return true
-
-    this.getLeaves().forEach(function(leave){
-      let data = figtree_data[leave.name]
-      if (data !== undefined && data.constructor === Object)
-        leave.addAnnotation(data)
-    })
   }
 
   // Dirty tree/fasta functionality

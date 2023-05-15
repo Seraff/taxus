@@ -3038,6 +3038,13 @@ const parseString = window.modules.xml2js.parseString;
       } else {
         this_node["name"] = current_node_name;
       }
+
+      if ("children" in this_node) {
+        this_node["is_leaf"] = false
+      } else {
+        this_node["is_leaf"] = true
+      }
+
       this_node["attribute"] = current_node_attribute;
       this_node["annotation"] = current_node_annotation;
       current_node_name = "";
@@ -3189,10 +3196,25 @@ const parseString = window.modules.xml2js.parseString;
         tree_json.name = current_node_name;
     }
 
-    return {
+    let result = {
       json: tree_json,
       error: null
-    };
+    }
+
+    result.traverse = function (f) {
+      let applyToChildren = function (node) {
+        if ("children" in node) {
+          node.children.forEach((child) => {
+            f(child)
+            applyToChildren(child)
+          })
+        }
+      }
+
+      applyToChildren(tree_json)
+    }
+
+    return result
   }
 
   function d3_phylotree_phyloxml_parser(xml_string) {

@@ -463,14 +463,13 @@ end;
   }
 
   phylotree.read_tree = function(str){
-    var newick = null
-    var taxus_block = null
+    let newick = null
+    let taxus_block = null
 
     phylotree.nexus = null
-    phylotree.original_newick = null
-    phylotree.original_file_template = null
 
-    str = $.trim(str)
+
+    str = str.trim()
 
     // if it looks like newick, make a basic nexus
     if (str[0] == '(' && str[str.length-1] == ';'){
@@ -479,10 +478,13 @@ end;
     }
 
     // str is nexus now, parse it, check it
-    var parsed_nexus = parseNexus(str)
+    let parsed_nexus = parseNexus(str)
+
     if (parsed_nexus.status === NexusParseError.ok){
       // it is nexus
       phylotree.nexus = parsed_nexus
+
+
 
       if (phylotree.nexus.treesblock === undefined ||
           phylotree.nexus.treesblock.trees === undefined ||
@@ -502,12 +504,12 @@ end;
       }
 
     } else {
-      var error = NexusParseErrorHumanized(parsed_nexus.status)
+      let error = NexusParseErrorHumanized(parsed_nexus.status)
       throw new NexusError("Error in nexus file (" + error + ")")
     }
 
     // check newick
-    var newick_test = d3.layout.newick_parser(phylotree.original_newick)
+    let newick_test = d3.layout.newick_parser(phylotree.original_newick)
     if (newick_test.error !== null) {
       throw new NewickError("Error in newick line (" + newick_test.error + ")")
     }

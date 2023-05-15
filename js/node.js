@@ -135,18 +135,22 @@ function Node(taxus, phylotree_node){
   }
 
   node.parseAnnotation = function(){
-    var result = {}
+    node.parsed_annotation = node.parseAnnotationString(node.annotation)
+    node.parsed_taxablock_annotation = node.parseAnnotationString(node.taxablock_annotation)
+  }
 
-    if (!node.annotation){
-      node.parsed_annotation = result
-      return
+  node.parseAnnotationString = function(str) {
+    let result = {}
+
+    if (!str) {
+      return result
     }
 
-    var values = node.annotation.replace(/&/g, '').split(',')
+    let values = str.replace(/&/g, '').split(',')
 
-    values.forEach(function(e){
-      var splitted = e.split('=')
-      var val = splitted[1]
+    values.forEach(function (e) {
+      let splitted = e.split('=')
+      let val = splitted[1]
 
       if (val === "true")
         val = true
@@ -156,16 +160,21 @@ function Node(taxus, phylotree_node){
       result[splitted[0]] = val
     })
 
-    node.parsed_annotation = result
+    return result
   }
 
   node.buildAnnotation = function(){
+    node.annotation = node.stringifiedAnnotation("parsed_annotation")
+    node.taxablock_annotation = node.stringifiedAnnotation("parsed_taxablock_annotation")
+  }
+
+  node.stringifiedAnnotation = function (annotation_attribute = "parsed_annotation") {
     var annotations = []
-    Object.keys(node.parsed_annotation).forEach(function(k){
-      annotations.push(k + "=" + node.parsed_annotation[k])
+    Object.keys(node[annotation_attribute]).forEach(function (k) {
+      annotations.push(k + "=" + node[annotation_attribute][k])
     })
 
-    node.annotation = (annotations.length > 0) ? ("&" + annotations.join(',')) : ""
+    return (annotations.length > 0) ? ("&" + annotations.join(',')) : ""
   }
 
   node.addAnnotation = function(annotation){

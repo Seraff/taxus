@@ -25,10 +25,16 @@ class NodeStyler {
     this.setColor(this.defaultColor())
     this.setWidth()
 
-    for (var prop in this.node.parsed_annotation){
-      var val = this.node.parsed_annotation[prop]
-
+    for (let prop in this.node.parsed_annotation) {
+      let val = this.node.parsed_annotation[prop]
       if (prop === '!color') { this.setColor(val) }
+    }
+
+    if (this.node.isLeaf()) {
+      for (let prop in this.node.parsed_taxablock_annotation) {
+        let val = this.node.parsed_taxablock_annotation[prop]
+        if (prop === '!color') { this.setLeafTextColor(val) }
+      }
     }
   }
 
@@ -70,10 +76,12 @@ class NodeStyler {
   setColor(value){
     if (this.node.prev_branch){
       $(this.node.prev_branch.get_element()[0]).css('stroke', value)
+    }
+  }
 
-      if (this.node.isLeaf()){
-        $(this.node.getHtmlElement()).css('fill', value)
-      }
+  setLeafTextColor(value){
+    if (this.node.isLeaf()) {
+      $(this.node.getHtmlElement()).css('fill', value)
     }
   }
 

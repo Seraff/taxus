@@ -263,6 +263,20 @@ Scanner.prototype.GetToken = function(returnspace)
   return this.token;
 }
 
+Scanner.prototype.GetLine = function ()
+{
+  this.buffer = '';
+
+  while ((this.str.charAt(this.pos) != ';') && (this.pos < this.str.length)){
+    this.buffer += this.str.charAt(this.pos);
+    this.pos++;
+  }
+  this.buffer += this.str.charAt(this.pos);
+  this.pos++;
+
+  return this.buffer;
+}
+
 //----------------------------------------------------------------------------------------------
 Scanner.prototype.ParseComment = function()
 {
@@ -695,6 +709,7 @@ function parseNexus(str)
                   t = nx.GetToken();
                 }
                 tree.newick += ';';
+                tree.newick = tree.newick.replace(/^\[\&\w\]\s?/, '')
 
                 nexus.treesblock.trees.push(tree);
               }
@@ -792,27 +807,41 @@ function parseNexus(str)
         }
       }
     } else {
-      var command = null;
+      // parse all strings of this unknown block
+
+      if (nexus.others === undefined) {
+        nexus.others = []
+      }
+
       var counter = 0;
       var endNotFound = false;
 
-      while ((command != 'end') && (command != 'endblock')) {
-        command = nx.GetCommand();
+      var result = "begin " + blockname + ";"
+      var line = "";
 
-        if ((command != 'end') && (command != 'endblock')){
-          nx.error = NexusParseError.ok;
-          nx.SkipCommand();
-        } else
-          nx.GetToken();
+      do {
+        nx.GetLine();
+        line = nx.buffer;
+        result += line
 
-        if (counter >= 128){
+        if (counter >= 128) {
           endNotFounds = true;
           break;
         }
         counter += 1;
-      }
 
-      nx.error = endNotFound ? NexusParseError.badblock : NexusParseError.ok;
+        line = line.replaceAll(' ', '')
+                   .replaceAll('\t', '')
+                   .replaceAll('\n', '')
+                   .toLocaleLowerCase()
+
+      } while (line !== "end;")
+
+      if (nx.error === endNotFound) {
+        NexusParseError.badblock
+      } else {
+        nexus.others.push(result)
+      }
     }
 
     last_error = nx.error;
@@ -827,9 +856,38 @@ function parseNexus(str)
   return nexus;
 }
 
+function nexusFromNewick(nwk) {
+  let newick = d3.layout.newick_parser(nwk)
+  if (newick.error !== null) {
+    throw new NewickError("Error in newick line (" + newick_test.error + ")")
+  }
+
+  let nexus = {}
+  nexus.status = 0
+
+  nexus.taxablock = {}
+  nexus.taxablock.taxlabels = []
+
+  newick.traverse((n) => {
+    if (n.is_leaf === true) {
+      nexus.taxablock.taxlabels.push(n.name)
+    }
+  })
+
+  nexus.treesblock = {}
+  nexus.treesblock.trees = []
+
+  let tree = {}
+  tree.label = 'tree'
+  tree.newick = nwk
+  nexus.treesblock.trees.push(tree)
+
+  return nexus
+}
+
 
 function taxusToNexus(taxus) {
-  nexus = {}
+  let nexus = taxus.nexus || {}
 
   nexus.status = 0
   nexus.taxablock = {}
@@ -838,7 +896,15 @@ function taxusToNexus(taxus) {
   let leaves = taxus.getLeaves().sort()
 
   leaves.forEach((l) => {
-    nexus.taxablock.taxlabels.push(l.name)
+    let label = l.name
+
+    let taxablock_annotation = l.stringifiedAnnotation('parsed_taxablock_annotation')
+
+    if (taxablock_annotation !== ""){
+      label += '[' + taxablock_annotation + ']'
+    }
+
+    nexus.taxablock.taxlabels.push(label)
   })
 
   nexus.treesblock = {}
@@ -852,10 +918,53 @@ function taxusToNexus(taxus) {
   nexus.taxus = taxus.metadataFromCurrentState()
 
   return nexus
-
 }
 
 
 function nexusToString(nexus) {
+  let result = "#NEXUS\n"
 
+  if ('taxablock' in nexus){
+    result += "begin taxa;\n"
+    let taxas = nexus.taxablock.taxlabels
+
+    result += "\tdimensions ntax=" + taxas.length + ";\n"
+
+    nexus.taxablock.taxlabels.forEach((e) => {
+      result += "\t" + e + "\n"
+    })
+
+    result += ";\n"
+    result += "end;\n"
+  }
+
+  if ('treesblock' in nexus) {
+    result += "\n"
+
+    tree = nexus.treesblock.trees[0]
+    result += "begin trees;\n"
+    result += "\ttree " + tree.label + " = [&R] " + tree.newick + ";\n"
+    result += "end;\n"
+  }
+
+  if ('taxus' in nexus) {
+    result += "\n"
+
+    result += "begin nexus;\n"
+    for (const [key, value] of Object.entries(nexus.taxus)) {
+      result += "\tset " + key + "=\"" + value + "\";\n "
+    }
+    result += "end;\n"
+  }
+
+  if ('others' in nexus) {
+    result += "\n"
+
+    nexus.others.forEach(other => {
+      result += other
+      result += "\n"
+    })
+  }
+
+  return result
 }

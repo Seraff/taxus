@@ -162,10 +162,15 @@ async function openTreeAction (e) {
     window.api.openFileDialog(options).then(path => {
       if (path){
         progressBar.show()
-        taxus.loadTreeFile(path, () => {
-          progressBar.hide()
-          progressBar.setNewComplexity(taxus.getNodes().length)
-        })
+        taxus.loadTreeFile(path, {
+            success: () => {
+              progressBar.setNewComplexity(taxus.getNodes().length)
+            },
+            after: () => {
+              progressBar.hide()
+            }
+          }
+        )
       }
     })
   }
@@ -246,14 +251,17 @@ function toggleSelectionModeAction () {
   mode = modeSelector.active_button.data('mode')
   new_mode = mode == 'taxa' ? 'branch' : 'taxa'
   setMode(new_mode)
+  dispatchDocumentEvent('selection_modified')
 }
 
 function setModeToTaxaAction() {
   setMode('taxa')
+  dispatchDocumentEvent('selection_modified')
 }
 
 function setModeToBranchAction() {
   setMode('branch')
+  dispatchDocumentEvent('selection_modified')
 }
 
 function removeSelectedAction() {
@@ -347,7 +355,9 @@ function exportToSvgAction() {
 function changeBranchColorAction() {}
 
 function removeBranchColorAction() {
-  taxus.setSelectedNodesAnnotation({ '!color': undefined })
+  let mode = modeSelector.active_button.data('mode')
+  let attribute = mode === 'branch' ? "parsed_annotation" : "parsed_taxablock_annotation"
+  taxus.setSelectedNodesAnnotation({ '!color': undefined }, attribute)
   taxus.getTree().dispatch_selection_modified_event() // for picker to reset color
 }
 
@@ -491,12 +501,10 @@ $(document).ready(function () {
   // Preferences logic
 
   window.api.handleGiveCurrentPrefs((event, message) => {
-    console.log('They asked for current prefs')
     window.api.takeCurrentPrefs(taxus.preferences || {})
   })
 
   window.api.handleTakeNewPrefs((event, prefs) => {
-    console.log('Receiving new preferences')
     if (taxus.preferences)
       taxus.applyNewPreferences(prefs)
     window.api.newPrefsTaken()
@@ -506,7 +514,10 @@ $(document).ready(function () {
 
   let picker = new ColorPicker('#branch-color-picker', '#change-branch-color-action', ['#change-branch-color-box'])
   picker.add_color_change_callback(function (color) {
-    taxus.setSelectedNodesAnnotation({ "!color": color })
+    let mode = modeSelector.active_button.data('mode')
+    let attribute = mode === 'branch' ? "parsed_annotation" : "parsed_taxablock_annotation"
+
+    taxus.setSelectedNodesAnnotation({ "!color": color }, attribute)
   })
 
   // Search panel logic
@@ -541,10 +552,16 @@ $(document).ready(function () {
   window.api.handleOpenFile((event, file_path) => {
     if (file_path) {
       progressBar.show()
-      taxus.loadTreeFile(file_path, () => {
-        progressBar.hide()
-        progressBar.setNewComplexity(taxus.getNodes().length)
-      })
+      taxus.loadTreeFile(file_path,
+        {
+          success: () => {
+            progressBar.setNewComplexity(taxus.getNodes().length)
+          },
+          after: () => {
+            progressBar.hide()
+          }
+        }
+      )
     }
   })
 
@@ -567,9 +584,17 @@ $(document).ready(function () {
   // Color picker and branch selection
   document.addEventListener('selection_modified', function (e) {
     let selection = taxus.getSelection()
+    let mode = modeSelector.active_button.data('mode')
+    let annotation_attribute = undefined
+
+    if (mode == 'branch') {
+      annotation_attribute = "parsed_annotation"
+    } else if (mode == 'taxa') {
+      annotation_attribute = "parsed_taxablock_annotation"
+    }
 
     if (selection.length === 1) {
-      let color = selection[0].parsed_annotation['!color']
+      let color = selection[0][annotation_attribute]['!color']
 
       if (color) {
         picker.set_color(color)
@@ -577,7 +602,7 @@ $(document).ready(function () {
         picker.remove_color()
       }
     } else if (selection.length > 1) {
-      let set = new Set(selection.map((e) => { return e.parsed_annotation.color }))
+      let set = new Set(selection.map((e) => { return e[annotation_attribute]['!color'] }))
       let first_color = set.values().next().value
 
       if (set.size === 1 && first_color !== undefined){
