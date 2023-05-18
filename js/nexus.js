@@ -930,11 +930,12 @@ function nexusToString(nexus) {
 
     result += "\tdimensions ntax=" + taxas.length + ";\n"
 
+    result += "\ttaxlabels\n"
     nexus.taxablock.taxlabels.forEach((e) => {
-      result += "\t" + e + "\n"
+      result += "\t\t" + e + "\n"
     })
 
-    result += ";\n"
+    result += "\t\t;\n"
     result += "end;\n"
   }
 

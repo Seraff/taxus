@@ -200,8 +200,15 @@ function saveTreeAsAction () {
       let fasta_is_loaded = taxus.fastaIsLoaded()
       let fasta_path = fasta_is_loaded && taxus.fasta.path
 
-      taxus.loadTreeFile(result.filePath)
-      if (fasta_is_loaded) { taxus.loadFastaFile(fasta_path, true) }
+      progressBar.show()
+      taxus.loadTreeFile(path, {
+        success: () => {
+          if (fasta_is_loaded) { taxus.loadFastaFile(fasta_path, true) }
+        },
+        after: () => {
+          progressBar.hide()
+        }
+      })
     }
   })
 }
