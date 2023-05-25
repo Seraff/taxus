@@ -457,10 +457,11 @@ class Taxus {
     dispatchDocumentEvent('tree_topology_changed')
   }
 
-  setSelectedNodesAnnotation(annotation, annotation_attribute ='parsed_annotation') {
+  setSelectedNodesAnnotation(annotation, annotation_attribute = 'parsed_annotation') {
     this.getSelection().forEach(function (node) {
       Object.keys(annotation).forEach(function (key) {
         let value = annotation[key]
+
         if (value){
           node[annotation_attribute][key] = annotation[key]
         } else if (node[annotation_attribute][key]) {

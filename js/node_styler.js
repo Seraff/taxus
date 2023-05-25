@@ -23,6 +23,7 @@ class NodeStyler {
 
   style() {
     this.setColor(this.defaultColor())
+    this.setLeafTextColor(this.defaultColor())
     this.setWidth()
 
     for (let prop in this.node.parsed_annotation) {
