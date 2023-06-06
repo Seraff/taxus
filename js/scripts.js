@@ -471,8 +471,15 @@ function changeScale(func, amount){
 }
 
 function printTaxaCount () {
-  cnt = taxus.getLeaves().length
-  printMetaInfo(cnt + ' taxa')
+  let cnt = taxus.getLeaves().length
+  let selectedCnt = taxus.getSelectedLeaves().length
+
+  let text = cnt + " taxa"
+  if (getMode() == 'taxa' && selectedCnt > 0) {
+    text += ", " + selectedCnt + " selected"
+  }
+
+  printMetaInfo(text)
 }
 
 function printMetaInfo (msg) {
@@ -626,6 +633,10 @@ $(document).ready(function () {
 
   document.addEventListener('new_tree_is_loaded', () => {
     $("#footer-text").show()
+    printTaxaCount()
+  })
+
+  document.addEventListener('selection_modified', function (e) {
     printTaxaCount()
   })
 

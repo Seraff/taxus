@@ -87,6 +87,10 @@ span.fasta-pane-entry-sequence{
   font: 8px sans-serif;
 }
 
+.node-selected .node-tip {
+  fill: black !important;
+}
+
 dialog {
     padding: 0;
     border: 1px solid #bebebe;
@@ -193,7 +197,9 @@ dialog {
 
 #footer-meta {
   float: right;
-  width: 100px;
+  width: 150px;
+  text-align: right;
+  margin-right: 10px;
 }
 
 #search-panel input{
