@@ -18,8 +18,9 @@ class NodeStyler {
 
     if (this.node.isMarked() == true){
       this.setFontWeight(true)
-      this.setColor(this.removedTaxaColor)
-      this.setLeafTextColor(this.removedTaxaColor)
+      this.setFontLineThrough(true)
+    } else {
+      this.setFontLineThrough(false)
     }
   }
 

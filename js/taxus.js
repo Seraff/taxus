@@ -217,7 +217,7 @@ class Taxus {
           callbacks.success()
 
       } catch (e) {
-        showSimpleError(e)
+        showSimpleError(e.message)
       }
     }, error => {
       console.error(error)
@@ -494,7 +494,8 @@ class Taxus {
     let our_removed_seqs = this.getMarkedLeaves().map(function (e) { return e.fasta() })
 
     if (our_removed_seqs.length > 0) {
-      result.removed_seqs = our_removed_seqs.map(function (e) { return e.toFasta() }).join('')
+      let seqs = our_removed_seqs.map(function (e) { return e.toFasta() }).join('')
+      result.removed_seqs = btoa(pako.deflate(seqs, { to: 'string' }))
     }
 
     // Apply preferences

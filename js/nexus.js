@@ -951,7 +951,7 @@ function nexusToString(nexus) {
   if ('taxus' in nexus) {
     result += "\n"
 
-    result += "begin nexus;\n"
+    result += "begin taxus;\n"
     for (const [key, value] of Object.entries(nexus.taxus)) {
       result += "\tset " + key + "=\"" + value + "\";\n "
     }
