@@ -3,6 +3,7 @@ class NodeStyler {
     this.node = node
     this.preferences = node.taxus.preferences
     this.drawn_shapes = []
+    this.removedTaxaColor = '#e6550d'
 
     this.highlight_rect = null
     this.initHighlight()
@@ -17,7 +18,8 @@ class NodeStyler {
 
     if (this.node.isMarked() == true){
       this.setFontWeight(true)
-      this.setColor('#e6550d')
+      this.setColor(this.removedTaxaColor)
+      this.setLeafTextColor(this.removedTaxaColor)
     }
   }
 
@@ -70,7 +72,32 @@ class NodeStyler {
   setFontUnderline(is_underlined) {
     if (this.node.isLeaf()){
       var text = this.getLeafTextElement()
-      text.style.textDecoration = is_underlined ? 'underline' : ''
+
+      if (!text.style.textDecoration) {
+        text.style.textDecoration = ''
+      }
+
+      if (is_underlined) {
+        text.style.textDecoration += ' underline'
+      } else {
+        text.style.textDecoration = text.style.textDecoration.replace('underline', '').trim()
+      }
+    }
+  }
+
+  setFontLineThrough(is_line_through) {
+    if (this.node.isLeaf()) {
+      var text = this.getLeafTextElement()
+
+      if (!text.style.textDecoration) {
+        text.style.textDecoration = ''
+      }
+
+      if (is_line_through) {
+        text.style.textDecoration += ' line-through'
+      } else {
+        text.style.textDecoration = text.style.textDecoration.replace('line-through', '').trim()
+      }
     }
   }
 
