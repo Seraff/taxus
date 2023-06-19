@@ -7,8 +7,10 @@ class PreferencesWindow {
     this.mainWindow = BrowserWindow.getFocusedWindow()
 
     this.window = new BrowserWindow({ width: 300, height: 500,
-                                      modal: false,
                                       parent: this.mainWindow,
+                                      modal: true,
+                                      autoHideMenuBar: true,
+                                      menuBarVisible: false,
                                       maximizable: false,
                                       fullscreen: false,
                                       minimizable: false,
