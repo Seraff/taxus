@@ -25,6 +25,8 @@ Additionally there are "Zoom out" and "Zoom in" buttons in the toolbar (|zoom_ac
 .. |zoom_actions| image:: _static/img/zoom_actions.png
   :scale: 50%
 
+.. _branch_taxa_selection:
+
 Branch/Taxa Selection
 ---------------------
 
@@ -68,11 +70,10 @@ Tree Visualization and Modification
 Changing the Proportions
 ########################
 
-To expand or contract tree by width or height use the group of tools on the left side of the toolbar.
+To expand or contract tree by width or height use the group of tools (|expand_contract_buttons|) on the left side of the toolbar.
 
-.. image:: _static/img/expand_contract_buttons.png
+.. |expand_contract_buttons| image:: _static/img/expand_contract_buttons.png
   :scale: 50%
-  :align: center
 
 .. Note:: The Expand/Contract tools don't modify the tree file. They only change the way how the tree is displayed.
 
@@ -95,6 +96,19 @@ To rotate the clade, select the branch and click the "Rotate branch" button in t
 
 .. note:: Rerooting and Rotation operations change the tree topology. To apply changes to the file the tree should be saved.
 
+Sorting
+#######
+
+It is possible to sort nodes by the length of the path from the root.
+
+To sort nodes ascending select :menuselection:`Edit --> Order Nodes Ascending`
+
+To sort nodes descending select :menuselection:`Edit --> Order Nodes Descending`
+
+To revert to the original order select :menuselection:`Edit --> Restore Original Node Order`
+
+.. note:: Sorting changes the tree topology. To apply changes to the file the tree should be saved.
+
 Applying Colors
 ###############
 The branches and taxa can be colored.
@@ -114,6 +128,8 @@ To remove the color annotation from selected branches/taxa, click the "Remove Co
 
 .. |remove_color_button| image:: _static/img/remove_color_button.png
   :scale: 50%
+
+Applying colors in **taxa** selection mode will apply them to text, while doing it in **branch** selection mode will change colors of branches (see :ref:`Branch/Taxa Selection<branch_taxa_selection>`).
 
 Other Preferences
 #################
