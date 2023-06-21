@@ -437,7 +437,10 @@ end;
 
   phylotree.to_taxus_newick = function(annotations = false){
     if (annotations){
-      return phylotree.get_newick(function(e){ return e.annotation ? "[" + e.annotation + "]" : "" })
+      return phylotree.get_newick(function(e){
+        let annotation = e.stringifiedAnnotation()
+        return annotation.length > 0 ? "[" + annotation + "]" : ""
+      })
     } else {
       return phylotree.get_newick(function(e){ return "" })
     }
