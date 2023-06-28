@@ -896,7 +896,7 @@ function taxusToNexus(taxus) {
   let leaves = taxus.getLeaves().sort()
 
   leaves.forEach((l) => {
-    let label = l.name
+    let label = l.translation_name || l.name
 
     let taxablock_annotation = l.stringifiedAnnotation('parsed_taxablock_annotation')
 
@@ -942,7 +942,7 @@ function nexusToString(nexus) {
   if ('treesblock' in nexus) {
     result += "\n"
 
-    tree = nexus.treesblock.trees[0]
+    let tree = nexus.treesblock.trees[0]
     result += "begin trees;\n"
     result += "\ttree " + tree.label + " = [&R] " + tree.newick + ";\n"
     result += "end;\n"

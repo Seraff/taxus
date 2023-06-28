@@ -199,6 +199,23 @@ class Taxus {
       })
     }
 
+    // proccess translations
+
+    if (nexus.treesblock.translate !== undefined) {
+      let translations = nexus.treesblock.translate
+
+      this._tree.get_nodes().forEach((n) => {
+        if (this._tree.is_leafnode(n)) {
+          let key = parseInt(n.name)
+
+          if (key in translations) {
+            n.translation_index = key
+            n.translation_name = translations[key]
+          }
+        }
+      })
+    }
+
     this.dispatchStateUpdate()
 
     return true
@@ -246,6 +263,7 @@ class Taxus {
 
       this.applyMetadataFromNexus()
       this.redrawFeatures()
+      this.translateLeaves()
 
       this.getTree().update() // for initial node styling.
       dispatchDocumentEvent('new_tree_is_loaded')
@@ -591,5 +609,39 @@ class Taxus {
   toggleCladogramView() {
     let new_mode = this.getTree().cladogram ? false : true
     this.setCladogramView(new_mode)
+  }
+
+  translationTable() {
+    let table = {}
+
+    this.getLeaves().forEach((leaf) => {
+      if (leaf.translation_index !== undefined){
+        table[leaf.translation_index] = leaf.translation_name
+      }
+    })
+
+    return table
+  }
+
+  detranslateLeaves() {
+    let table = this.translationTable()
+
+    if (Object.values(table).length > 0) {
+      this.getLeaves().forEach((leaf) => {
+        if (leaf.translation_index !== undefined)
+          leaf.name = leaf.translation_index
+      })
+    }
+  }
+
+  translateLeaves() {
+    let table = this.translationTable()
+
+    if (Object.values(table).length > 0) {
+      this.getLeaves().forEach((leaf) => {
+        if (leaf.translation_index !== undefined)
+          leaf.name = leaf.translation_name
+      })
+    }
   }
 }
