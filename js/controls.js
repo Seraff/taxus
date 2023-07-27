@@ -48,7 +48,6 @@ class Controls {
 
     runMenuCallback(menu_id) {
         if (menu_id in this._menu_items){
-            console.log('run callback on ' + menu_id)
             this._menu_items[menu_id].runCallback()
         }
     }
@@ -102,8 +101,7 @@ class ControlItem {
     // Runs systemNameAction() method in scripts.js
     runCallback() {
         if (this.system_id) {
-            var func_name = toCamel(this.system_id + '-action')
-            console.log('running callback ' + func_name)
+            let func_name = toCamel(this.system_id + '-action')
             window[func_name]()
         }
     }

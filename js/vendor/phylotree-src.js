@@ -1703,6 +1703,7 @@ const parseString = window.modules.xml2js.parseString;
         nodes.forEach(function(n) {
           n.__mapped_bl = branch_length_accessor(n);
         });
+
         phylotree.branch_length(function(n) {
           // TAXUS modified
           return phylotree.cladogram ? undefined : n.__mapped_bl
@@ -1711,9 +1712,9 @@ const parseString = window.modules.xml2js.parseString;
         // rerooted and inited branch lengths
 
         var remove_me = node,
-          current_node = node.parent,
-          parent_length = current_node.__mapped_bl,
-          stashed_bl = _.noop();
+            current_node = node.parent,
+            parent_length = current_node.__mapped_bl,
+            stashed_bl = _.noop();
 
         // if parent node has another parent
         if (current_node.parent) {
@@ -1729,6 +1730,7 @@ const parseString = window.modules.xml2js.parseString;
 
           while (current_node.parent) {
             var remove_idx = current_node.children.indexOf(remove_me);
+
             if (current_node.parent.parent) {
               current_node.children.splice(remove_idx, 1, current_node.parent);
             } else {
@@ -1736,6 +1738,7 @@ const parseString = window.modules.xml2js.parseString;
             }
 
             var t = current_node.parent.__mapped_bl;
+
             if (t !== undefined) {
               current_node.parent.__mapped_bl = stashed_bl;
               stashed_bl = t;
@@ -1743,8 +1746,10 @@ const parseString = window.modules.xml2js.parseString;
             remove_me = current_node;
             current_node = current_node.parent;
           }
+
           var remove_idx = current_node.children.indexOf(remove_me);
           current_node.children.splice(remove_idx, 1);
+
         } else {
           // rerooting on one of the root clades
           // removing node from it's parent
@@ -1782,6 +1787,7 @@ const parseString = window.modules.xml2js.parseString;
 
         phylotree.update_layout(new_json, true);
       }
+
       return phylotree;
     };
 

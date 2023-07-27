@@ -35,6 +35,13 @@ class Taxus {
     return this._nodes.filter(function (node) { return node.isLeaf() })
   }
 
+  getInternalNodes(include_root = false) {
+    return this._nodes.filter((n) => {
+      let root_condition = include_root ? true : !n.isRoot()
+      return !n.isLeaf() && root_condition
+    })
+  }
+
   getLeaveByName(name) {
     return this.getLeaves().find((leave) => { return leave.name == name })
   }
@@ -266,6 +273,7 @@ class Taxus {
       this.translateLeaves()
 
       this.getTree().update() // for initial node styling.
+      this.saveBipartitions()
       dispatchDocumentEvent('new_tree_is_loaded')
     }
   }
@@ -457,6 +465,8 @@ class Taxus {
     this.getTree().safe_update()
     this.makeTreeDirty()
     this.reinitNodes()
+    this.applyOriginalBipartitionAttrs()
+
     dispatchDocumentEvent('tree_topology_changed')
   }
 
@@ -643,5 +653,88 @@ class Taxus {
           leaf.name = leaf.translation_name
       })
     }
+  }
+
+  // Bipartition logic
+
+  // list of current bipartition attributes
+  getCurrentBipartitions() {
+    let bipartitions = []
+
+    let getBipartition = (n) => {
+      let descs = this.getTree().select_all_descendants(n, true, true)
+
+      let descs_ids = descs.map(function (d) { return d.name }).sort()
+      if (n.isLeaf()) {
+        descs_ids.push(n.name)
+      }
+
+      let result = all_leaf_ids.map(function (l) {
+        return descs_ids.includes(l) ? "1" : "0"
+      })
+
+      return result.join("")
+    }
+
+    let all_leaf_ids = this.getLeaveNames().sort()
+
+    // collect all bipartitions
+
+    this.getInternalNodes().forEach(function (n) {
+      let bipartition = getBipartition(n)
+      bipartitions.push([bipartition, n])
+    })
+
+    return bipartitions
+  }
+
+  // Save the state of current bipartitions
+  saveBipartitions() {
+    this.bipartitions = {}
+
+    this.getCurrentBipartitions().forEach((b) => {
+      let data = {
+        name: b[1].name,
+        annotation: b[1].annotation,
+        taxablock_annotation: b[1].taxablock_annotation
+      }
+
+      this.bipartitions[b[0]] = data
+
+      // Faster than three replaceAll calls, tested
+      let inverted = b[0]
+        .split('')
+        .map((e) => { return e === '0' ? '1' : '0' })
+        .join('')
+
+      this.bipartitions[inverted] = data
+    })
+  }
+
+  // After the modification of the tree
+  applyOriginalBipartitionAttrs() {
+    if (this.bipartitions !== undefined) {
+      let current_bipartitions = this.getCurrentBipartitions()
+      current_bipartitions.forEach((b) => {
+        let code = b[0]
+        let node = b[1]
+
+        node.name = ""
+        node.annotation = ""
+        node.taxablock_annotation = ""
+
+        if (this.bipartitions[code] !== undefined) {
+          let original_values = this.bipartitions[code]
+
+          node.name = original_values.name
+          node.annotation = original_values.annotation
+          node.taxablock_annotation = original_values.taxablock_annotation
+          node.parseAnnotation()
+        }
+      })
+    }
+
+
+    taxus.getTree().update()
   }
 }

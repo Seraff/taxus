@@ -65,7 +65,11 @@ function Node(taxus, phylotree_node){
       node.styler.styleLeaf(dom_element)
     } else {
       if (node.taxus.preferences.preferences.displayBootstrap === 'true'){
-        node.addTipToNode(node.bootstrap())
+        if (node.bootstrap()){
+          node.addTipToNode(node.bootstrap())
+        } else {
+          node.removeNodeTip()
+        }
       } else {
         node.removeNodeTip()
       }
