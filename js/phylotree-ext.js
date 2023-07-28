@@ -552,7 +552,8 @@ end;
     var scale = tree_transform.scale[0]
     var translate = []
     translate[0] = tree_transform.translate[0] + (tree_container.getBBox().width*0.4*scale)
-    translate[1] = ((tree_container.getBBox().height + 20) * scale) + tree_transform.translate[1]
+    translate[1] = (tree_container.getBBox().height * scale) + tree_transform.translate[1]
+    translate[1] += phylotree.get_fixed_width()[0] * 0.5 + 5
 
     bar.attr("transform", "translate(" + translate + ")scale(" + scale + ")")
   }

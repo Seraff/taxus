@@ -1856,6 +1856,10 @@ const parseString = window.modules.xml2js.parseString;
       return phylotree;
     };
 
+    phylotree.get_fixed_width = function() {
+      return fixed_width;
+    }
+
 /**
  * Toggle collapsed view of a given node. Either collapses a clade into
  * a smaller blob for viewing large trees, or expands a node that was
