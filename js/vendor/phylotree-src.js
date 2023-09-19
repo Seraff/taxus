@@ -2895,6 +2895,8 @@ const parseString = window.modules.xml2js.parseString;
           if (!isNaN(bl)) {
             return Math.max(0, bl);
           }
+        } else {
+          return 0;
         }
       }
 
