@@ -1,4 +1,5 @@
 const Split = window.modules.splitjs
+const svgToPng = window.modules.svgToPng
 
 // const unhandled = require('electron-unhandled');
 
@@ -33,6 +34,8 @@ function initControls() {
     .register('order_ascending', 'order-ascending', undefined)
     .register('order_descending', 'order-descending', undefined)
     .register('order_original', 'order-original', undefined)
+    .register('export_to_svg', 'export-to-svg', undefined)
+    .register('export_to_png', 'export-to-png', undefined)
     // Both menu and button
     .register('reroot', 'reroot', '#reroot-action')
     .register('rotate_branch', 'rotate-branch', '#rotate-branch-action')
@@ -74,6 +77,8 @@ function updateControls () {
     controls.enableItem('preferences')
     controls.enableItem('save_tree')
     controls.enableItem('save_tree_as')
+    controls.enableItem('export_to_svg')
+    controls.enableItem('export_to_png')
 
     controls.enableItem('open_fasta')
     controls.enableItem('select_all')

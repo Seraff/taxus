@@ -68,6 +68,7 @@ contextBridge.exposeInMainWorld(
         },
         xml2js: require('xml2js'),
         splitjs: require('split.js'),
-        pako: require('pako')
+        pako: require('pako'),
+        svgToPng: require('save-svg-as-png')
     }
 );
