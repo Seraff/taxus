@@ -859,7 +859,7 @@ function parseNexus(str)
 function nexusFromNewick(nwk) {
   let newick = d3.layout.newick_parser(nwk)
   if (newick.error !== null) {
-    throw new NewickError("Error in newick line (" + newick_test.error + ")")
+    throw new NewickError("Error in newick line (" + newick.error + ")")
   }
 
   let nexus = {}
