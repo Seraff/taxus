@@ -433,15 +433,15 @@ function findAction() {
 }
 
 function orderAscendingAction(){
-  taxus.getTree().order_nodes('ASC')
+  taxus.orderNodes('ASC')
 }
 
 function orderDescendingAction(){
-  taxus.getTree().order_nodes('DESC')
+  taxus.orderNodes('DESC')
 }
 
 function orderOriginalAction(){
-  taxus.getTree().order_nodes('ORIGINAL')
+  taxus.orderNodes('ORIGINAL')
 }
 
 function getMode() {

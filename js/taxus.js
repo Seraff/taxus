@@ -501,6 +501,14 @@ class Taxus {
     this.makeTreeDirty()
   }
 
+  orderNodes(how) {
+    this.getTree().order_nodes(how)
+
+    this.reinitNodes()
+    this.makeTreeDirty()
+    dispatchDocumentEvent('tree_topology_changed')
+  }
+
   // Nexus metdata stuff
 
   metadataFromNexus() {
