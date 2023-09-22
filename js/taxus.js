@@ -252,6 +252,7 @@ class Taxus {
   }
 
   loadTreeString(content) {
+    // console.time("loadTree")
     this.closeFasta()
 
     let nexus = null
@@ -276,6 +277,8 @@ class Taxus {
       this.saveBipartitions()
       dispatchDocumentEvent('new_tree_is_loaded')
     }
+
+    // console.timeEnd("loadTree")
   }
 
   saveTree(path = null) {
