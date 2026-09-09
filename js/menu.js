@@ -180,11 +180,13 @@ const template = [
       {
         id: "order-ascending",
         label: 'Order Nodes Ascending',
+        accelerator: 'CmdOrCtrl+U',
         click: onClick
       },
       {
         id: "order-descending",
         label: 'Order Nodes Descending',
+        accelerator: 'CmdOrCtrl+D',
         click: onClick
       },
       {
@@ -198,13 +200,13 @@ const template = [
       {
         id: "remove-selected",
         label: 'Delete Selected',
-        accelerator: 'CmdOrCtrl+D',
+        accelerator: 'CmdOrCtrl+Shift+D',
         click: onClick
       },
       {
         id: "remove-unselected",
         label: 'Delete Unselected',
-        accelerator: 'CmdOrCtrl+U',
+        accelerator: 'CmdOrCtrl+Shift+U',
         click: onClick
       },
       {
