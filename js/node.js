@@ -104,6 +104,12 @@ function Node(taxus, phylotree_node){
     }
   }
 
+  node.setBootstrap = function (val) {
+    if (node.isInternal()) {
+      node.name = val
+    }
+  }
+
   node.addTipToNode = function(text){
     if (node.isLeaf() || (!text && text !== 0)){
       return

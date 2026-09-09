@@ -1687,110 +1687,177 @@ const parseString = window.modules.xml2js.parseString;
     };
 
 /**
- * Reroot the tree on the given node.
+ * Reroot the tree on the branch leading to the given node.
  *
- * @param {Node} node Node to reroot on.
+ * @param {Node} node           Node whose incoming branch carries the new root.
+ * @param {Number} [fraction=0.5] Portion of that branch given to `node`;
+ *                                the remainder goes to the other side.
+ * @param {Boolean} [rotate_support=true] Also rotate support values along the
+ *                                path, so they stay attached to their branches.
  * @returns {Phylotree} The current ``phylotree``.
  */
-    phylotree.reroot = function(node) {
-      if (node.parent) {
-        new_json = {
-          name: "new_root",
-          __mapped_bl: undefined,
-          children: [node]
+    phylotree.reroot = function (node, fraction, rotate_support) {
+
+      if (!node || !node.parent) {
+        return phylotree; // already the root — nothing to do
+      }
+
+      fraction = fraction === undefined ? 0.5 : fraction;
+      rotate_support = rotate_support === undefined ? true : rotate_support;
+
+      // ---- helpers ---------------------------------------------------------
+
+      function is_leaf(n) {
+        return !(n.children && n.children.length);
+      }
+
+      // support is a property of the branch below `n`
+      function get_support(n) {
+        if (is_leaf(n)) return "";
+        return n.name;
+      }
+
+      function set_support(n, v) {
+        if (is_leaf(n)) return;
+        n.name = v;
+      }
+
+      function add_bl(a, b) {
+        if (a === undefined) return b;
+        if (b === undefined) return a;
+        return a + b;
+      }
+
+      // ---- snapshot the current branch lengths ------------------------------
+
+      nodes.forEach(function (n) {
+        n.__mapped_bl = branch_length_accessor(n);
+      });
+
+      phylotree.branch_length(function (n) {
+        return phylotree.cladogram ? undefined : n.__mapped_bl;
+      });
+
+      var new_json = {
+        name: "new_root",
+        __mapped_bl: undefined,
+        children: [node]
+      };
+
+      var remove_me = node,
+        current_node = node.parent,
+        remove_idx;
+
+      // ---- split the branch leading to `node` -------------------------------
+      // `node` keeps `fraction` of it, its old parent gets the rest.
+
+      var apportioned_bl =
+        node.__mapped_bl === undefined ? undefined : node.__mapped_bl * fraction,
+        remainder_bl =
+          node.__mapped_bl === undefined ? undefined : node.__mapped_bl - apportioned_bl;
+
+      // what has to travel one step up the path
+      var stashed_bl = current_node.__mapped_bl,
+        stashed_support = get_support(current_node);
+
+      current_node.__mapped_bl = remainder_bl;
+      node.__mapped_bl = apportioned_bl;
+
+      // both halves of the split branch describe the same bipartition
+      if (rotate_support) set_support(current_node, get_support(node));
+
+      if (current_node.parent) {
+
+        new_json.children.push(current_node);
+
+        while (current_node.parent) {
+
+          remove_idx = current_node.children.indexOf(remove_me);
+
+          if (current_node.parent.parent) {
+
+            // reverse the path: our parent becomes our child
+            current_node.children.splice(remove_idx, 1, current_node.parent);
+
+            // and it inherits the branch we came up through
+            var t_bl = current_node.parent.__mapped_bl,
+              t_support = get_support(current_node.parent);
+
+            current_node.parent.__mapped_bl = stashed_bl;
+            if (rotate_support) set_support(current_node.parent, stashed_support);
+
+            stashed_bl = t_bl;
+            stashed_support = t_support;
+
+          } else {
+
+            // our parent is the old root: it does not join the path.
+            // `stashed_bl` now holds the edge (current_node -> old root),
+            // which is what the old root's remaining clade will hang from.
+            current_node.children.splice(remove_idx, 1);
+
+          }
+
+          remove_me = current_node;
+          current_node = current_node.parent;
+        }
+
+        remove_idx = current_node.children.indexOf(remove_me);
+        current_node.children.splice(remove_idx, 1);
+
+      } else {
+
+        // rerooting directly on a child of the old root
+        remove_idx = current_node.children.indexOf(remove_me);
+        current_node.children.splice(remove_idx, 1);
+
+        stashed_bl = current_node.__mapped_bl;      // == remainder_bl
+        stashed_support = get_support(current_node);
+        remove_me = new_json;
+
+      }
+
+      // current_node is the old root; remove_me is the node we came up through
+
+      if (current_node.children.length == 1) {
+
+        // old root is now degree 2 and is suppressed: its two edges merge
+        var only_child = current_node.children[0];
+
+        only_child.__mapped_bl = add_bl(only_child.__mapped_bl, stashed_bl);
+
+        if (rotate_support) {
+          var s = get_support(only_child);
+          if (s === undefined || s === "" || s === null) {
+            set_support(only_child, stashed_support);
+          }
+        }
+
+        remove_me.children = (remove_me.children || []).concat(current_node.children);
+
+      } else {
+
+        // old root keeps >1 child: wrap them in a new node hanging from the
+        // edge that used to lead to the old root
+        var new_node = {
+          name: "__reroot_top_clade",
+          __mapped_bl: stashed_bl,
+          children: current_node.children.map(function (n) { return n; })
         };
 
-        nodes.forEach(function(n) {
-          n.__mapped_bl = branch_length_accessor(n);
-        });
-
-        phylotree.branch_length(function(n) {
-          // TAXUS modified
-          return phylotree.cladogram ? undefined : n.__mapped_bl
-        });
-
-        // rerooted and inited branch lengths
-
-        var remove_me = node,
-            current_node = node.parent,
-            parent_length = current_node.__mapped_bl,
-            stashed_bl = _.noop();
-
-        // if parent node has another parent
-        if (current_node.parent) {
-          //shorten current node branch by half
-
-          node.__mapped_bl =
-            node.__mapped_bl === undefined ? undefined : node.__mapped_bl * 0.5;
-
-          stashed_bl = current_node.__mapped_bl;
-          current_node.__mapped_bl = node.__mapped_bl;
-
-          new_json.children.push(current_node);
-
-          while (current_node.parent) {
-            var remove_idx = current_node.children.indexOf(remove_me);
-
-            if (current_node.parent.parent) {
-              current_node.children.splice(remove_idx, 1, current_node.parent);
-            } else {
-              current_node.children.splice(remove_idx, 1);
-            }
-
-            var t = current_node.parent.__mapped_bl;
-
-            if (t !== undefined) {
-              current_node.parent.__mapped_bl = stashed_bl;
-              stashed_bl = t;
-            }
-            remove_me = current_node;
-            current_node = current_node.parent;
-          }
-
-          var remove_idx = current_node.children.indexOf(remove_me);
-          current_node.children.splice(remove_idx, 1);
-
-        } else {
-          // rerooting on one of the root clades
-          // removing node from it's parent
-          var remove_idx = current_node.children.indexOf(remove_me);
-          current_node.children.splice(remove_idx, 1);
-          remove_me = new_json;
+        if (rotate_support && stashed_support !== undefined &&
+          stashed_support !== "" && stashed_support !== null) {
+          set_support(new_node, stashed_support);
         }
 
-        // current_node is now old root, and remove_me is the root child we came up
-        // the tree through
+        remove_me.children.push(new_node);
 
-        if (current_node.children.length == 1) {
-          // if the old root now has only one guy to go, add children
-          if (stashed_bl) {
-            current_node.children[0].__mapped_bl += stashed_bl;
-          }
-          remove_me.children = remove_me.children.concat(current_node.children);
-        } else {
-          // if the old root now has more than 1 child, add a new node and put it behind
-          var new_node = {
-            name: "__reroot_top_clade"
-          };
-
-          var new_bl = node.__mapped_bl === undefined ? undefined : node.__mapped_bl * 0.5;
-
-          node.__mapped_bl = new_bl
-          new_node.__mapped_bl = new_bl
-
-          new_node.children = current_node.children.map(function(n) {
-            return n;
-          });
-
-          remove_me.children.push(new_node);
-        }
-
-        phylotree.update_layout(new_json, true);
       }
+
+      phylotree.update_layout(new_json, true);
 
       return phylotree;
     };
-
 
 /**
  * Update a given key name in each node.
