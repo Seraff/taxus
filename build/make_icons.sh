@@ -1,3 +1,7 @@
+#!/bin/bash
+
+set -e
+
 mkdir build/icon.iconset
 
 sips -z 16 16     img/icon.png --out build/icon.iconset/icon_16x16.png
