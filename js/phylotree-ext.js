@@ -593,12 +593,14 @@ end;
 
   // Order nodes feature
 
+  // Returns true if the order of at least one node has been changed
   phylotree.order_nodes = function (order) {
     if (!['ASC', 'DESC', 'ORIGINAL'].includes(order)){
       return false
     }
 
     let root = phylotree.get_root()
+    let reordered = false
 
     let sort_nodes = function(parent){
       let children = parent.children ? parent.children : []
@@ -606,9 +608,7 @@ end;
       if (children.length === 0) {
         return true
       } else {
-        let unsorted = parent.children
-
-        let sorted = unsorted.sort((a, b) => {
+        let sorted = children.slice().sort((a, b) => {
           let a_len = phylotree.descendants(a).length
           let b_len = phylotree.descendants(b).length
 
@@ -620,6 +620,10 @@ end;
             return a.original_child_order - b.original_child_order
         })
 
+        if (sorted.some((child, i) => { return child !== children[i] })) {
+          reordered = true
+        }
+
         parent.children = sorted
       }
 
@@ -628,8 +632,14 @@ end;
 
     sort_nodes(root)
 
+    if (!reordered) {
+      return false
+    }
+
     phylotree.update_layout(phylotree.get_nodes()[0], true)
     taxus.getTree().safe_update()
+
+    return true
   }
 
 

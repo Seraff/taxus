@@ -114,6 +114,21 @@ const template = [
     label: 'Edit',
     submenu: [
       {
+        id: "undo",
+        label: 'Undo',
+        accelerator: 'CmdOrCtrl+Z',
+        click: onClick
+      },
+      {
+        id: "redo",
+        label: 'Redo',
+        accelerator: process.platform === 'darwin' ? 'Shift+Command+Z' : 'Ctrl+Y',
+        click: onClick
+      },
+      {
+        type: 'separator'
+      },
+      {
         label: "Cut",
         accelerator: "CmdOrCtrl+X",
         role: "cut"

@@ -488,24 +488,36 @@ class Taxus {
     dispatchDocumentEvent('tree_topology_changed')
   }
 
+  // Returns true if at least one node has been changed
   setSelectedNodesAnnotation(annotation, annotation_attribute = 'parsed_annotation') {
+    let changed = false
+
     this.getSelection().forEach(function (node) {
       Object.keys(annotation).forEach(function (key) {
         let value = annotation[key]
 
-        if (value){
-          node[annotation_attribute][key] = annotation[key]
+        if (value) {
+          if (node[annotation_attribute][key] === value) { return }
+          node[annotation_attribute][key] = value
         } else if (node[annotation_attribute][key]) {
           delete node[annotation_attribute][key]
+        } else {
+          return
         }
+
+        changed = true
       })
     })
 
-    this.makeTreeDirty()
+    if (changed) { this.makeTreeDirty() }
+
+    return changed
   }
 
   orderNodes(how) {
-    this.getTree().order_nodes(how)
+    if (!this.getTree().order_nodes(how)) {
+      return false
+    }
 
     this.reinitNodes()
     this.makeTreeDirty()

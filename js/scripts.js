@@ -4,6 +4,7 @@ const svgToPng = window.modules.svgToPng
 // const unhandled = require('electron-unhandled');
 
 let taxus = null
+let undoManager = null
 let modeSelector = null
 let progressBar = null
 let controls = null
@@ -18,6 +19,8 @@ function initControls() {
 
   controls
     // Only menu
+    .register('undo', 'undo', undefined)
+    .register('redo', 'redo', undefined)
     .register('preferences', 'preferences', undefined)
     .register('open_tree', 'open-tree', undefined)
     .register('save_tree', 'save-tree', undefined)
@@ -138,6 +141,14 @@ function updateControls () {
 
     if (taxus.getSelectedLeavesFasta()){
       controls.enableItem('save_selection_as_fasta')
+    }
+
+    if (undoManager.canUndo()) {
+      controls.enableItem('undo')
+    }
+
+    if (undoManager.canRedo()) {
+      controls.enableItem('redo')
     }
   }
 
@@ -277,26 +288,38 @@ function setModeToBranchAction() {
 }
 
 function removeSelectedAction() {
-  taxus.getSelection().forEach(function (n) { n.mark() })
-  taxus.getTree().refresh()
-  taxus.selectNone()
-  dispatchDocumentEvent('node_mark_status_changed')
+  undoManager.record(() => {
+    let selected = taxus.getSelection()
+    if (selected.length === 0) { return false }
+
+    selected.forEach(function (n) { n.mark() })
+    finishMarking()
+  })
 }
 
 function removeUnselectedAction() {
-  let selected = taxus.getSelection()
+  undoManager.record(() => {
+    let selected = taxus.getSelection()
+    let unselected = taxus.getLeaves().filter(function (l) { return !selected.includes(l) })
 
-  taxus.getLeaves().forEach(function (l) {
-    if (!selected.includes(l)) { l.mark() }
+    if (unselected.length === 0) { return false }
+
+    unselected.forEach(function (l) { l.mark() })
+    finishMarking()
   })
-
-  taxus.getTree().refresh()
-  taxus.selectNone()
-  dispatchDocumentEvent('node_mark_status_changed')
 }
 
 function restoreSelectedAction() {
-  taxus.getSelection().forEach(function (n) { n.unmark() })
+  undoManager.record(() => {
+    let selected = taxus.getSelection()
+    if (selected.length === 0) { return false }
+
+    selected.forEach(function (n) { n.unmark() })
+    finishMarking()
+  })
+}
+
+function finishMarking() {
   taxus.getTree().refresh()
   taxus.selectNone()
   dispatchDocumentEvent('node_mark_status_changed')
@@ -338,13 +361,25 @@ function annotateNodeAction() {
 
 function rerootAction() {
   progressBar.withProgressBarAttempt(() => {
-    taxus.rerootToSelectedNode()
+    undoManager.record(() => { return taxus.rerootToSelectedNode() })
   })
 }
 
 function rotateBranchAction() {
   progressBar.withProgressBarAttempt(() => {
-    taxus.rotateSelectedBranch()
+    undoManager.record(() => { return taxus.rotateSelectedBranch() })
+  })
+}
+
+function undoAction() {
+  progressBar.withProgressBarAttempt(() => {
+    undoManager.undo()
+  })
+}
+
+function redoAction() {
+  progressBar.withProgressBarAttempt(() => {
+    undoManager.redo()
   })
 }
 
@@ -367,10 +402,17 @@ function exportToSvgAction() {
 function changeBranchColorAction() {}
 
 function removeBranchColorAction() {
-  let mode = modeSelector.active_button.data('mode')
-  let attribute = mode === 'branch' ? "parsed_annotation" : "parsed_taxablock_annotation"
-  taxus.setSelectedNodesAnnotation({ '!color': undefined }, attribute)
+  let attribute = selectedNodesAnnotationAttribute()
+
+  undoManager.record(() => {
+    return taxus.setSelectedNodesAnnotation({ '!color': undefined }, attribute)
+  })
+
   taxus.getTree().dispatch_selection_modified_event() // for picker to reset color
+}
+
+function selectedNodesAnnotationAttribute() {
+  return getMode() === 'branch' ? "parsed_annotation" : "parsed_taxablock_annotation"
 }
 
 function selectAllAction() {
@@ -433,15 +475,15 @@ function findAction() {
 }
 
 function orderAscendingAction(){
-  taxus.orderNodes('ASC')
+  undoManager.record(() => { return taxus.orderNodes('ASC') })
 }
 
 function orderDescendingAction(){
-  taxus.orderNodes('DESC')
+  undoManager.record(() => { return taxus.orderNodes('DESC') })
 }
 
 function orderOriginalAction(){
-  taxus.orderNodes('ORIGINAL')
+  undoManager.record(() => { return taxus.orderNodes('ORIGINAL') })
 }
 
 function getMode() {
@@ -503,6 +545,7 @@ $(document).ready(function () {
   })
 
   taxus = new Taxus()
+  undoManager = new UndoManager(taxus)
 
   let controls = initControls()
   updateControls()
@@ -533,10 +576,17 @@ $(document).ready(function () {
 
   let picker = new ColorPicker('#branch-color-picker', '#change-branch-color-action', ['#change-branch-color-box'])
   picker.add_color_change_callback(function (color) {
-    let mode = modeSelector.active_button.data('mode')
-    let attribute = mode === 'branch' ? "parsed_annotation" : "parsed_taxablock_annotation"
+    let attribute = selectedNodesAnnotationAttribute()
 
-    taxus.setSelectedNodesAnnotation({ "!color": color }, attribute)
+    undoManager.record(() => {
+      return taxus.setSelectedNodesAnnotation({ "!color": color }, attribute)
+    })
+  })
+
+  // Undo/redo logic
+
+  document.addEventListener('new_tree_is_loaded', () => {
+    undoManager.reset()
   })
 
   // Search panel logic
@@ -551,9 +601,11 @@ $(document).ready(function () {
     let leave = taxus.getLeaveByName(name)
 
     if (leave){
-      taxus.updateNodeTitle(leave, data.annotation.name)
-      dispatchDocumentEvent('node_titles_changed')
-      dispatchDocumentEvent('tree_topology_changed')
+      undoManager.record(() => {
+        taxus.updateNodeTitle(leave, data.annotation.name)
+        dispatchDocumentEvent('node_titles_changed')
+        dispatchDocumentEvent('tree_topology_changed')
+      })
     }
   })
 
