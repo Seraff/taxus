@@ -240,6 +240,7 @@ function openFastaAction () {
     window.api.openFileDialog(options).then(path => {
       if (path){
         taxus.loadFastaFile(path)
+        showFasta()
       }
     })
   }
@@ -340,13 +341,21 @@ function saveSelectionAsFastaAction() {
   })
 }
 
+function showFasta() {
+  $('#fasta-panel').show()
+  $('#show-fasta-action').addClass('btn-pressed')
+}
+
+function hideFasta() {
+  $('#fasta-panel').hide()
+  $('#show-fasta-action').removeClass('btn-pressed')
+}
+
 function showFastaAction() {
   if ($('#fasta-panel').is(':hidden')) {
-    $('#fasta-panel').show()
-    $('#show-fasta-action').addClass('btn-pressed')
+    showFasta()
   } else {
-    $('#fasta-panel').hide()
-    $('#show-fasta-action').removeClass('btn-pressed')
+    hideFasta()
   }
 }
 
