@@ -32,6 +32,9 @@
     "bioinformatics"
   ],
   "build": {
+    "mac": {
+      "identity": null
+    },
     "appId": "com.kolisko-lab.taxus",
     "fileAssociations": [
       {

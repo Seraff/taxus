@@ -1,6 +1,6 @@
 *.DS_Store
 tmp/*
-dist/*
+dist/local/
 .idea/*
 .history
 *.code-workspace
