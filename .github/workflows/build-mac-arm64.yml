@@ -1,0 +1,41 @@
+name: Build MacOS arm64
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            label: mac
+            args: "--arm64"
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20.17.0
+
+      - id: pkg
+        shell: bash
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - run: npm ci
+
+      - run: npm run dist -- ${{ matrix.args }}
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Verify ad-hoc signature
+        run: codesign -dv --verbose=4 dist/mac-arm64/*.app
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: taxus-${{ steps.pkg.outputs.version }}-${{ matrix.label }}
+          path: dist/*.dmg

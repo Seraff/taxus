@@ -18,7 +18,13 @@
     "dist:mac": "electron-builder -m",
     "dist:win": "electron-builder -w",
     "dist:lin": "electron-builder -l",
-    "docs": "cd docs; make html; cd ../"
+    "docs": "cd docs; make html; cd ../",
+    "build": {
+      "afterPack": "./scripts/afterPack.js",
+      "mac": {
+        "identity": null
+      }
+    }
   },
   "devDependencies": {
     "electron": "^24.8.5",
