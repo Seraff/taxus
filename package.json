@@ -81,7 +81,7 @@
     ]
   },
   "author": "Serafim Nenarokov",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "a-color-picker": "^1.2.1",
     "ansi-regex": "^6.0.1",
