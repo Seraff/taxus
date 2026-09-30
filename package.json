@@ -27,7 +27,7 @@
     }
   },
   "devDependencies": {
-    "electron": "^24.8.5",
+    "electron": "^41.10.6",
     "electron-builder": "^24.6.4",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
